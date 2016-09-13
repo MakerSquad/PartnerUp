@@ -1,0 +1,49 @@
+<div id='container'>
+  <!-- Your html here -->
+	<div class="col-12">
+		<h1 class= 'appname'>Magic Personality Insight</h1>
+	</div>
+  	<div class='col-sm-12 clearfix'>
+  		<button class= 'btn btn-primary btn-lg pull-right' ng-click="logout()">Logout</button>
+  	</div>
+  	<div class='col-sm-12'>
+	  	<h3>Personality Description</h3>
+	  	<p>{{descPara}}</p>
+  	</div>
+  	 <canvas id="radar" class="chart chart-radar"
+  	  chart-data="data" colours="colours" chart-options="options" chart-labels="labels">
+	</canvas> 
+  	<div class='col-sm-6'>
+	  	<h3>Needs/Loves</h3>
+		<ul>
+			<li ng-repeat="like in likes" > 
+				<p>{{like}}</p>
+			</li>
+		</ul>
+	</div>
+	<div class='col-sm-6'>
+	  	<h3>Doesn't need</h3>
+		<ul>
+			<li ng-repeat="dislike in dislikes" > 
+				<p>{{dislike}}</p>
+			</li>
+		</ul>
+	</div>
+	<div class='col-sm-12'>
+  	<h3>Links</h3>
+		<ul>
+			<li ng-repeat="link in links" > 
+				<a target="_blank" ng-href="{{link}}">{{link}}</a>
+			</li>
+		</ul>
+	</div>
+	<div class='col-sm-12'>
+		<h3>YouTube Videos</h3>
+		<ul class="list-unstyled">
+			<li class='col-sm-4' ng-repeat="video in youTubeurls" > 
+				<iframe id="ytplayer" type="text/html" width="320" height="200"
+	  			src="{{video}}" frameborder="0"></iframe>
+			</li>
+		</ul>
+	</div>
+</div>

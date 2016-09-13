@@ -3,7 +3,7 @@
 // 
 var AuthPort = require('authport')
 var MakerpassService = require('authport-makerpass')
- 
+
 if (! process.env.MAKERPASS_CLIENT_ID || ! process.env.MAKERPASS_CLIENT_SECRET) {
   throw new Error("Please set MAKERPASS_CLIENT_ID and MAKERPASS_CLIENT_SECRET")
 }
