@@ -6,8 +6,9 @@ angular.module('PU.main', ['PU.factories'])
   $scope.instructors = []; //the current instructors
   $scope.fellows = []; //the current fellows
   $scope.currentClass; //the current class
-  $scope.groups = []; //the current assigned groups
+  $scope.groups = [];//the current assigned groups
   $scope.loading = true;
+  $scope.partnerUp = false;
 
   $scope.changeClass = function(cls){
     $scope.loading = true;
@@ -23,6 +24,29 @@ angular.module('PU.main', ['PU.factories'])
       $scope.loading = false;
     })
     //TODO: Get students for current class
+  }
+
+  $scope.randomize = function(groupSize){
+    $scope.groups = [];
+    var stus = $scope.students.slice();
+
+    var shuffled = [];
+    for(var i = 0; i < stus.length % groupSize; i++){
+      stus.push({user:{name: "Code Monkey"}});
+    }
+
+    while(stus.length){
+      var randInd = Math.floor(Math.random() * stus.length);
+      shuffled.push(stus.splice(randInd, 1)[0]);
+    }
+
+    for(var i = 0; i < shuffled.length; i += groupSize){
+      console.log("$scope groups in for loop: ", $scope.groups);
+      $scope.groups.push(shuffled.slice(i, i+groupSize))
+    }
+
+    $scope.partnerUp = true;
+    return $scope.groups;
   }
 
   Makerpass.getGroups()
