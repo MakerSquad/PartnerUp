@@ -6,13 +6,13 @@
   "author": "",
   "license": "ISC",
   "scripts": {
+    "postinstall": "bower install",
     "start": "./node_modules/.bin/nodemon --ignore node_modules ./server/Server.js"
   },
   "devDependencies": {
     "browser-sync": "^1.5.7"
   },
   "dependencies": {
-    "angular": "^1.5.8",
     "authport": "^1.0.0",
     "authport-makerpass": "^1.0.0",
     "bcrypt-nodejs": "0.0.3",
