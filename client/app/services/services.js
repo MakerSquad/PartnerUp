@@ -1,4 +1,4 @@
-angular.module('MP.services', [])
+angular.module('PU.services', [])
 
 
 

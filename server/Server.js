@@ -4,9 +4,9 @@
 var AuthPort = require('authport')
 var MakerpassService = require('authport-makerpass')
 
-if (! process.env.MAKERPASS_CLIENT_ID || ! process.env.MAKERPASS_CLIENT_SECRET) {
-  throw new Error("Please set MAKERPASS_CLIENT_ID and MAKERPASS_CLIENT_SECRET")
-}
+// if (! process.env.MAKERPASS_CLIENT_ID || ! process.env.MAKERPASS_CLIENT_SECRET) {
+//   throw new Error("Please set MAKERPASS_CLIENT_ID and MAKERPASS_CLIENT_SECRET")
+// }
  
 AuthPort.registerService('makerpass', MakerpassService)
  
@@ -38,7 +38,8 @@ var session = require('express-session')
 var app = express()
 var MP = require('node-makerpass');
 var path = require('path');
- 
+
+
 app.use(session({secret: "funnyGilby"}));
 app.use(express(path.join(__dirname, '../client')));
 app.get("/auth/:service", AuthPort.app);
@@ -60,7 +61,7 @@ app.get("/groups/:nameId", function(req, res){
 })
 
 app.get("/groups/:nameId/memberships", function(req, res){
-  MP.group(req.params.nameId, req.session.accessToken)
+  MP.memberships(req.params.nameId, req.session.accessToken)
   .then(function(data){
     console.log("Data for members: ", data);
     res.send(data);
