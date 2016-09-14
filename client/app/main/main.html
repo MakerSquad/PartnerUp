@@ -1,3 +1,17 @@
 <div>
-  
+  <div>Current class: {{currentClass.name}}</div>
+  <select ng-model="classSelect" ng-options="class as class.name for class in classes" ng-change="changeClass(classSelect)">
+  </select>
+  <div class="instructorList">
+    <h2>Instructors: </h2>
+      <div class="instructor" ng-repeat="instructor in instructors">{{instructor.user.name}}</div>
+  </div>
+  <div class="fellowList">
+    <h2>Fellows: </h2>
+      <div class="fellow" ng-repeat="fellow in fellows">{{fellow.user.name}}</div>
+  </div>
+  <div class="studentList">
+    <h2>Students: </h2> 
+    <div class="student" ng-repeat="student in students">{{student.user.name}}</div>
+  </div>
 </div>
