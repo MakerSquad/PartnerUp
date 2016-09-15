@@ -49,6 +49,11 @@ angular.module('PU.main', ['PU.factories'])
     return $scope.groups;
   }
 
+  $scope.removeFromStudent = function(student){
+     var index = $scope.students.indexOf(student)
+     $scope.students.splice(index, 1);
+  }
+
   Makerpass.getGroups()
   .then(function(groups){
     console.log("My group data: ", groups);

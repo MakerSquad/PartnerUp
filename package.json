@@ -22,7 +22,7 @@
     "express-session": "^1.14.1",
     "jwt-simple": "^0.2.0",
     "knex": "^0.12.0",
-    "node-makerpass": "^1.1.0",
+    "node-makerpass": "^1.2.0",
     "path": "^0.12.7",
     "pg": "^6.1.0",
     "request": "^2.36.0",

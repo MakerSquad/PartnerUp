@@ -13,7 +13,7 @@
   </div>
   <div ng-show="!partnerUp" class="studentList">
     <h2>Students: </h2> 
-    <div class="student" ng-repeat="student in students">{{student.user.name}}</div>
+    <div class="student" ng-repeat="student in students"><button ng-click="removeFromStudent(student);">x<button>{{student.user.name}}</div>
   </div>
   <div class="studentGroups">
     <table>
