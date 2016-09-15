@@ -9,9 +9,15 @@ angular.module('PU.main', ['PU.factories'])
   })
   .then(function(resp){
     console.log("Current User Data: ", resp);
-    if(resp.data === "") $location.path('/signin');
+    if(resp.data === ""){
+      $location.path('/signin');
+    } 
+    else{
+      $scope.currentUser = resp.data;
+    }
   })
 
+  $scope.currentUser = {}
   $scope.classes = []; //all classes the user is a part of
   $scope.students = []; //students in the current class
   $scope.instructors = []; //the current instructors
@@ -22,12 +28,19 @@ angular.module('PU.main', ['PU.factories'])
   $scope.groupSize = 2;
   $scope.loading = true;
   $scope.partnerUp = false;
+  $scope.roles = ["instructor", "fellow", "student"];
+
+
+  $scope.creatingGroup = false;
+  $scope.modalUserList = [];
 
   $scope.changeClass = function(cls){
     $scope.loading = true;
     console.log("Switching to: ", cls);
     $scope.currentClass = cls;
 
+
+    //TODO: This should be a database call
     return Makerpass.getMemberships($scope.currentClass.name_id)
     .then(function(members){
       console.log("Members: ", members);
@@ -43,13 +56,10 @@ angular.module('PU.main', ['PU.factories'])
   * (Used to ng-repeat for a specific number)
   */
   $scope.getIndexArray = function(num){
-    console.log("GroupSize: ", num);
     var arr = [];
     for(var i = 0; i < num; i++){
       arr[i] = i;
-      console.log("i: ", i);
     }
-    console.log("Returning: ", arr);
     return arr;
   }
 
@@ -86,10 +96,44 @@ angular.module('PU.main', ['PU.factories'])
     $scope.students.push($scope.noPair.splice(index,1)[0]);
   }
 
-  Makerpass.getGroups()
-  .then(function(groups){
-    console.log("My group data: ", groups);
-    $scope.classes = groups.data;
+  $scope.importFromMakerpass = function(){
+    Makerpass.getGroups()
+    .then(function(groups){
+      console.log("My group data: ", groups);
+      $scope.classes = $scope.classes.concat(groups.data);
+      $scope.loading = false;
+    })
+  }
+
+  //Functions for the createGroup Modal below
+  $scope.openCreateModal = function(){
+    $scope.modalUserList = [];
+    $scope.inputRole = "";
+    $scope.inputName = "";
+    $scope.groupName = "";
+    $scope.creatingGroup = true;
+  }
+
+  $scope.closeCreateModal = function(){
+    $scope.creatingGroup = false;
+  }
+
+  $scope.addToUserList = function(name, role){
+    var newUser = {role: role, user: {name: name}} //matches MakerPass format
+    $scope.modalUserList.push(newUser);
+    return newUser;
+  }
+
+  $scope.createClass = function(name, users){
+    console.log("Got name: ", name);
+    console.log("Got users: ", users);
+    $scope.loading = true;
+    $scope.classes.push({name: name});
+    $scope.students = users.filter(m => m.role === 'student');
+    $scope.fellows = users.filter(m => m.role === 'fellow');
+    $scope.instructors = users.filter(m => m.role === 'instructor');
     $scope.loading = false;
-  })
+    $scope.closeCreateModal();
+  }
+
 })

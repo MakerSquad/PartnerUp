@@ -12,4 +12,33 @@ body {
   margin-right: 300px;
 }
 
+.modal{
+  position: absolute;
+  width: 300px;
+  border: 1px solid black;
+  top: 100px;
+  left: 500px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: white;
+}
+
+.addedUsers{
+  margin-top: 10px;
+  border: 1px solid #CCC;
+}
+
+th{
+  padding-right: 30px;
+}
+
+td{
+  padding-right: 30px;
+}
+
+.toBackground{
+  position: relative;
+  background-color: #CCC;
+}
 

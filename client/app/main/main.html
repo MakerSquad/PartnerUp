@@ -1,5 +1,10 @@
-<div>
+<div ng-class="{toBackground: creatingGroup}">
+  <h1 class="welcome">Hello, {{currentUser.name.includes("Gilbert") ? "Gilby" : currentUser.name || "Gilby"}}!</h1>
   <button ng-click="randomize(groupSize)">Partner Up!</button>
+  <div class="createButtons">
+    <button ng-click="openCreateModal()">Create a group</button>
+    <button ng-click="importFromMakerpass()">Import Groups from Makerpass</button>
+  </div>
   <div>Current class: {{currentClass.name}}</div>
   <select ng-model="classSelect" ng-options="class as class.name for class in classes" ng-change="changeClass(classSelect)">
   </select>
@@ -30,6 +35,35 @@
   <div>
     <h2>Removed Students</h2>
     <div class ="removedStudents" ng-repeat="nopair in noPair"><button ng-click="addStudentBackIn(nopair);">o</button>{{nopair.user.name}}
+    </div>
   </div>
+
+
+  <div class="modal" ng-show="creatingGroup">
+    <form>
+      <label>Group Name: </label>
+      <br>
+      <input type="text" class="groupName" placeholder="(e.g. Physics 101, MKS46)" ng-model="groupName">
+      <form class="addUsers">
+        <br>
+        <label>Name:</label>
+        <br>
+        <input type="text" class="userName" ng-model="inputName">
+        <select class="roles" ng-model="inputRole" ng-options="role for role in roles">
+        <input type="submit" value="Add User" class="submitUser" ng-click="addToUserList(inputName, inputRole)">
+      </form>
+      <table class="addedUsers">
+        <tr>
+          <th>Name:</th>
+          <th>Role:</th>
+        </tr>
+        <tr ng-repeat="user in modalUserList">
+          <td>{{user.user.name}}</td>
+          <td>{{user.role}}</td>
+        </tr>
+      </table>
+      <input type="submit" value="Create Group" class="submitGroup" ng-click="createClass(groupName, modalUserList)">
+      <input type="submit" value="Cancel" class="cancel" ng-click="closeCreateModal()">
+    </form>
   </div>
 </div>
