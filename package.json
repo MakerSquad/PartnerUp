@@ -7,7 +7,7 @@
   "license": "ISC",
   "scripts": {
     "postinstall": "bower install",
-    "start": "./node_modules/.bin/nodemon --ignore node_modules Server.js"
+    "start": "./node_modules/.bin/nodemon --ignore node_modules server/Server.js"
   },
   "devDependencies": {
     "browser-sync": "^1.5.7"
