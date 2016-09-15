@@ -9,7 +9,7 @@ body {
   top: 200px;
   right: 0px;
   float: right;
-  margin-right: 300px;
+  margin-right: 200px;
 }
 
 .modal{
@@ -40,5 +40,12 @@ td{
 .toBackground{
   position: relative;
   background-color: #CCC;
+}
+
+.stu{
+  cursor: pointer;
+}
+.selectedStu{
+  color: #CCC;
 }
 

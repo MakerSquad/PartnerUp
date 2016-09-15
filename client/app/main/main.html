@@ -26,14 +26,14 @@
       <th ng-repeat="index in getIndexArray(groupSize)">Partner {{index + 1}}</th>
       </tr>
       <tr ng-repeat="group in groups">
-        <td ng-repeat="stu in group">
+        <td ng-repeat="stu in group" ng-click="selectForSwap(stu)" ng-class="{selectedStu: selectedForSwap === stu}" class="stu">
           {{stu.user.name}}
         </td>
       </tr>
     </table>
   </div>
   <div>
-    <h2>Removed Students</h2>
+    <h2>Removed Students:</h2>
     <div class ="removedStudents" ng-repeat="nopair in noPair"><button ng-click="addStudentBackIn(nopair);">o</button>{{nopair.user.name}}
     </div>
   </div>

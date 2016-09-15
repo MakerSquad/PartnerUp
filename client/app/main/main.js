@@ -30,6 +30,9 @@ angular.module('PU.main', ['PU.factories'])
   $scope.partnerUp = false;
   $scope.roles = ["instructor", "fellow", "student"];
 
+  $scope.selectedForSwap = null;
+  $scope.selectedForSwapIndex;
+
 
   $scope.creatingGroup = false;
   $scope.modalUserList = [];
@@ -99,10 +102,41 @@ angular.module('PU.main', ['PU.factories'])
   $scope.importFromMakerpass = function(){
     Makerpass.getGroups()
     .then(function(groups){
-      console.log("My group data: ", groups);
       $scope.classes = $scope.classes.concat(groups.data);
       $scope.loading = false;
     })
+  }
+
+  //Functions for rearranging students
+  $scope.selectForSwap = function(student){
+    var selectedIndex = searchForSelected(student);
+    if($scope.selectedForSwap === student){
+      $scope.selectedForSwap = null;
+      $scope.selectedForSwapIndex = null;
+    }else if($scope.selectedForSwap === null){
+      $scope.selectedForSwap = student;
+      $scope.selectedForSwapIndex = selectedIndex; 
+    }else{
+      swapStus(selectedIndex, $scope.selectedForSwapIndex);
+      $scope.selectedForSwap = null;
+      $scope.selectedForSwapIndex = null;
+    }
+  }
+
+  var searchForSelected = function(student){
+    for(var i = 0; i < $scope.groups.length; i++){
+      for(var j = 0; j < $scope.groups[i].length; j++){
+        if($scope.groups[i][j] === student){
+          return [i, j];
+        }
+      }
+    }
+  }
+
+  var swapStus = function(indexTuple1, indexTuple2){
+    var tmp = $scope.groups[indexTuple1[0]][indexTuple1[1]];
+    $scope.groups[indexTuple1[0]][indexTuple1[1]] = $scope.groups[indexTuple2[0]][indexTuple2[1]]
+    $scope.groups[indexTuple2[0]][indexTuple2[1]] = tmp;
   }
 
   //Functions for the createGroup Modal below
@@ -121,6 +155,7 @@ angular.module('PU.main', ['PU.factories'])
   $scope.addToUserList = function(name, role){
     var newUser = {role: role, user: {name: name}} //matches MakerPass format
     $scope.modalUserList.push(newUser);
+    $scope.inputName = "";
     return newUser;
   }
 
@@ -135,5 +170,4 @@ angular.module('PU.main', ['PU.factories'])
     $scope.loading = false;
     $scope.closeCreateModal();
   }
-
 })
