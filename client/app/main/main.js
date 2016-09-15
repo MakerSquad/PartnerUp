@@ -1,3 +1,4 @@
+
 angular.module('PU.main', ['PU.factories'])
 
 .controller('MainController', function ($scope, $location, Makerpass) {
@@ -60,4 +61,3 @@ angular.module('PU.main', ['PU.factories'])
     $scope.classes = groups.data;
     $scope.loading = false;
   })
-});

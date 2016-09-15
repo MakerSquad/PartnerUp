@@ -1,7 +1,6 @@
 var pg = require('pg');
 const config = require('../knexfile.js');
-const env = 'development';
-
+// const env = 'development';
 
 const knex = require('knex')({
   client: 'pg',
@@ -13,7 +12,6 @@ const knex = require('knex')({
     ssl: true
   }
 });
-
 
 knex.migrate.latest([config]);
 
@@ -38,3 +36,4 @@ knex.migrate.latest([config]);
 //   ]),
 //   knex('JoinTable').insert([]),
 // ]);
+
