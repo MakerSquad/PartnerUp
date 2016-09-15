@@ -3,4 +3,13 @@ body {
   margin-top: 10px;
 }
 
+.studentGroups{
+  display: inline;
+  position: absolute;
+  top: 200px;
+  right: 0px;
+  float: right;
+  margin-right: 300px;
+}
+
 

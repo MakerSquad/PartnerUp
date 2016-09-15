@@ -1,13 +1,25 @@
 
 angular.module('PU.main', ['PU.factories'])
 
-.controller('MainController', function ($scope, $location, Makerpass) {
+.controller('MainController', function ($scope, $location, Makerpass, $http) {
+
+  $http({
+    method: "GET",
+    url: "/currentUser"
+  })
+  .then(function(resp){
+    console.log("Current User Data: ", resp);
+    if(resp.data === "") $location.path('/signin');
+  })
+
   $scope.classes = []; //all classes the user is a part of
   $scope.students = []; //students in the current class
   $scope.instructors = []; //the current instructors
   $scope.fellows = []; //the current fellows
   $scope.currentClass; //the current class
   $scope.groups = [];//the current assigned groups
+  $scope.noPair = []; //the current removed students
+  $scope.groupSize = 2;
   $scope.loading = true;
   $scope.partnerUp = false;
 
@@ -24,7 +36,21 @@ angular.module('PU.main', ['PU.factories'])
       $scope.instructors = members.data.filter(m => m.role === 'instructor');
       $scope.loading = false;
     })
-    //TODO: Get students for current class
+  }
+
+  /*
+  * Takes a number and generates an array that contains indexes from 0 to that number
+  * (Used to ng-repeat for a specific number)
+  */
+  $scope.getIndexArray = function(num){
+    console.log("GroupSize: ", num);
+    var arr = [];
+    for(var i = 0; i < num; i++){
+      arr[i] = i;
+      console.log("i: ", i);
+    }
+    console.log("Returning: ", arr);
+    return arr;
   }
 
   $scope.randomize = function(groupSize){
@@ -51,8 +77,13 @@ angular.module('PU.main', ['PU.factories'])
   }
 
   $scope.removeFromStudent = function(student){
-     var index = $scope.students.indexOf(student)
-     $scope.students.splice(index, 1);
+     var index = $scope.students.indexOf(student);
+     $scope.noPair.push($scope.students.splice(index, 1)[0]);
+  }
+
+  $scope.addStudentBackIn = function(nopair){
+    var index = $scope.noPair.indexOf(nopair);
+    $scope.students.push($scope.noPair.splice(index,1)[0]);
   }
 
   Makerpass.getGroups()
@@ -61,3 +92,4 @@ angular.module('PU.main', ['PU.factories'])
     $scope.classes = groups.data;
     $scope.loading = false;
   })
+})

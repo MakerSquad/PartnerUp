@@ -19,8 +19,9 @@ AuthPort.createServer({
  
 AuthPort.on('auth', function(req, res, data) {
   console.log("OAuth success!", data);
-  req.session.accessToken = data.token
-  req.session.uid = data.data.user.uid
+  req.session.accessToken = data.token;
+  req.session.uid = data.data.user.uid;
+  req.session.user = data.data.user;
   res.redirect('/')
 })
  
@@ -53,6 +54,10 @@ app.get("/myGroups", function(req, res){
     console.log("Makerpass groups data: ", data);
     res.send(data);
   })
+})
+
+app.get("/currentUser", function(req, res){
+  res.send(req.session.user);
 })
 
 app.get("/groups/:nameId", function(req, res){
