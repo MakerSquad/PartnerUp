@@ -1,6 +1,7 @@
 var pg = require('pg');
-const config = require('../knexfile');
-const env = 'staging';
+const config = require('../knexfile.js');
+// const env = 'development';
+
 const knex = require('knex')({
   client: 'pg',
   connection: {
@@ -35,3 +36,4 @@ knex.migrate.latest([config]);
 //   ]),
 //   knex('JoinTable').insert([]),
 // ]);
+

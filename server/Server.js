@@ -44,6 +44,7 @@ app.use(session({secret: "funnyGilby"}));
 app.use(express.static(path.join(__dirname, '../client'))); 
 app.use(express.static(path.join(__dirname, '../client/app')));
 app.use(express.static(path.join(__dirname, '../bower_components')));
+
 app.get("/auth/:service", AuthPort.app);
 
 app.get("/myGroups", function(req, res){
@@ -70,6 +71,6 @@ app.get("/groups/:nameId/memberships", function(req, res){
   })
 })
 
- 
-app.listen(4000)
-console.log('listening on port 4000 ')
+var port = process.env.PORT || 4000
+app.listen(port)
+console.log('listening on port ' + port)

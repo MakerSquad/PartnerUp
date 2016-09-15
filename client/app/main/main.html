@@ -1,3 +1,27 @@
 <div>
-  
+  <button ng-click="randomize(2)">Partner Up!</button>
+  <div>Current class: {{currentClass.name}}</div>
+  <select ng-model="classSelect" ng-options="class as class.name for class in classes" ng-change="changeClass(classSelect)">
+  </select>
+  <div ng-show="!partnerUp" class="instructorList">
+    <h2>Instructors: </h2>
+      <div class="instructor" ng-repeat="instructor in instructors">{{instructor.user.name}}</div>
+  </div>
+  <div ng-show="!partnerUp" class="fellowList">
+    <h2>Fellows: </h2>
+      <div class="fellow" ng-repeat="fellow in fellows">{{fellow.user.name}}</div>
+  </div>
+  <div ng-show="!partnerUp" class="studentList">
+    <h2>Students: </h2> 
+    <div class="student" ng-repeat="student in students"><button ng-click="removeFromStudent(student);">x<button>{{student.user.name}}</div>
+  </div>
+  <div class="studentGroups">
+    <table>
+      <tr ng-repeat="group in groups">
+        <td ng-repeat="stu in group">
+          {{stu.user.name}}
+        </td>
+      </tr>
+    </table>
+  </div>
 </div>
