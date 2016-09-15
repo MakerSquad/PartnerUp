@@ -1,6 +1,8 @@
 var pg = require('pg');
-const config = require('../knexfile');
-const env = 'staging';
+const config = require('../knexfile.js');
+const env = 'development';
+
+
 const knex = require('knex')({
   client: 'pg',
   connection: {
@@ -11,6 +13,7 @@ const knex = require('knex')({
     ssl: true
   }
 });
+
 
 knex.migrate.latest([config]);
 

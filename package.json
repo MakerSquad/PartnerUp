@@ -7,7 +7,7 @@
   "license": "ISC",
   "scripts": {
     "postinstall": "bower install",
-    "start": "./node_modules/.bin/nodemon --ignore node_modules ./server/Server.js"
+    "start": "./node_modules/.bin/nodemon --ignore node_modules server/Server.js"
   },
   "devDependencies": {
     "browser-sync": "^1.5.7"
@@ -24,6 +24,7 @@
     "knex": "^0.12.0",
     "node-makerpass": "^1.1.0",
     "path": "^0.12.7",
+    "pg": "^6.1.0",
     "request": "^2.36.0",
     "sqlite3": "^3.1.4"
   }
