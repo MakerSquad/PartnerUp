@@ -79,11 +79,30 @@ app.get("/groups/:nameId/memberships", function(req, res){
   })
 })
 
+
 app.post('/test', (req, res) => {
   // db.addPairs(req.body.name)
     // .then((id) => console.log('group id: ', id))
     // .catch((err) => console.log('errror: ', err))
   res.status(200).send(db.addStudents(req.body.name))
+}
+app.post('/database', (req, res) => {
+  // var data = req.body.data
+  // switch(data.func){
+
+  //   case "getStudentsByGroup":
+  //     if(typeof(data.args) == string )
+  //   break;
+  //   case "getGroup":
+
+
+  //   default:
+  //     res.status(404).send("Function Not Found")
+
+
+  //db.addPairs(req.body.name)
+  res.status(200).send(db.addPairs(req.body.name))
+
 })
 
 app.get('/test2', (req, res) => {
