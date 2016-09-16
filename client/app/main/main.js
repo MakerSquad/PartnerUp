@@ -170,4 +170,6 @@ angular.module('PU.main', ['PU.factories'])
     $scope.loading = false;
     $scope.closeCreateModal();
   }
+
 })
+

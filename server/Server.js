@@ -39,7 +39,10 @@ var session = require('express-session')
 var app = express()
 var MP = require('node-makerpass');
 var path = require('path');
+var db = require('./db');
+var bodyParser = require('body-parser');
 
+app.use(bodyParser.json());
 
 app.use(session({secret: "funnyGilby"}));
 app.use(express.static(path.join(__dirname, '../client'))); 
@@ -74,6 +77,24 @@ app.get("/groups/:nameId/memberships", function(req, res){
     console.log("Data for members: ", data);
     res.send(data);
   })
+})
+
+app.post('/test', (req, res) => {
+  db.addStudents(req.body.name)
+    // .then((id) => console.log('group id: ', id))
+    // .catch((err) => console.log('errror: ', err))
+  res.status(200).send('good')
+})
+
+app.get('/test2', (req, res) => {
+  db.getTables()
+    .then((data) => {
+      res.status(200).send(data)
+    })
+     .catch((err) => {
+      console.log('errror: ', err)
+      res.status(404).send()
+    })
 })
 
 var port = process.env.PORT || 4000
