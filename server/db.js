@@ -16,8 +16,15 @@ const knex = require('knex')({
 
 knex.migrate.latest([config]);
 
-knex.addGroup = (name) => {
-  return knex('groups').insert({name: name}).returning('id')
+/* 
+  params: group = {
+    'name': (string)name,
+    'groupId': (int)mksId
+  }
+  return: 'added student to group' or error
+*/
+knex.addGroup = (group) => {
+  return knex('groups').insert({name: group.name, mks_id: group.mksId}).returning('id')
     .then((id) => {
       console.log(id[0])
       return id[0]
@@ -25,8 +32,37 @@ knex.addGroup = (name) => {
     .catch((err) => console.log('error: ', err))
 }
 
+/* 
+  params: 
+    group = {
+    'name': (string)name 
+    } 
+      OR
+    group = {
+    'mksId': (string)mksId
+    } 
+      OR
+    group = {
+    'id': (int)ID
+    }
+  return: Object with group information
+*/
+knex.getGroup = (group) => {
+  if(group.name)
+    return knex('groups').where('name', group.name).returning('*')
+      .then((groupData) => groupData[0])
+      .catch((err) => console.log('error: ', err))
+  if(group.id)
+    return knex('groups').where('id', group.id).returning('*')
+      .then((groupData) => groupData[0])
+      .catch((err) => console.log('error: ', err))
+  return knex('groups').where('mks_id', group.mksId).returning('*')
+    .then((groupData) => groupData[0])
+    .catch((err) => console.log('error: ', err))  
+}
+
 knex.getTables = () => {
-  return knex('users').returning('*')
+  return knex('pairs').returning('*')
 }
 
 /* 
@@ -71,37 +107,68 @@ knex.addStudents = (students) => {
       }).catch((err) => console.log('error ', err))
   }
 }
+/**
+  @params: data = {
+    mksId: (string)mksId
+  }
+  return: 'added pair' or error
+*/
 
-knex.getPairs = (studentId) => {
-  return knex('pairs').where('user1_id', studentId).orWhere('user2_id', studentId)
+knex.getStudentsByGroup = (mksId) => {
+  return knex('user_group').where('group_id', mksId).returning('*')
+    .then((students) => students)
+}
+
+/**
+  @params: data = {
+    student1Id: (int)id
+    student2Id: (int)id
+    groupId: (string)id
+  }
+  return: 'added pair' or error
+*/
+knex.addPairs = (pair) => {
+  if(pair.student1Id > pair.student2Id) {
+    var temp = pair.student1Id;
+    pair.student1Id = pair.student2Id;
+    pair.student2Id = temp; 
+  }
+  return knex('pairs').where({'user1_id': pair.student1Id, 'user2_id': pair.student2Id, 'group_id': pair.groupId}).returning('id')
+    .then((id) => {
+      console.log('pair ', pair)
+      if(!id.length) {
+        return knex('pairs').insert({
+          group_id: pair.groupId,
+          user1_id: pair.student1Id, 
+          user2_id: pair.student2Id
+        }).returning('id')
+          .then((id) => {return 'pair added'})
+          .catch((err) => console.log('error: ', err))
+      } return 'pair exists'
+    }).catch((err) => console.log('error: ', err))
+}
+
+/**
+  @params: data = {
+    student1Id: (int)id
+    groupId: (string)id
+  }
+  return: array of pairs the student was in
+*/
+knex.getPairsForStudent = (student) => {
+  return knex('pairs').where({'group_id': student.groupId, 'user1_id': student.studentId}).orWhere({'group_id': groupId, 'user2_id': studentId}).returning('*')
     .then((pairs) => pairs )
     .catch((err) => console.log('error: ', err))
 }
 
-/* 
-  params: student = {
-    name: (string)user-name
-    groupId: (int)id
-    role: (string)title
-  }
-  return: 'added student to group' or error
-*/
-knex.addPairs = () => {
 
-}
-
-knex.removeStudentFromGroup = (studentId, groupId) => {
-  return knex('user_group').where({'group_id': groupId, 'user1_id': studentId}).orWhere({'group_id': groupId, 'user2_id': studentId}).del().returning('id')
+knex.removeStudentFromGroup = (student) => {
+  return knex('user_group').where({'group_id': student.groupId, 'user1_id': student.studentId}).orWhere({'group_id': student.groupId, 'user2_id': student.studentId}).del()
     .then(() => {
-      knex('pairs').where('group_id', groupId).orWhere('user1_id', studentId)
+      return 'deleted'
     })
 }
 
-knex.getGroupData = (groupId) => {
-  return knex('user_group').where('group_id', groupId)
-    .then((groupData) => groupData)
-    .catch((err) => console.log('error: ', err))
-}
 
 knex.findGroupByName = (groupName) => {
   return knex('groups').where('name', groupName)

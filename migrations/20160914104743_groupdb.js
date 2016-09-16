@@ -10,6 +10,7 @@ exports.up = (knex, Promise) => Promise.all([
   knex.schema.createTableIfNotExists('groups', table => {
     table.increments('id');
     table.string('name');
+    table.string('mks_id')
   }),
   knex.schema.createTableIfNotExists('user_group', table => {
     table.increments('id');
@@ -22,7 +23,7 @@ exports.up = (knex, Promise) => Promise.all([
     table.increments('id');
     table.integer('user1_id');
     table.integer('user2_id');
-    table.integer('group_id')
+    table.string('group_id')
   })
 ])
 
