@@ -80,23 +80,10 @@ app.get("/groups/:nameId/memberships", function(req, res){
 })
 
 app.post('/test', (req, res) => {
-  //db.addPairs(req.body.name)
+  // db.addPairs(req.body.name)
     // .then((id) => console.log('group id: ', id))
     // .catch((err) => console.log('errror: ', err))
-  res.status(200).send(db.addPairs(req.body.name))
-})
-
-app.get('/test2', (req, res) => {
-  db.getTables()
-    .then((data) => {
-      res.status(200).send(data)
-    })
-     .catch((err) => {
-      console.log('errror: ', err)
-      res.status(404).send()
-    })
-    .catch((err) => console.log('errror: ', err))
-  res.status(200).send('good')
+  res.status(200).send(db.addStudents(req.body.name))
 })
 
 app.get('/test2', (req, res) => {

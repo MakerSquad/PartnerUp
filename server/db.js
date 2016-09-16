@@ -62,7 +62,7 @@ knex.getGroup = (group) => {
 }
 
 knex.getTables = () => {
-  return knex('pairs').returning('*')
+  return knex('user_group').returning('*')
 }
 
 /* 
@@ -80,24 +80,22 @@ knex.getTables = () => {
 */
 knex.addStudents = (students) => {
   for(let i = 0; i < students.length; i++){
-    knex('users').where('name', students[i].user.name).returning('id')
+    knex('users').where('uid', students[i].user_uid).returning('uid')
       .then((id) => {
         console.log('id: ', id.length);
         if(id.length){
           knex('user_group').insert({
-            user_id: id[0].id,
-            user_name: students[i].user.name,
+            user_uid: id[0].uid,
             group_id: students[i].group_uid,
             role_name: students[i].role
           }).then((id) => 'added student to group')
             .catch((err) => console.log('error found user: ', err))
         } else {
-          knex('users').insert({name: students[i].user.name}).returning('id')
+          knex('users').insert({name: students[i].user.name, uid: students[i].user_uid}).returning('uid')
             .then((id) => {
               console.log('inside else: ', id[0], 'student: ', students[i])
               knex('user_group').insert({
-                user_id: id[0],
-                user_name: students[i].user.name,
+                user_uid: id[0],
                 group_id: students[i].group_uid,
                 role_name: students[i].role
               }).then((id) => 'added student to group')
