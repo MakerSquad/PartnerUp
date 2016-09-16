@@ -1,6 +1,7 @@
 <div ng-class="{toBackground: creatingGroup}">
   <h1 class="welcome">Hello, {{currentUser.name.includes("Gilbert") ? "Gilby" : currentUser.name || "Gilby"}}!</h1>
   <button ng-click="randomize(groupSize)">Partner Up!</button>
+  <button ng-click="finalize()" ng-show="partnerUp && !finalized">Finalize this pairing</button>
   <div class="createButtons">
     <button ng-click="openCreateModal()">Create a group</button>
     <button ng-click="importFromMakerpass()">Import Groups from Makerpass</button>
@@ -25,7 +26,7 @@
       <tr>
       <th ng-repeat="index in getIndexArray(groupSize)">Partner {{index + 1}}</th>
       </tr>
-      <tr ng-repeat="group in groups">
+      <tr ng-repeat="group in groups" ng-class="{clash: clashes.includes(group)}">
         <td ng-repeat="stu in group" ng-click="selectForSwap(stu)" ng-class="{selectedStu: selectedForSwap === stu}" class="stu">
           {{stu.user.name}}
         </td>
