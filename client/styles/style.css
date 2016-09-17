@@ -7,8 +7,8 @@ body {
   display: inline;
   position: absolute;
   top: 200px;
-  right: 0px;
-  float: right;
+  left: 250px;
+  float: left;
   margin-right: 200px;
 }
 
@@ -57,8 +57,12 @@ td{
 
 .stu{
   cursor: pointer;
+  border-style: solid;
+  border-width: 3px;
+  border-color: slategrey;
 }
 .selectedStu{
   color: #CCC;
 }
+
 

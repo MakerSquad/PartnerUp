@@ -85,7 +85,7 @@ angular.module('PU.main', ['PU.factories'])
 
     var shuffled = [];
     for(var i = 0; i < stus.length % groupSize; i++){
-      stus.push({user:{name: "Code Monkey", uid: "-" + i}}); //give them decrementing ids
+      stus.push({user:{name: "Code Monkey", uid: "-" + i, avatar_url:"http://codemonkey.sunburst.com/images/monkey.png "}}); //give them decrementing ids
     }
 
     while(stus.length){
@@ -125,7 +125,7 @@ angular.module('PU.main', ['PU.factories'])
 
     var shuffled = [];
     for(var i = 0; i < stus.length % groupSize; i++){
-      stus.push({user:{name: "Code Monkey", uid: "-" + i}});
+      stus.push({user:{name: "Code Monkey", uid: "-" + i, avatar_url:"http://codemonkey.sunburst.com/images/monkey.png "}});
     }
 
     while(stus.length){
