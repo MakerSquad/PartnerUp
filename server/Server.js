@@ -86,22 +86,26 @@ app.post('/test', (req, res) => {
     // .catch((err) => console.log('errror: ', err))
   res.status(200).send(db.addStudents(req.body.name))
 }
-app.post('/database', (req, res) => {
-  // var data = req.body.data
-  // switch(data.func){
-
-  //   case "getStudentsByGroup":
-  //     if(typeof(data.args) == string )
-  //   break;
-  //   case "getGroup":
-
-
-  //   default:
-  //     res.status(404).send("Function Not Found")
-
-
-  //db.addPairs(req.body.name)
+app.post('/database/onLogin', (req, res) => {
+ db.getAdmin(req.params.nameId).then((id) => {
+  if(id.length){
+    id[0]
+  }
+ }).catch((err) => ("error: ", err))
   res.status(200).send(db.addPairs(req.body.name))
+
+})
+
+app.post('/database/getPair', (req, res) => {
+  db.getAdmin(req.params.nameId).then((Admin) =>{
+    if(Admin.length){
+      db.getPairsForStudent(req.body.data).then((studentsRay) =>{
+        res.send(studentsRay);
+      }) //gets all pairs for a specific user
+    }else{
+      res.status(401).send("No access. Please sign in with make pass")
+    }
+  })
 
 })
 
