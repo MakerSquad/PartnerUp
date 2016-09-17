@@ -1,5 +1,7 @@
 <div ng-class="{toBackground: creatingGroup}">
   <h1 class="welcome">Hello, {{currentUser.name.includes("Gilbert") ? "Gilby" : currentUser.name || "Gilby"}}!</h1>
+
+  <!--Control buttons-->
   <button ng-click="randomize(groupSize)">Partner Up!</button>
   <button ng-click="finalize()" ng-show="partnerUp && !finalized">Finalize this pairing</button>
   <div class="createButtons">
@@ -9,6 +11,8 @@
   <div>Current class: {{currentClass.name}}</div>
   <select ng-model="classSelect" ng-options="class as class.name for class in classes" ng-change="changeClass(classSelect)">
   </select>
+
+  <!--Lists of people in the current class-->
   <div class="instructorList">
     <h2>Instructors: </h2>
       <div class="instructor" ng-repeat="instructor in instructors">{{instructor.user.name}}</div>
@@ -21,6 +25,13 @@
     <h2>Students: </h2> 
     <div class="student" ng-repeat="student in students"><button ng-click="removeFromStudent(student);">x</button>{{student.user.name}}</div>
   </div>
+  <div>
+    <h2>Removed Students:</h2>
+    <div class ="removedStudents" ng-repeat="nopair in noPair"><button ng-click="addStudentBackIn(nopair);">o</button>{{nopair.user.name}}
+    </div>
+  </div>
+
+  <!--The table of current groupings-->
   <div ng-show="partnerUp" class="studentGroups">
     <table>
       <tr>
@@ -36,13 +47,8 @@
       </tr>
     </table>
   </div>
-  <div>
-    <h2>Removed Students:</h2>
-    <div class ="removedStudents" ng-repeat="nopair in noPair"><button ng-click="addStudentBackIn(nopair);">o</button>{{nopair.user.name}}
-    </div>
-  </div>
 
-
+  <!--The modal for creating a group-->
   <div class="modal" ng-show="creatingGroup">
     <form>
       <label>Group Name: </label>

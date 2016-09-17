@@ -3,7 +3,7 @@ angular.module('PU.main', ['PU.factories'])
 
 .controller('MainController', function ($scope, $location, Makerpass, $http) {
 
-  $http({
+  $http({ //Check the current user
     method: "GET",
     url: "/currentUser"
   })
@@ -17,34 +17,45 @@ angular.module('PU.main', ['PU.factories'])
     }
   })
 
-  $scope.currentUser = {}
+  $scope.currentUser = {} //Information for the current user
   $scope.classes = []; //all classes the user is a part of
   $scope.students = []; //students in the current class
   $scope.instructors = []; //the current instructors
   $scope.fellows = []; //the current fellows
   $scope.currentClass; //the current class
   $scope.groups = [];//the current assigned groups
-  $scope.noPair = []; //the current removed students
-  $scope.groupSize = 3;
-  $scope.loading = true;
-  $scope.partnerUp = false;
-  $scope.roles = ["instructor", "fellow", "student"];
+  $scope.noPair = []; //the current students that are removed from pairings
+  $scope.groupSize = 3; //the size of the groups to be assigned
+  $scope.loading = true; //a loading state
+  $scope.partnerUp = false; //True if groups are assigned
+  $scope.roles = ["instructor", "fellow", "student"]; //The possible roles 
 
-  $scope.selectedForSwap = null;
-  $scope.selectedForSwapIndex;
+  $scope.selectedForSwap = null; //The student object that has been selected to swap
+  $scope.selectedForSwapIndex;  //The index of the student object to swap, as a tuple (2d Array Index)
 
 
-  $scope.creatingGroup = false;
-  $scope.modalUserList = [];
+  $scope.creatingGroup = false; //A boolean that determines if the create group modal should show
+  $scope.modalUserList = []; //The list of users being added to the new group
 
+  /*
+  $scope.pastPairs contains the pairing history of the current students. This object has a key 
+  for each student uid with the corresponding value being another object. This value object contains keys
+  for the other students, with a value of true if they have been previously paired
+  */
   $scope.pastPairs = {};
-  $scope.finalized = true;
-  $scope.clashes = [];
+  $scope.finalized = true; //Set to true if the grouping has been finalized and stored; false after a new grouping is generated
+  $scope.clashes = []; //Clashing groups
   var timeoutCounter = 0;
   var timeoutThreshold = 2500; //number of iterations to run before we assume we're in an infinite loop
 
-  $scope.lockedGroups = [];
-  var lockedStus = {};
+  $scope.lockedGroups = []; //The groups that have been locked in
+  var lockedStus = {}; //Hash table of student uids to boolean values
+
+  /**
+  * ChangeClass is called when the current class needs to change
+  * ChangeClass updates the lists of people with a call to the database
+  * @param cls : The new class object to switch to
+  */
 
   $scope.changeClass = function(cls){
     $scope.loading = true;
@@ -63,9 +74,11 @@ angular.module('PU.main', ['PU.factories'])
     })
   }
 
-  /*
+  /**
   * Takes a number and generates an array that contains indexes from 0 to that number
   * (Used to ng-repeat for a specific number)
+  * @param num : The size of the array
+  * @return An array of size num; each cell contains its index as a number
   */
   $scope.getIndexArray = function(num){
     var arr = [];
@@ -75,7 +88,13 @@ angular.module('PU.main', ['PU.factories'])
     return arr;
   }
 
-  //THIS VERSION OF RANDOMIZE ROLLS THE WHOLE GROUP RANDOMLY
+  /**
+  * trueRandomize generates a completely random grouping of the current students, disregarding pair history
+  * trueRandomize is called if our loop threshold is reached before we are able to resolve clashes
+  * @param groupSize : The size of the groups to generate
+  * @return $scope.groups, after it has been updated
+  */
+
   $scope.trueRandomize = function(groupSize){
     console.log("Rolling");
     $scope.groups = [];
@@ -108,6 +127,14 @@ angular.module('PU.main', ['PU.factories'])
     $scope.finalized = false;
     return $scope.groups;
   }
+
+  /**
+  * Randomize generates a grouping of the current students, attempting to avoid clashes
+  * Recursively calls itself if we were unable to make non-repeating groups; if this recursion occurs
+  * too many times, the user is alerted, and trueRandomize is called instead
+  * @param groupSize : The size of the groups to generate
+  * @return $scope.groups, after it has been updated
+  */
 
   $scope.randomize = function(groupSize){
     timeoutCounter += 1;
@@ -175,6 +202,11 @@ angular.module('PU.main', ['PU.factories'])
     return $scope.groups;
   }
 
+  /**
+  * CheckClashes checks the current groups for any groups in which students have previously worked together
+  * Any clashing groups will be pushed to $scope.groups
+  */
+
   var checkClashes = function(){
     $scope.clashes = [];
     for(var i = 0; i < $scope.groups.length; i++){
@@ -197,7 +229,7 @@ angular.module('PU.main', ['PU.factories'])
     }
   }
 
-  /*
+  /**
   * Finalize takes the current pairings and records them into the "past pairs" object
   */
 
@@ -220,10 +252,22 @@ angular.module('PU.main', ['PU.factories'])
     $scope.finalized = true;
   }
 
+  /**
+  * removeFromStudent takes in a student object and removes it from the students list
+  * Removed students are stored in the noPair array
+  * @param student The student object to remove
+  */
+
   $scope.removeFromStudent = function(student){
      var index = $scope.students.indexOf(student);
      $scope.noPair.push($scope.students.splice(index, 1)[0]);
   }
+
+  /**
+  * addStudentBackIn takes in a student object from the noPair array and removes it
+  * The student object is then placed into the students array
+  * @param nopair The student object to place back into the students array
+  */
 
   $scope.addStudentBackIn = function(nopair){
     var index = $scope.noPair.indexOf(nopair);
@@ -239,6 +283,15 @@ angular.module('PU.main', ['PU.factories'])
   }
 
   //Functions for rearranging students
+
+  /**
+  * selectForSwap takes in a student object from groups. If another student is currently selected, they will be swapped
+  * If no other student is currently selected, the passed in student will be selected
+  * If the student passed in is the same as the currently selected student, they will be unselected
+  * Students that have been locked in place cannot be selected
+  * @param student The student object that has been selected
+  */
+
   $scope.selectForSwap = function(student){
     if(lockedStus[student.user.uid]){
       alert("This student has been locked into a group; please unlock them before moving them around");
@@ -262,6 +315,13 @@ angular.module('PU.main', ['PU.factories'])
     checkClashes();
   }
 
+  /**
+  * searchForSelected is a helper function for selectForSwap
+  * searchForSelected takes in a student object and searches the groups for its index
+  * @param student The student object to search for
+  * @return The index tuple for the student's location in groups; if the student is not found, returns undefined
+  */
+
   var searchForSelected = function(student){
     for(var i = 0; i < $scope.groups.length; i++){
       for(var j = 0; j < $scope.groups[i].length; j++){
@@ -272,11 +332,26 @@ angular.module('PU.main', ['PU.factories'])
     }
   }
 
+  /**
+  * swapStus is a helper function for selectForSwap
+  * swapStus takes in 2 index tuples from $scope.groups and swaps the students in those locations
+  * @param indexTuple1 The index of the first student selected to swap
+  * @param indexTuple2 The index of the second student selected to swap
+  */
+
   var swapStus = function(indexTuple1, indexTuple2){
     var tmp = $scope.groups[indexTuple1[0]][indexTuple1[1]];
     $scope.groups[indexTuple1[0]][indexTuple1[1]] = $scope.groups[indexTuple2[0]][indexTuple2[1]]
     $scope.groups[indexTuple2[0]][indexTuple2[1]] = tmp;
   }
+
+  /**
+  * toggleLockGroup takes in a group array from $scope.groups and either locks or unlocks the group
+  * Locked groups will not be shuffled when randomized is called
+  * The locked groups are stored in $scope.lockedGroups as a tuple, with their index from groups at index 1
+  * @param group The group array to lock or unlock
+  * @return "unlocked" if the group has been unlocked, "locked" if it has been locked
+  */
 
   $scope.toggleLockGroup = function(group){
     for(var i = 0; i < $scope.lockedGroups.length; i++){
@@ -301,6 +376,12 @@ angular.module('PU.main', ['PU.factories'])
     return "locked";
   }
 
+  /**
+  * searchLockedGroups searches $scope.lockedGroups for a specific group and returns true if it has been found
+  * @param group The group array to search for
+  * @return True if the group is found, false if it is not
+  */
+
   $scope.searchLockedGroups = function(group){
     for(var i = 0; i < $scope.lockedGroups.length; i++){
       if($scope.lockedGroups[i][0] === group){ //found the group in the locked groups
@@ -311,6 +392,11 @@ angular.module('PU.main', ['PU.factories'])
   }
 
   //Functions for the createGroup Modal below
+
+  /**
+  * openCreateModal resets the information in the create group modal and shows it on the page
+  */
+
   $scope.openCreateModal = function(){
     $scope.modalUserList = [];
     $scope.inputRole = "";
@@ -319,9 +405,20 @@ angular.module('PU.main', ['PU.factories'])
     $scope.creatingGroup = true;
   }
 
+  /**
+  * closeCreateModal hides the create group modal
+  */
+
   $scope.closeCreateModal = function(){
     $scope.creatingGroup = false;
   }
+
+  /**
+  * addToUserList adds a new user to the list of users being added to a newly created class
+  * @param name The user's name
+  * @param role The user's role
+  * @return the new User as an object
+  */
 
   $scope.addToUserList = function(name, role){
     var newUser = {role: role, user: {name: name}} //matches MakerPass format
@@ -329,6 +426,10 @@ angular.module('PU.main', ['PU.factories'])
     $scope.inputName = "";
     return newUser;
   }
+
+  /**
+  * TODO: make this function make database calls to create new classes
+  */
 
   $scope.createClass = function(name, users){
     console.log("Got name: ", name);

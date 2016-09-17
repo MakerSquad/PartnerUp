@@ -85,7 +85,7 @@ app.post('/test', (req, res) => {
     // .catch((err) => console.log('errror: ', err))
   res.status(200).send(db.addStudents(req.body.name))
 
-}
+})
 app.post('/database/onLogin', (req, res) => {
  db.getAdmin(req.params.nameId).then((id) => {
   if(id.length){
