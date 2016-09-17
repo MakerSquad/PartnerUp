@@ -17,19 +17,27 @@ const knex = require('knex')({
 knex.migrate.latest([config]);
 
 /* 
-  params: uid = (string)mksId
+  params: uid = (string)mksId 
+            or
+          {
+            name: (string)name
+            uid: (string)id
+          }
   return: object with user data or error
 */
 knex.findOrCreateAdmin = (uid) => {
-  return knex('users').where('uid', uid)
-    .then((user) => {
-      var userObj = {};
-      userObj.id = user[0].id;
-      userObj.name = user[0].name;
-      userObj.uid = user[0].uid;
-      return userObj
-    })
-    .catch((err) => console.log('error: ', err))
+  if(typeof uid === 'string')
+    return knex('users').where('uid', uid)
+      .then((user) => {
+        return user
+      })
+      .catch((err) => console.log('error: ', err))
+  else if(typeof uid === 'object') {
+    return knex('users').insert({name: uid.name, uid: uid.uid}).returning('*')
+      .then((user) => {
+        return user
+      })
+  }
 }
 
 /* 
@@ -88,7 +96,7 @@ knex.getGroupByAdmin = (uid) => {
 }
 
 knex.getTables = () => {
-  return knex('user_group').returning('*')
+  return knex('users').returning('*')
 }
 
 /* 
@@ -229,42 +237,5 @@ knex.deleteGroup = (groupId) => {
         }).catch((err) => console.log('error: ', err))
     }).catch((err) => console.log('error: ', err))
 }
-// knex.addTest = () => {
-//   console.log('inside addTest')
-//   return knex('users').insert([
-//     { name: 'Ryan'}
-//   ])
-// }
 
-
-// knex.getTest = () => {
-//   console.log('inside getTest')
-//   return knex('users')
-//     .then((users) => {
-//       console.log('users: ', users)
-//     })
-//     .catch((err) => console.log('errror: ', err))
-// }
-
-// knex.initDB = () => Promise.all([
-//   knex('users').insert([
-//     { name: 'Joe' },
-//     { name: 'Frank' },
-//     { name: 'Rob' },
-//     { name: 'Ryan' },
-//     { name: 'Gilbert' },
-//   ]),
-//   knex('groups').insert([
-//     { url: 'OMflBAXJJKc', channel_id: 1 },
-//     { url: 'x76VEPXYaI0', channel_id: 1 },
-//     { url: 'evj6y2xZCnM', channel_id: 1 },
-//     { url: '5XpU5M0ZCKM', channel_id: 2 },
-//     { url: '-hfKtUT4ISs', channel_id: 2 },
-//     { url: 'JYYsAxC0Dic', channel_id: 2 },
-//     { url: 'rbFvzRsDBN4', channel_id: 3 },
-//     { url: '-C_jPcUkVrM', channel_id: 3 },
-//     { url: 'FHtvDA0W34I', channel_id: 3 },
-//   ]),
-//   knex('JoinTable').insert([]),
-// ]);
 module.exports = knex;
