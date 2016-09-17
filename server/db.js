@@ -17,6 +17,22 @@ const knex = require('knex')({
 knex.migrate.latest([config]);
 
 /* 
+  params: uid = (string)mksId
+  return: object with user data or error
+*/
+knex.findOrCreateAdmin = (uid) => {
+  return knex('users').where('uid', uid)
+    .then((user) => {
+      var userObj = {};
+      userObj.id = user[0].id;
+      userObj.name = user[0].name;
+      userObj.uid = user[0].uid;
+      return userObj
+    })
+    .catch((err) => console.log('error: ', err))
+}
+
+/* 
   params: group = {
     'name': (string)name,
     'groupId': (int)mksId
@@ -59,6 +75,16 @@ knex.getGroup = (group) => {
   return knex('groups').where('mks_id', group.mksId).returning('*')
     .then((groupData) => groupData[0])
     .catch((err) => console.log('error: ', err))  
+}
+
+knex.getGroupByAdmin = (uid) => {
+  // return knex('groups').where('role_name', 'instructor').returning('group_id')
+  //   .then((groupIds) => {
+  //     var 
+  //     for(var i = 0; i < groupIds.length; i++) {
+  //       knex('user_group').where('group_id', groupIds[i]).andWhere('role_name', 'student')
+  //     }
+  //   })
 }
 
 knex.getTables = () => {
