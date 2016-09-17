@@ -51,6 +51,11 @@ app.use(express.static(path.join(__dirname, '../bower_components')));
 
 app.get("/auth/:service", AuthPort.app);
 
+app.get("/signout", function(req, res){
+  req.session.destroy();
+  res.redirect("/")
+})
+
 app.get("/myGroups", function(req, res){
   MP.user.groups(req.session.uid, req.session.accessToken)
   .then(function(data){

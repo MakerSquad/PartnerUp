@@ -5,8 +5,18 @@ angular.module('PU.signin', [
 
   ])
 
-.controller('AuthController', function ($scope, $window, $location) {
+.controller('AuthController', function ($scope, $window, $location, $http) {
   $scope.user = {};
+
+  $http({ //Check the current user
+    method: "GET",
+    url: "/currentUser"
+  })
+  .then(function(resp){
+    if(resp.data !== ""){
+      $location.path('/');
+    }
+  })
 
   $scope.loginMakerPass = function(){
     $window.location.href = '/auth/makerpass';

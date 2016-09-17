@@ -52,6 +52,22 @@ angular.module('PU.main', ['PU.factories'])
   var lockedStus = {}; //Hash table of student uids to boolean values
 
   /**
+  * signOut makes a get request to '/signout,' destroying the current session
+  */
+
+  $scope.signOut = function(){
+    return $http({
+      method: 'GET',
+      url: '/signout'
+    }).then(function(){
+      $location.path('/signin');
+    })
+    .catch(function(err){
+      console.error("Logout failed: ", err);
+    })
+  }
+  
+  /**
   * ChangeClass is called when the current class needs to change
   * ChangeClass updates the lists of people with a call to the database
   * @param cls : The new class object to switch to

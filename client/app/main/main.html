@@ -1,16 +1,19 @@
 <div ng-class="{toBackground: creatingGroup}">
   <h1 class="welcome">Hello, {{currentUser.name.includes("Gilbert") ? "Gilby" : currentUser.name || "Gilby"}}!</h1>
+  <button class="signout" ng-click="signOut()">Log out</button>
 
   <!--Control buttons-->
-  <button ng-click="randomize(groupSize)">Partner Up!</button>
-  <button ng-click="finalize()" ng-show="partnerUp && !finalized">Finalize this pairing</button>
-  <div class="createButtons">
-    <button ng-click="openCreateModal()">Create a group</button>
-    <button ng-click="importFromMakerpass()">Import Groups from Makerpass</button>
+  <div class="controls">
+    <button ng-click="randomize(groupSize)">Partner Up!</button>
+    <button ng-click="finalize()" ng-show="partnerUp && !finalized">Finalize this pairing</button>
+    <div class="createButtons">
+      <button ng-click="openCreateModal()">Create a group</button>
+      <button ng-click="importFromMakerpass()">Import Groups from Makerpass</button>
+    </div>
+    <div>Current class: {{currentClass.name}}</div>
+    <select ng-model="classSelect" ng-options="class as class.name for class in classes" ng-change="changeClass(classSelect)">
+    </select>
   </div>
-  <div>Current class: {{currentClass.name}}</div>
-  <select ng-model="classSelect" ng-options="class as class.name for class in classes" ng-change="changeClass(classSelect)">
-  </select>
 
   <!--Lists of people in the current class-->
   <div class="instructorList">
