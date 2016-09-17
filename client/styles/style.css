@@ -29,6 +29,15 @@ body {
   border: 1px solid #CCC;
 }
 
+.locked{
+  background-color: #DDD;
+}
+
+.lockBtn{
+  cursor: pointer;
+  color: #777;
+}
+
 .clash{
   color: red;
 }

@@ -43,6 +43,9 @@ angular.module('PU.main', ['PU.factories'])
   var timeoutCounter = 0;
   var timeoutThreshold = 2500; //number of iterations to run before we assume we're in an infinite loop
 
+  $scope.lockedGroups = [];
+  var lockedStus = {};
+
   $scope.changeClass = function(cls){
     $scope.loading = true;
     console.log("Switching to: ", cls);
@@ -76,7 +79,9 @@ angular.module('PU.main', ['PU.factories'])
   $scope.trueRandomize = function(groupSize){
     console.log("Rolling");
     $scope.groups = [];
-    var stus = $scope.students.slice();
+    var stus = $scope.students.filter(function(stu){
+      return !lockedStus[stu.user.uid]; //don't shuffle the locked students
+    })
 
     var shuffled = [];
     for(var i = 0; i < stus.length % groupSize; i++){
@@ -95,6 +100,9 @@ angular.module('PU.main', ['PU.factories'])
       var group = shuffled.slice(i, i+groupSize);
       $scope.groups.push(group);
     }
+    for(var i = 0; i < $scope.lockedGroups.length; i++){
+      $scope.groups.splice($scope.lockedGroups[i][1], 0, $scope.lockedGroups[i][0])
+    }
     checkClashes();
     $scope.partnerUp = true;
     $scope.finalized = false;
@@ -111,7 +119,9 @@ angular.module('PU.main', ['PU.factories'])
       return $scope.trueRandomize(groupSize);
     }
     $scope.groups = [];
-    var stus = $scope.students.slice();
+    var stus = $scope.students.filter(function(stu){
+      return !lockedStus[stu.user.uid]; //don't shuffle the locked students
+    })
 
     var shuffled = [];
     for(var i = 0; i < stus.length % groupSize; i++){
@@ -153,6 +163,9 @@ angular.module('PU.main', ['PU.factories'])
       if(failed){
         return $scope.randomize(groupSize);
       }
+    }
+    for(var i = 0; i < $scope.lockedGroups.length; i++){
+      $scope.groups.splice($scope.lockedGroups[i][1], 0, $scope.lockedGroups[i][0])
     }
     $scope.partnerUp = true;
     $scope.finalized = false;
@@ -226,6 +239,10 @@ angular.module('PU.main', ['PU.factories'])
 
   //Functions for rearranging students
   $scope.selectForSwap = function(student){
+    if(lockedStus[student.user.uid]){
+      alert("This student has been locked into a group; please unlock them before moving them around");
+      return;
+    }
     var selectedIndex = searchForSelected(student);
     if($scope.selectedForSwap === student){
       $scope.selectedForSwap = null;
@@ -237,6 +254,9 @@ angular.module('PU.main', ['PU.factories'])
       swapStus(selectedIndex, $scope.selectedForSwapIndex);
       $scope.selectedForSwap = null;
       $scope.selectedForSwapIndex = null;
+      if($scope.finalized){
+        alert("Note: the groups have already been finalized; any manual edits will not be recorded")
+      }
     }
     checkClashes();
   }
@@ -255,6 +275,34 @@ angular.module('PU.main', ['PU.factories'])
     var tmp = $scope.groups[indexTuple1[0]][indexTuple1[1]];
     $scope.groups[indexTuple1[0]][indexTuple1[1]] = $scope.groups[indexTuple2[0]][indexTuple2[1]]
     $scope.groups[indexTuple2[0]][indexTuple2[1]] = tmp;
+  }
+
+  $scope.toggleLockGroup = function(group){
+    for(var i = 0; i < $scope.lockedGroups.length; i++){
+      if($scope.lockedGroups[i][0] === group){ //found the group in the locked groups
+        var unlocked = $scope.lockedGroups.splice(i, 1)[0][0];
+        for(var j = 0; j < unlocked.length; j++){
+          lockedStus[unlocked[j].user.uid] = false; //unlock the students in the group
+        }      
+        return "unlocked";
+      }
+    }
+
+    var index = $scope.groups.indexOf(group);
+    $scope.lockedGroups.push([group, index]); //track the pair
+    for(var j = 0; j < group.length; j++){
+      lockedStus[group[j].user.uid] = true; //make sure the students don't get reshuffled
+    }
+    return "locked";
+  }
+
+  $scope.searchLockedGroups = function(group){
+    for(var i = 0; i < $scope.lockedGroups.length; i++){
+      if($scope.lockedGroups[i][0] === group){ //found the group in the locked groups
+        return true;
+      }
+    }
+    return false;    
   }
 
   //Functions for the createGroup Modal below

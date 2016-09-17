@@ -26,9 +26,12 @@
       <tr>
       <th ng-repeat="index in getIndexArray(groupSize)">Partner {{index + 1}}</th>
       </tr>
-      <tr ng-repeat="group in groups" ng-class="{clash: clashes.includes(group)}">
+      <tr ng-repeat="group in groups" ng-class="{clash: !finalized && clashes.includes(group), locked: searchLockedGroups(group)}">
         <td ng-repeat="stu in group" ng-click="selectForSwap(stu)" ng-class="{selectedStu: selectedForSwap === stu}" class="stu">
           {{stu.user.name}}
+        </td>
+        <td>
+          <div class="lockBtn" ng-click="toggleLockGroup(group)">{{!searchLockedGroups(group) ? '🔓' : '🔒'}}</button>
         </td>
       </tr>
     </table>
