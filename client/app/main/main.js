@@ -25,7 +25,7 @@ angular.module('PU.main', ['PU.factories'])
   $scope.currentClass; //the current class
   $scope.groups = [];//the current assigned groups
   $scope.noPair = []; //the current removed students
-  $scope.groupSize = 2;
+  $scope.groupSize = 3;
   $scope.loading = true;
   $scope.partnerUp = false;
   $scope.roles = ["instructor", "fellow", "student"];
@@ -85,7 +85,7 @@ angular.module('PU.main', ['PU.factories'])
 
     var shuffled = [];
     for(var i = 0; i < stus.length % groupSize; i++){
-      stus.push({user:{name: "Code Monkey"}});
+      stus.push({user:{name: "Code Monkey", uid: "-" + i}}); //give them decrementing ids
     }
 
     while(stus.length){
@@ -125,7 +125,7 @@ angular.module('PU.main', ['PU.factories'])
 
     var shuffled = [];
     for(var i = 0; i < stus.length % groupSize; i++){
-      stus.push({user:{name: "Code Monkey", uid: "-1"}});
+      stus.push({user:{name: "Code Monkey", uid: "-" + i}});
     }
 
     while(stus.length){
@@ -134,10 +134,10 @@ angular.module('PU.main', ['PU.factories'])
     }
 
     while(shuffled.length){
+      var first = shuffled[0];
+      var group = [first];
       for(var j = 1; j < shuffled.length; j++){
         var failed = true;
-        var first = shuffled[0];
-        var group = [first];
         var noClashes = true;
         for(var k = 0; k < group.length; k++){
           if($scope.pastPairs[group[k].user.uid]){
@@ -148,8 +148,9 @@ angular.module('PU.main', ['PU.factories'])
           }
         }
         if(noClashes){
-          group.push(shuffled[j]);
+          group.push(shuffled[j]);          
           shuffled.splice(j, 1);
+          j--;
         }else{
           continue;
         }
@@ -291,6 +292,10 @@ angular.module('PU.main', ['PU.factories'])
     var index = $scope.groups.indexOf(group);
     $scope.lockedGroups.push([group, index]); //track the pair
     for(var j = 0; j < group.length; j++){
+      if($scope.selectedForSwap === group[j]){
+        $scope.selectedForSwap = null;
+        $scope.selectedForSwapIndex = null; //deselect them if they're selected
+      }
       lockedStus[group[j].user.uid] = true; //make sure the students don't get reshuffled
     }
     return "locked";
