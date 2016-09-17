@@ -85,7 +85,7 @@ angular.module('PU.main', ['PU.factories'])
 
     var shuffled = [];
     for(var i = 0; i < stus.length % groupSize; i++){
-      stus.push({user:{name: "Code Monkey", uid: "-" + i, avatar_url:"http://codemonkey.sunburst.com/images/monkey.png "}}); //give them decrementing ids
+      stus.push({user:{name: "Code Monkey", uid: "-" + i, avatar_url:'https://s-media-cache-ak0.pinimg.com/564x/7e/e7/fe/7ee7fe7d2753c6c47715a95c8508533d.jpg'}}); //give them decrementing ids
     }
 
     while(stus.length){
@@ -125,7 +125,7 @@ angular.module('PU.main', ['PU.factories'])
 
     var shuffled = [];
     for(var i = 0; i < stus.length % groupSize; i++){
-      stus.push({user:{name: "Code Monkey", uid: "-" + i, avatar_url:"http://codemonkey.sunburst.com/images/monkey.png "}});
+      stus.push({user:{name: "Code Monkey", uid: "-" + i, avatar_url:'https://s-media-cache-ak0.pinimg.com/564x/7e/e7/fe/7ee7fe7d2753c6c47715a95c8508533d.jpg'}});
     }
 
     while(stus.length){
