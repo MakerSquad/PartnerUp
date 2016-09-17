@@ -1,15 +1,7 @@
 var pg = require('pg');
 const config = require('../knexfile.js');
 // const env = 'development';
-/**
-  @params {object} group - {
-    'name': (string)name,
-    'groupId': (string)mksId
-  }
-  return: 'added student to group' or error
 
-connecting to database using knex for promises/convinace
-*/
 const knex = require('knex')({
   client: 'pg',
   connection: {
@@ -24,10 +16,10 @@ const knex = require('knex')({
 
 knex.migrate.latest([config]);
 
-/**
-  @params: group = {
+/* 
+  params: group = {
     'name': (string)name,
-    'groupId': (string)mksId
+    'groupId': (int)mksId
   }
   return: 'added student to group' or error
 */
@@ -40,8 +32,8 @@ knex.addGroup = (group) => {
     .catch((err) => console.log('error: ', err))
 }
 
-/**
-  @params: 
+/* 
+  params: 
     group = {
     'name': (string)name 
     } 
@@ -73,8 +65,8 @@ knex.getTables = () => {
   return knex('user_group').returning('*')
 }
 
-/**
-  @params: student = {
+/* 
+  params: student = {
   "group_uid": "774f8e8ef2b7",
   "user_uid": "b3d187b37eb6",
   "role": "student",
@@ -103,7 +95,7 @@ knex.addStudents = (students) => {
             .then((id) => {
               console.log('inside else: ', id[0], 'student: ', students[i])
               knex('user_group').insert({
-                 user_id: id[0].uid,
+                user_uid: id[0],
                 group_id: students[i].group_uid,
                 role_name: students[i].role
               }).then((id) => 'added student to group')
@@ -199,7 +191,7 @@ knex.deleteUser = (userId) => {
         }).catch((err) => console.log('error: ', err))
     }).catch((err) => console.log('error: ', err))
 }
-  
+
 knex.deleteGroup = (groupId) => {
   return knex('groups').where('id', groupId).del()
     .then((bool) => {
