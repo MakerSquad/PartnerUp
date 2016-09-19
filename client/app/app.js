@@ -2,7 +2,8 @@
 angular.module('PU', [
   'ngRoute',
   'PU.signin',
-  'PU.main'
+  'PU.main',
+  'PU.history'
   ])
 .config(function($routeProvider, $httpProvider) {
   $routeProvider
