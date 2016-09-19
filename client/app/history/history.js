@@ -20,6 +20,9 @@ angular.module('PU.history', ['PU.factories'])
     $scope.getHistory($routeParams.class, $scope.generationId);
   }
 
+  $scope.goHome = function(){
+    $location.path('/');
+  }
 
 
 })

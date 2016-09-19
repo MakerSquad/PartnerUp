@@ -22,3 +22,25 @@ angular.module('PU.factories', [])
   }  
 
 })
+
+.factory('StateSaver', function(){
+  var state = null; //set to null if nothing is saved
+
+  var saveState = function(toSave){
+    console.log('Saving: ', toSave);
+    state = toSave;
+  }
+
+  var restoreState = function(){
+    var tmp = state;
+    state = null; //clear out the state
+    console.log("Restoring: ", tmp);
+    return tmp;
+  }
+
+  return {
+    saveState: saveState,
+    restoreState: restoreState
+  }
+
+})

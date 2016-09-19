@@ -1,7 +1,7 @@
 
 angular.module('PU.main', ['PU.factories'])
 
-.controller('MainController', function ($scope, $location, Makerpass, $http) {
+.controller('MainController', function ($scope, $location, Makerpass, $http, StateSaver) {
 
   $http({ //Check the current user
     method: "GET",
@@ -48,10 +48,29 @@ angular.module('PU.main', ['PU.factories'])
   var timeoutThreshold = 5000; //number of iterations to run before we assume we're in an infinite loop
 
   $scope.lockedGroups = []; //The groups that have been locked in
-  var lockedStus = {}; //Hash table of student uids to boolean values
+  $scope.lockedStus = {}; //Hash table of student uids to boolean values
+
+  var savedState = StateSaver.restoreState(); //if we previously saved state, grab it back
+  if(savedState){
+    $scope = Object.assign($scope, savedState); //copy the saved state back into scope
+    console.log("Scope: ", $scope);
+  }
 
   $scope.seeHistory = function(){
     if($scope.currentClass){
+      StateSaver.saveState({ //save the state to restore later
+        groups: $scope.groups,
+        currentClass: $scope.currentClass,
+        lockedGroups: $scope.lockedGroups,
+        lockedStus: $scope.lockedStus,
+        pastPairs: $scope.pastPairs,
+        students: $scope.students,
+        fellows: $scope.fellows,
+        instructors: $scope.instructors,
+        partnerUp: $scope.partnerUp,
+        finalized: $scope.finalized,
+        noPair: $scope.noPair
+      })
       $location.path(`/${$scope.currentClass.name_id}/history`);
     }
   }
@@ -120,7 +139,7 @@ angular.module('PU.main', ['PU.factories'])
     console.log("Rolling");
     $scope.groups = [];
     var stus = $scope.students.filter(function(stu){
-      return !lockedStus[stu.user.uid]; //don't shuffle the locked students
+      return !$scope.lockedStus[stu.user.uid]; //don't shuffle the locked students
     })
 
     var shuffled = [];
@@ -162,7 +181,6 @@ angular.module('PU.main', ['PU.factories'])
       groupSize = 2; //default group size to 2
     }
     groupSize = Number(groupSize);
-    console.log("groupSize: ", groupSize + 1 - 1);
     timeoutCounter += 1;
 
     if(timeoutCounter > timeoutThreshold){
@@ -173,7 +191,7 @@ angular.module('PU.main', ['PU.factories'])
     }
     $scope.groups = [];
     var stus = $scope.students.filter(function(stu){
-      return !lockedStus[stu.user.uid]; //don't shuffle the locked students
+      return !$scope.lockedStus[stu.user.uid]; //don't shuffle the locked students
     })
 
     var shuffled = [];
@@ -319,7 +337,7 @@ angular.module('PU.main', ['PU.factories'])
   */
 
   $scope.selectForSwap = function(student){
-    if(lockedStus[student.user.uid]){
+    if($scope.lockedStus[student.user.uid]){
       alert("This student has been locked into a group; please unlock them before moving them around");
       return;
     }
@@ -384,7 +402,7 @@ angular.module('PU.main', ['PU.factories'])
       if($scope.lockedGroups[i][0] === group){ //found the group in the locked groups
         var unlocked = $scope.lockedGroups.splice(i, 1)[0][0];
         for(var j = 0; j < unlocked.length; j++){
-          lockedStus[unlocked[j].user.uid] = false; //unlock the students in the group
+          $scope.lockedStus[unlocked[j].user.uid] = false; //unlock the students in the group
         }      
         return "unlocked";
       }
@@ -397,7 +415,7 @@ angular.module('PU.main', ['PU.factories'])
         $scope.selectedForSwap = null;
         $scope.selectedForSwapIndex = null; //deselect them if they're selected
       }
-      lockedStus[group[j].user.uid] = true; //make sure the students don't get reshuffled
+      $scope.lockedStus[group[j].user.uid] = true; //make sure the students don't get reshuffled
     }
     return "locked";
   }

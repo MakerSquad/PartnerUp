@@ -11,7 +11,7 @@
       <button ng-click="importFromMakerpass()">Import Groups from Makerpass</button>
     </div>
     <div>Current class: {{currentClass.name}}</div>
-    <select ng-model="classSelect" ng-options="class as class.name for class in classes" ng-change="changeClass(classSelect)">
+    <select ng-model="currentClass" ng-options="class as class.name for class in classes" ng-change="changeClass(currentClass)">
     </select>
     <div>Group Size: </div>
     <select ng-init="groupSizeSelect = 2" ng-model="groupSizeSelect">
