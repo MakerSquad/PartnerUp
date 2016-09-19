@@ -84,36 +84,49 @@ app.get("/groups/:nameId/memberships", function(req, res){
   })
 })
 
-app.post('/test', (req, res) => {
-  // db.addPairs(req.body.name)
-    // .then((id) => console.log('group id: ', id))
-    // .catch((err) => console.log('errror: ', err))
-  res.status(200).send(db.addStudents(req.body.name))
+app.get('/database/updateGroups', (req, res) => {
+    MP.user.groups(req.session.uid, req.session.accessToken)
+      .then(function(data){
+        for(let i=0; i<data.length; i++){
+        console.log("data at i inside db/udpate-second call:", data[i])
+          MP.memberships(data[i].name_id, req.session.accessToken)
+          .then(function(members){
+            db.addStudents(members)
+          }).catch((err) => {console.log("error: ",err); res.send(err)})
+        }
+        res.send("updated!");
+      }).catch((err) => {console.log("error: ",err); res.send(err)})
 
 })
-app.post('/database/onLogin', (req, res) => {
- db.getAdmin(req.params.nameId).then((id) => {
-  if(id.length){
-    id[0]
-  }
- }).catch((err) => ("error: ", err))
-  res.status(200).send(db.addPairs(req.body.name))
 
+
+app.get('/database/getGroups', (req, res) => {
+  console.log("session", req.session.user)
+  db.findOrCreateAdmin({uid: req.session.uid, name: req.session.user.name}).then((id) => {
+      db.getGroup({mksId: id.uid}).then((groups) => {
+        res.send(groups) // send back an array with students that have groups that you can control over
+      }).catch((err) => res.status(500).send(err)) // error probably db is down or something else i wrong
+  }).catch((err) => {
+   console.log("error: ", err);
+   res.status(401).send("error", err)
+  })
+    res.send("cool");
 })
 
-app.post('/database/getPair', (req, res) => {
-  db.getAdmin(req.params.nameId).then((Admin) =>{
-    if(Admin.length){
+app.get('/database/getPair', (req, res) => {
+  db.findOrCreateAdmin(req.session.accessToken).then((Admin) =>{ //checks if person logged in 
+    if(Admin.length){ // if there is admin user inside table
       db.getPairsForStudent(req.body.data).then((studentsRay) =>{
-        res.send(studentsRay);
+        res.send(studentsRay); //reponse 200 with all pairs student was a part of in the group
       }) //gets all pairs for a specific user
+      .catch((err) => res.status(500).send(err)) // error probably db is down or something else i wrong
     }else{
-      res.status(401).send("No access. Please sign in with make pass")
+      res.status(401).send("No access. Make sure Makepass has the right credentials")
     }
   })
 })
 
-app.get('/test2', (req, res) => {
+app.get('/test', (req, res) => {
   db.getTables()
     .then((data) => {
       res.status(200).send(data)
