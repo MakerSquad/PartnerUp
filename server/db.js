@@ -64,6 +64,7 @@ knex.addGroup = (group) => {
   return: Object with group information
 */
 knex.getGroup = (group) => {
+  console.log("group id ::: ", group)
   if(group.name)
     return knex('groups').where('name', group.name).returning('*')
       .then((groupData) => groupData)
@@ -72,8 +73,10 @@ knex.getGroup = (group) => {
     return knex('groups').where('id', group.id).returning('*')
       .then((groupData) => groupData)
       .catch((err) => console.log('error: ', err))
-  return knex('groups').where('mks_id', group.mksId).returning('*')
-    .then((groupData) => groupData)
+  return knex('groups').where({mks_id: group.mksId}).returning('*')
+    .then((groupData) => {
+      console.log("data:::",groupData)
+      return groupData})
     .catch((err) => console.log('error: ', err))  
 }
 
@@ -88,7 +91,7 @@ knex.getGroupByAdmin = (uid) => {
 }
 
 knex.getTables = () => {
-  return knex('users').returning('*')
+  return knex('user_group').returning('*')
 }
 
 /* 
@@ -139,8 +142,13 @@ knex.addStudents = (students) => {
 */
 
 knex.getStudentsByGroup = (mksId) => {
-  return knex('user_group').where('group_id', mksId).returning('*')
-    .then((students) => students)
+  return knex('user_group').where('user_uid', mksId).returning('*')
+    .then((student) => {
+      return knex('user_group').where('group_id', student[0].group_id).returning('*')
+      .then((students) => students)
+      .catch((err) => console.log(err))
+    })
+    .catch((err) => console.log(err))
 }
 
 /**
@@ -185,6 +193,15 @@ knex.getPairsForStudent = (student) => {
     .catch((err) => console.log('error: ', err))
 }
 
+/**
+  @params: groupId = (string) group ID
+  return: array of pairs of the group
+*/
+knex.getPairsForStudent = (groupId) => {
+  return knex('pairs').where({'group_id': groupId}).returning('*')
+    .then((pairs) => pairs )
+    .catch((err) => console.log('error: ', err))
+}
 
 knex.removeStudentFromGroup = (student) => {
   return knex('user_group').where({'group_id': student.groupId, 'user1_id': student.studentId}).orWhere({'group_id': student.groupId, 'user2_id': student.studentId}).del()

@@ -48,7 +48,10 @@ app.use(session({secret: "funnyGilby"}));
 app.use(express.static(path.join(__dirname, '../client'))); 
 app.use(express.static(path.join(__dirname, '../client/app')));
 app.use(express.static(path.join(__dirname, '../bower_components')));
-
+// app.use((req, res, next) => {
+  // TODO:
+  //  write a test that cehcks if user is logged in, if not redirect to log in page
+// })
 app.get("/auth/:service", AuthPort.app);
 
 app.get("/signout", function(req, res){
@@ -84,6 +87,7 @@ app.get("/groups/:nameId/memberships", function(req, res){
   })
 })
 
+
 app.get('/database/updateGroups', (req, res) => {
     MP.user.groups(req.session.uid, req.session.accessToken)
       .then(function(data){
@@ -102,29 +106,17 @@ app.get('/database/updateGroups', (req, res) => {
 
 app.get('/database/getGroups', (req, res) => {
   console.log("session", req.session.user)
-  db.findOrCreateAdmin({uid: req.session.uid, name: req.session.user.name}).then((id) => {
-      db.getGroup({mksId: id.uid}).then((groups) => {
+  db.findOrCreateAdmin({uid: req.session.uid, name: req.session.name}).then((id) => {
+    console.log("id", id)
+      db.getStudentsByGroup(id.uid).then((groups) => {
         res.send(groups) // send back an array with students that have groups that you can control over
-      }).catch((err) => res.status(500).send(err)) // error probably db is down or something else i wrong
+      }).catch((err) => res.status(500).send(err)) // error probably db is down or something elsrong
   }).catch((err) => {
    console.log("error: ", err);
    res.status(401).send("error", err)
   })
-    res.send("cool");
 })
 
-app.get('/database/getPair', (req, res) => {
-  db.findOrCreateAdmin(req.session.accessToken).then((Admin) =>{ //checks if person logged in 
-    if(Admin.length){ // if there is admin user inside table
-      db.getPairsForStudent(req.body.data).then((studentsRay) =>{
-        res.send(studentsRay); //reponse 200 with all pairs student was a part of in the group
-      }) //gets all pairs for a specific user
-      .catch((err) => res.status(500).send(err)) // error probably db is down or something else i wrong
-    }else{
-      res.status(401).send("No access. Make sure Makepass has the right credentials")
-    }
-  })
-})
 
 app.get('/test', (req, res) => {
   db.getTables()
