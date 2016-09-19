@@ -14,9 +14,10 @@
     <select ng-model="classSelect" ng-options="class as class.name for class in classes" ng-change="changeClass(classSelect)">
     </select>
     <div>Group Size: </div>
-    <select ng-model="groupSizeSelect">
+    <select ng-init="groupSizeSelect = 2" ng-model="groupSizeSelect">
       <option ng-repeat="idx in getIndexArray(8)">{{idx+2}}</option>
     </select>
+    <button ng-click="seeHistory()" class="histBtn">See History</button>
   </div>
 
   <!--Lists of people in the current class-->

@@ -14,6 +14,10 @@ angular.module('PU', [
     templateUrl: 'signin/signin.html',
     controller: 'AuthController'
   })
+  .when('/:class/history', {
+    templateUrl: 'history/history.html',
+    controller: 'HistoryController'
+  })
 })
 
 // .run();

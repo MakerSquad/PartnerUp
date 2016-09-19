@@ -50,6 +50,12 @@ angular.module('PU.main', ['PU.factories'])
   $scope.lockedGroups = []; //The groups that have been locked in
   var lockedStus = {}; //Hash table of student uids to boolean values
 
+  $scope.seeHistory = function(){
+    if($scope.currentClass){
+      $location.path(`/${$scope.currentClass.name_id}/history`);
+    }
+  }
+
   /**
   * signOut makes a get request to '/signout,' destroying the current session
   */
@@ -152,6 +158,9 @@ angular.module('PU.main', ['PU.factories'])
   */
 
   $scope.randomize = function(groupSize){
+    if(!groupSize){
+      groupSize = 2; //default group size to 2
+    }
     groupSize = Number(groupSize);
     console.log("groupSize: ", groupSize + 1 - 1);
     timeoutCounter += 1;
