@@ -25,7 +25,6 @@ angular.module('PU.main', ['PU.factories'])
   $scope.currentClass; //the current class
   $scope.groups = [];//the current assigned groups
   $scope.noPair = []; //the current students that are removed from pairings
-  $scope.groupSize = 3; //the size of the groups to be assigned
   $scope.loading = true; //a loading state
   $scope.partnerUp = false; //True if groups are assigned
   $scope.roles = ["instructor", "fellow", "student"]; //The possible roles 
@@ -44,9 +43,9 @@ angular.module('PU.main', ['PU.factories'])
   */
   $scope.pastPairs = {};
   $scope.finalized = true; //Set to true if the grouping has been finalized and stored; false after a new grouping is generated
-  $scope.clashes = []; //Clashing groups
+  $scope.clashes = []; //Clashing groups (groups with repeats)
   var timeoutCounter = 0;
-  var timeoutThreshold = 2500; //number of iterations to run before we assume we're in an infinite loop
+  var timeoutThreshold = 5000; //number of iterations to run before we assume we're in an infinite loop
 
   $scope.lockedGroups = []; //The groups that have been locked in
   var lockedStus = {}; //Hash table of student uids to boolean values
@@ -153,6 +152,8 @@ angular.module('PU.main', ['PU.factories'])
   */
 
   $scope.randomize = function(groupSize){
+    groupSize = Number(groupSize);
+    console.log("groupSize: ", groupSize + 1 - 1);
     timeoutCounter += 1;
 
     if(timeoutCounter > timeoutThreshold){

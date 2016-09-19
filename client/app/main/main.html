@@ -4,7 +4,7 @@
 
   <!--Control buttons-->
   <div class="controls">
-    <button ng-click="randomize(groupSize)">Partner Up!</button>
+    <button ng-click="randomize(groupSizeSelect)">Partner Up!</button>
     <button ng-click="finalize()" ng-show="partnerUp && !finalized">Finalize this pairing</button>
     <div class="createButtons">
       <button ng-click="openCreateModal()">Create a group</button>
@@ -12,6 +12,10 @@
     </div>
     <div>Current class: {{currentClass.name}}</div>
     <select ng-model="classSelect" ng-options="class as class.name for class in classes" ng-change="changeClass(classSelect)">
+    </select>
+    <div>Group Size: </div>
+    <select ng-model="groupSizeSelect">
+      <option ng-repeat="idx in getIndexArray(8)">{{idx+2}}</option>
     </select>
   </div>
 
@@ -38,7 +42,7 @@
   <div ng-show="partnerUp" class="studentGroups">
     <table>
       <tr>
-      <th ng-repeat="index in getIndexArray(groupSize)">Partner {{index + 1}}</th>
+      <th ng-repeat="index in getIndexArray(groupSizeSelect)">Partner {{index + 1}}</th>
       </tr>
       <tr ng-repeat="group in groups" ng-class="{clash: !finalized && clashes.includes(group), locked: searchLockedGroups(group)}" >
         <td ng-repeat="stu in group" ng-click="selectForSwap(stu)" ng-class="{selectedStu: selectedForSwap === stu}" class="stu"> <img src='{{stu.user.avatar_url}}' width='40px' height='50px'>
