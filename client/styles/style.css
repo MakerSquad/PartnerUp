@@ -45,7 +45,9 @@ body {
 .clash{
   color: red;
 }
-
+.bad{
+  color: red;
+}
 th{
   padding-right: 30px;
 }
@@ -68,5 +70,26 @@ td{
 .selectedStu{
   color: #CCC;
 }
+.loginBtn{
+  background-color: cornflowerblue;
+  color:white;
+  border-radius: 5px;
+  float: right;
+  height:35px;
+  width: 150px;
+  font-size:13px;
+}
+.welcome{
+  text-align: center;
 
+}
+.info{
+  padding:30px;
+  background-color: #ebebeb;
+  border: solid;
+  border-color: #dbdbdb;
+}
+.login{
+  font-family: 'Josefin Sans', sans-serif;
 
+}

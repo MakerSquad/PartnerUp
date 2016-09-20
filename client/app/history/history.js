@@ -4,7 +4,7 @@ angular.module('PU.history', ['PU.factories'])
   
   //set up for copy to clipboard function 
   new Clipboard('.clipyclip');
-
+  $scope.groupSize = 2
   $scope.generationId = 1; 
   $scope.pastPairs = [{'partner1': 'Kathryn Hansen', 'partner2': 'Elliot Cheung', 'groupName': 'mks-43', 'generation': '1'},{'partner1': 'Aaron Ventura', 'partner2': 'Chad Griffis', 'groupName': 'mks-43', 'generation': '1'},{'partner1': 'Iliya', 'partner2': 'Ryan Walter', 'groupName': 'mks-43', 'generation': '2'},
   {'partner1': 'Doug', 'partner2': 'Garrett Holmes', 'groupName': 'mks-43', 'generation': '3'},
@@ -15,6 +15,7 @@ angular.module('PU.history', ['PU.factories'])
   $scope.currGen = $scope.generations[0].title
   $scope.maxGen = $scope.generations.length
   $scope.currClass = $routeParams.class //CURRENT CLASS ID!
+  $scope.badPartners = []
 
   //*********************************************************************************
   //this will get all the past pairs from the database by class id and generation id
@@ -105,6 +106,23 @@ angular.module('PU.history', ['PU.factories'])
       $scope.prev=$scope.generations[($scope.generations.length-2)].title
     }
     $scope.getHistory($routeParams.class, $scope.generationId);
+  }
+
+  $scope.toggleBadPartners = function(pair){
+    console.log(pair)
+      $scope.badPartners.push(pair);
+    
+      console.log($scope.badPartners)
+    }
+
+  
+
+    $scope.getIndexArray = function(num){
+    var arr = [];
+    for(var i = 0; i < num; i++){
+      arr[i] = i;
+    }
+    return arr;
   }
 
   //*********************************************************************************
