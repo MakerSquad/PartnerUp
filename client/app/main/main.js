@@ -8,7 +8,6 @@ angular.module('PU.main', ['PU.factories'])
     url: "/currentUser"
   })
   .then(function(resp){
-    console.log("Current User Data: ", resp);
     if(resp.data === ""){
       $location.path('/signin');
     } 
@@ -53,8 +52,8 @@ angular.module('PU.main', ['PU.factories'])
   var savedState = StateSaver.restoreState(); //if we previously saved state, grab it back
   if(savedState){
     $scope = Object.assign($scope, savedState); //copy the saved state back into scope
-    console.log("Scope: ", $scope);
   }
+
 
   $scope.seeHistory = function(){
     if($scope.currentClass){
@@ -97,16 +96,11 @@ angular.module('PU.main', ['PU.factories'])
   * @param cls : The new class object to switch to
   */
 
-  $scope.changeClass = function(cls){
+  $scope.changeClass = function(){
     $scope.loading = true;
-    console.log("Switching to: ", cls);
-    $scope.currentClass = cls;
-
-
     //TODO: This should be a database call
     return Makerpass.getMemberships($scope.currentClass.name_id)
     .then(function(members){
-      console.log("Members: ", members);
       $scope.students = members.data.filter(m => m.role === 'student');
       $scope.fellows = members.data.filter(m => m.role === 'fellow');
       $scope.instructors = members.data.filter(m => m.role === 'instructor');
@@ -136,7 +130,6 @@ angular.module('PU.main', ['PU.factories'])
   */
 
   $scope.trueRandomize = function(groupSize){
-    console.log("Rolling");
     $scope.groups = [];
     var stus = $scope.students.filter(function(stu){
       return !$scope.lockedStus[stu.user.uid]; //don't shuffle the locked students
@@ -292,7 +285,6 @@ angular.module('PU.main', ['PU.factories'])
         }
       }
     }
-    console.log("Past pairs: ", $scope.pastPairs);
     $scope.finalized = true;
   }
 
@@ -326,6 +318,7 @@ angular.module('PU.main', ['PU.factories'])
     })
   }
 
+  $scope.importFromMakerpass(); //Get the groups from makerpass on load
   //Functions for rearranging students
 
   /**
@@ -476,8 +469,6 @@ angular.module('PU.main', ['PU.factories'])
   */
 
   $scope.createClass = function(name, users){
-    console.log("Got name: ", name);
-    console.log("Got users: ", users);
     $scope.loading = true;
     $scope.classes.push({name: name});
     $scope.students = users.filter(m => m.role === 'student');
