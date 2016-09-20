@@ -2,7 +2,7 @@
 angular.module('PU.main', ['PU.factories'])
 
 .controller('MainController', function ($scope, $location, Makerpass, $http, StateSaver) {
-
+  new Clipboard('.clipyclip');
   $http({ //Check the current user
     method: "GET",
     url: "/currentUser"

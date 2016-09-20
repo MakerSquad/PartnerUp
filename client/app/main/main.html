@@ -40,19 +40,24 @@
 
   <!--The table of current groupings-->
   <div ng-show="partnerUp" class="studentGroups">
-    <table>
+    
+    <table id="partners">
+    
       <tr>
       <th ng-repeat="index in getIndexArray(groupSizeSelect)">Partner {{index + 1}}</th>
       </tr>
-      <tr ng-repeat="group in groups" ng-class="{clash: !finalized && clashes.includes(group), locked: searchLockedGroups(group)}" >
-        <td ng-repeat="stu in group" ng-click="selectForSwap(stu)" ng-class="{selectedStu: selectedForSwap === stu}" class="stu"> <img src='{{stu.user.avatar_url}}' width='40px' height='50px'>
+      <tr  ng-repeat="group in groups" ng-class="{clash: !finalized && clashes.includes(group), locked: searchLockedGroups(group)}" >
+        <td  ng-repeat="stu in group" ng-click="selectForSwap(stu)" ng-class="{selectedStu: selectedForSwap === stu}" class="stu"> <img src='{{stu.user.avatar_url}}' width='40px' height='50px'>
           {{stu.user.name}}
         </td>
-        <td>
-          <div class="lockBtn" ng-click="toggleLockGroup(group)">{{!searchLockedGroups(group) ? '🔓' : '🔒'}}</button>
+          <td>
+          <img src= "http://simpleicon.com/wp-content/uploads/lock-3.png" width='15px' height='15px' ng-show='!searchLockedGroups(group)' class="lockBtn" ng-click="toggleLockGroup(group)">
+          <img src= "http://image.flaticon.com/icons/svg/26/26053.svg" width='15px' height='15px' ng-show='searchLockedGroups(group)' class="lockBtn" ng-click="toggleLockGroup(group)">
         </td>
       </tr>
     </table>
+    
+    <button class="clipyclip" data-clipboard-target="#partners">copy me</button>
   </div>
 
   <!--The modal for creating a group-->
