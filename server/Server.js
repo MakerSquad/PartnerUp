@@ -124,7 +124,7 @@ app.get('/database/:groupName/members', (req,res) => {
   .catch((err) => res.status(500).send(err));
 })
 
-app.get('/database/:groupName/getPairs', (req,res) => {
+app.get('/database/:groupName/pairs', (req,res) => {
   db.getGroup({name: req.params.groupName})
   .then(data => {
     db.getPairsForGroup(data[0].mks_id, req.params.groupName)
