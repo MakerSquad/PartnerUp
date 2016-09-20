@@ -110,17 +110,13 @@ app.get('/database/updateGroups', (req, res) => {
 
 })
 app.get('/database/:groupName/members', (req,res) => {
-  console.log(req.session);
-  var mergeGroup = [];
+
   db.getGroup({name: req.params.groupName})
   .then((data) => {
     db.getStudentsByGroup(data[0].mks_id)
     .then((data) => {
       db.getStudentData(data).then((students) => {
-        console.log(students[0][0])
-      for(let i=0; i<students.length; i++) mergeGroup.push(students[i][0]);
-      console.log("mergegroup", mergeGroup);
-      res.send(mergeGroup);
+      res.send(students);
       }).catch((err) => res.status(500).send(err))
     })
     .catch((err) => res.status(500).send(err))
@@ -128,6 +124,17 @@ app.get('/database/:groupName/members', (req,res) => {
   .catch((err) => res.status(500).send(err));
 })
 
+app.get('/database/:groupName/getPairs', (req,res) => {
+  db.getGroup({name: req.params.groupName})
+  .then(data => {
+    db.getPairsForGroup(data[0].mks_id, req.params.groupName)
+    .then((pairs) => {
+      res.send(pairs)
+    })
+  })
+
+
+})
 
 app.get('/database/getUsersPartOfSameGroup', (req, res) => {
   db.findOrCreateAdmin({uid: req.session.uid, name: req.session.name}).then((id) => {

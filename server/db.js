@@ -89,7 +89,14 @@ knex.getStudentData = (studentRay) => {
     ray.push(knex('users').where({uid: studentRay[i].user_uid}).returning("*")
     .then((group) =>  group))
   }
-  return Promise.all(ray).then((groups) => groups).catch((err) => console.log(err))
+  return Promise.all(ray).then((groups) =>{
+    var mergeGroup = [];
+    for(let i=0; i<groups.length; i++){ 
+      groups[i][0].role = studentRay[i].role_name;
+      mergeGroup.push(groups[i][0]);
+    }
+    return mergeGroup
+  }).catch((err) => console.log(err))
 }
 
 knex.getTables = () => {
@@ -221,12 +228,20 @@ knex.getPairsForStudent = (student) => {
 }
 
 /**
-  @params: groupId = (string) group ID
+  @params: groupId = (string) group name
   return: array of pairs of the group
 */
-knex.getPairsForStudent = (groupId) => {
+knex.getPairsForGroup = (groupId, groupName) => {
+  var ray =[];
   return knex('pairs').where({'group_id': groupId}).returning('*')
-    .then((pairs) => pairs )
+    .then((pairsWithId) => {
+      //[{user1_id: 4, user2_id:30, group_id:1, genId},{user1_id: 42, user2_id:3, group_id:1}]
+      for(let i=0; i<pairsWithId.length; i++){
+        ray.push(findUserByID(pairsWithId.user1_id).then(user => {pairsWithId.user1_id=user}));
+        ray.push(findUserByID(pairsWithId.user2_id).then(user => {pairsWithId.user1_id=user}));
+      }
+      return Promise.all(ray).then((done) => {console.log(pairsWithId); return pairsWithId});
+    })
     .catch((err) => console.log('error: ', err))
 }
 
@@ -237,16 +252,15 @@ knex.removeStudentFromGroup = (student) => {
     })
 }
 
-
 knex.findGroupByName = (groupName) => {
   return knex('groups').where('name', groupName)
     .then((id) => id)
     .catch((err) => console.log('error: ', err))
 }
 
-knex.findUserByName = (userName) => {
-  return knex('users').where('name', userName)
-    .then((id) => id)
+function findUserByID(ID) {
+  return knex('users').where('uid', ID).returning("*")
+    .then((id) => id[0])
     .catch((err) => console.log('error: ', err))
 }
 
