@@ -64,6 +64,7 @@ angular.module('PU.main', ['PU.factories'])
         lockedStus: $scope.lockedStus,
         pastPairs: $scope.pastPairs,
         students: $scope.students,
+        classes: $scope.classes,
         fellows: $scope.fellows,
         instructors: $scope.instructors,
         partnerUp: $scope.partnerUp,
@@ -312,8 +313,18 @@ angular.module('PU.main', ['PU.factories'])
 
   $scope.importFromMakerpass = function(){
     Makerpass.getGroups()
-    .then(function(groups){
-      $scope.classes = $scope.classes.concat(groups.data);
+    .then(function(classes){
+      var already = {};
+      classes = classes.data;
+      for(var i = 0; i < $scope.classes.length; i++){
+        already[$scope.classes[i]] = true;
+      }
+      for(var j = 0; j < classes.length; j++){
+        console.log("Classes: ", classes[j]);
+        if(!already[classes[j]]){
+          $scope.classes.push(classes[j]);
+        }
+      }
       $scope.loading = false;
     })
   }
