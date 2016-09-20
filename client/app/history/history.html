@@ -1,6 +1,8 @@
 <div>
-<button ng-click='previous()'>previous</button>
-<button ng-click='next()'>next</button>
-<h3>Generation {{generationId}}</h3>
-<h2 ng-repeat='pair in pastPairs' class='pastPairs'></h2>
+<button ng-click='previous()'>{{prev}}</button>
+<button ng-click='next()'>{{nex}}</button>
+<input ng-model='search' placeholder="type generation name...">
+<div ng-repeat='generation in generations| filter: {title: search}' ng-click='setGen(generation)'>{{generation.title}}</div>
+<h3>{{currGen}}</h3>
+<h2 ng-repeat='pair in pastPairs | filter: {generation: generationId, groupName: currClass}' class='pastPairs'>{{pair.partner1}} {{pair.partner2}}</h2>
 <div>
