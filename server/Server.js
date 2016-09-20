@@ -22,7 +22,7 @@ AuthPort.on('auth', function(req, res, data) {
   req.session.accessToken = data.token;
   req.session.uid = data.data.user.uid;
   req.session.user = data.data.user;
-  res.redirect('/')
+  res.redirect('/database/updateGroups')
 })
  
 AuthPort.on('error', function(req, res, data) {
@@ -87,24 +87,44 @@ app.get("/groups/:nameId/memberships", function(req, res){
   })
 })
 
+app.get('/database/myGroups', (req, res) =>{
+  db.getGroupsForStudent(req.session.uid).then((groups) =>{
+    var mergeGroup = [];
+    for(let i=0; i<groups.length; i++) mergeGroup.push(groups[i][0])
+    res.send(mergeGroup)
+  })
+
+})
 
 app.get('/database/updateGroups', (req, res) => {
     MP.user.groups(req.session.uid, req.session.accessToken)
       .then(function(data){
         for(let i=0; i<data.length; i++){
-        console.log("data at i inside db/udpate-second call:", data[i])
-          MP.memberships(data[i].name_id, req.session.accessToken)
-          .then(function(members){
-            db.addStudents(members)
+        console.log("data inside update:", data);
+        db.addGroup({name: data[i].name, groupId:data[i].uid}).then((e) => {
+           MP.memberships(data[i].name_id, req.session.accessToken)
+            .then(function(members){
+              db.addStudents(members)
+            }).catch((err) => {console.log("error: ",err); res.send(err)})
           }).catch((err) => {console.log("error: ",err); res.send(err)})
         }
-        res.send("updated!");
+        res.redirect("/");
       }).catch((err) => {console.log("error: ",err); res.send(err)})
 
 })
+app.get('/database/:groupName/members', (req,res) => {
+  db.getGroup({name: req.params.groupName})
+  .then((data) => {
+    console.log(data);
+    db.getStudentsByGroup(data[0].mks_id)
+    .then((students) => res.send(students) )
+    .catch((err) => res.status(500).send(err))
+  })
+  .catch((err) => res.status(500).send(err));
+})
 
 
-app.get('/database/getGroups', (req, res) => {
+app.get('/database/getUsersPartOfSameGroup', (req, res) => {
   console.log("session", req.session.user)
   db.findOrCreateAdmin({uid: req.session.uid, name: req.session.name}).then((id) => {
     console.log("id", id)

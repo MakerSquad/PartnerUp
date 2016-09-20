@@ -40,12 +40,12 @@ knex.findOrCreateAdmin = (uid) => {
   return: 'added student to group' or error
 */
 knex.addGroup = (group) => {
-  return knex('groups').insert({name: group.name, mks_id: group.mksId}).returning('id')
-    .then((id) => {
-      console.log(id[0])
-      return id[0]
-    })
-    .catch((err) => console.log('error: ', err))
+  return knex('groups').where({mks_id:group.groupId}).returning("*").then( (exist) =>{
+    if(!exist.length){
+      return knex('groups').insert({name: group.name, mks_id: group.groupId}).returning('id')
+      .then((id) => id[0]).catch((err) => console.log('error: ', err))
+    }
+  }).catch((err) => console.log('error: ', err))
 }
 
 /* 
@@ -64,12 +64,11 @@ knex.addGroup = (group) => {
   return: Object with group information
 */
 knex.getGroup = (group) => {
-  console.log("group id ::: ", group)
-  if(group.name)
+  if(typeof group.name == "string")
     return knex('groups').where('name', group.name).returning('*')
       .then((groupData) => groupData)
       .catch((err) => console.log('error: ', err))
-  if(group.id)
+  if(typeof group.id == 'integer')
     return knex('groups').where('id', group.id).returning('*')
       .then((groupData) => groupData)
       .catch((err) => console.log('error: ', err))
@@ -95,6 +94,7 @@ knex.getTables = () => {
 }
 
 /* 
+  adds or updates student 
   params: student = {
   "group_uid": "774f8e8ef2b7",
   "user_uid": "b3d187b37eb6",
@@ -109,45 +109,70 @@ knex.getTables = () => {
 */
 knex.addStudents = (students) => {
   for(let i = 0; i < students.length; i++){
-    knex('users').where('uid', students[i].user_uid).returning('uid')
-      .then((id) => {
-        // console.log('id: ', id.length);
-        if(id.length){
-          knex('user_group').insert({
-            user_uid: id[0].uid,
-            group_id: students[i].group_uid,
-            role_name: students[i].role
-          }).then((id) => 'added student to group')
-            .catch((err) => console.log('error found user: ', err))
-        } else {
-          knex('users').insert({name: students[i].user.name, uid: students[i].user_uid}).returning('uid')
-            .then((id) => {
-              // console.log('inside else: ', id[0], 'student: ', students[i])
+    knex('user_group').where({user_uid: students[i].user_uid, group_id: students[i].group_uid}).returning("*")
+    .then((data) => {
+      if(!data.length){
+        knex('users').where('uid', students[i].user_uid).returning('uid')
+          .then((id) => {
+            if(id.length){
               knex('user_group').insert({
-                user_uid: id[0],
+                user_uid: id[0].uid,
                 group_id: students[i].group_uid,
                 role_name: students[i].role
               }).then((id) => 'added student to group')
-                .catch((err) => console.log('error join table: ', err))
-            }).catch((err) => console.log('error no user: ', err))
+                .catch((err) => console.log('error found user: ', err))
+            } else {
+              knex('users').insert({name: students[i].user.name, uid: students[i].user_uid}).returning('uid')
+                .then((id) => {
+                  knex('user_group').insert({
+                    user_uid: id[0],
+                    group_id: students[i].group_uid,
+                    role_name: students[i].role
+                  }).then((id) => 'added student to group')
+                    .catch((err) => console.log('error join table: ', err))
+                }).catch((err) => console.log('error no user: ', err))
+            }
+          }).catch((err) => console.log('error ', err))
         }
-      }).catch((err) => console.log('error ', err))
+        else {
+          knex('user_group').where({user_uid: students[i].user_uid, group_id: students[i].group_uid}).update({role_name: students[i].role})
+          .then((id) => 'updated')
+          .catch((err) => console.log('error no user: ', err))
+        }
+    })
   }
 }
+/**
+  @params: mksId = (string)mks-UID
+  return: [groups] or error
+*/
+knex.getGroupsForStudent = (mksId) => {
+  let ray = [];
+  return knex('user_group').where('user_uid', mksId).returning('*')
+    .then((student) => {
+      for(let i=0; i<student.length; i++){
+        console.log("student: ", student[i])
+        ray.push(knex('groups').where({mks_id: student[i].group_id}).returning("*").then((group)=> {
+          console.log("group in promise:",group)
+          return group;
+        }))
+      }
+      console.log(ray.length);
+      return Promise.all(ray).then((groups) => groups).catch((err) => console.log(err))
+    })
+    .catch((err) => console.log(err))
+}
+
 /**
   @params: data = {
     mksId: (string)mksId
   }
-  return: 'added pair' or error
+  return: 'users in that group' or error
 */
-
 knex.getStudentsByGroup = (mksId) => {
-  return knex('user_group').where('user_uid', mksId).returning('*')
-    .then((student) => {
-      return knex('user_group').where('group_id', student[0].group_id).returning('*')
-      .then((students) => students)
-      .catch((err) => console.log(err))
-    })
+  console.log("in ssbg:", mksId)
+  return knex('user_group').where('group_id', mksId).returning('*')
+    .then((students) => students)
     .catch((err) => console.log(err))
 }
 
