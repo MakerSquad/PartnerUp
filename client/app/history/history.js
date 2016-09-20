@@ -2,6 +2,8 @@ angular.module('PU.history', ['PU.factories'])
 
 .controller('HistoryController', function ($scope, $location, Makerpass, $http, $routeParams) {
   //$routeParams.class //name id of the class! 
+  new Clipboard('.clipyclip');
+
   $scope.generationId = 1;
   $scope.pastPairs = [{'partner1': 'Kathryn Hansen', 'partner2': 'Elliot Cheung', 'groupName': 'mks-43', 'generation': '1'},{'partner1': 'Aaron Ventura', 'partner2': 'Chad Griffis', 'groupName': 'mks-43', 'generation': '1'},{'partner1': 'Iliya', 'partner2': 'Ryan Walter', 'groupName': 'mks-43', 'generation': '2'},
   {'partner1': 'Doug', 'partner2': 'Garrett Holmes', 'groupName': 'mks-43', 'generation': '3'},
