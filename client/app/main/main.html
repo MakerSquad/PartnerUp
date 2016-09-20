@@ -5,7 +5,6 @@
   <!--Control buttons-->
   <div class="controls">
     <button ng-click="randomize(groupSizeSelect)">Partner Up!</button>
-    <button ng-click="finalize()" ng-show="partnerUp && !finalized">Finalize this pairing</button>
     <div class="createButtons">
       <button ng-click="openCreateModal()">Create a group</button>
     </div>
@@ -41,6 +40,8 @@
   <!--The table of current groupings-->
   <div ng-show="partnerUp" class="studentGroups">
     
+    <input ng-model="genTitle">
+    <button ng-click="finalize()" ng-show="partnerUp && !finalized">Finalize this pairing</button>
     <table id="partners">
     
       <tr>

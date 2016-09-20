@@ -57,7 +57,6 @@ angular.module('PU.factories', [])
   }
 
   var getMemberships = function(cls){
-    console.log("Cls: ", cls);
     return $http({
       method: 'GET',
       url: `/database/${cls}/members`,
@@ -66,9 +65,34 @@ angular.module('PU.factories', [])
     .catch(err => err)
   }
 
+  var getPairs = function(cls){
+    return $http({
+      method: 'GET',
+      url: `/database/${cls}/pairs`
+    })
+    .then(resp => resp.data)
+    .catch(err => err)
+  }
+
+  var addPairs = function(cls, pairs, genTitle, groupSize){
+    return $http({
+      method: 'POST',
+      url: `/database/${cls}/pairs`,
+      data: {
+        pairs: pairs,
+        genTitle: genTitle,
+        groupSize: groupSize
+      }
+    })
+    .then(resp => resp.data)
+    .catch(err => err)
+  }
+
   return{
     getClasses: getClasses,
-    getMemberships: getMemberships
+    getMemberships: getMemberships,
+    getPairs: getPairs,
+    addPairs: addPairs
   }
   
 })

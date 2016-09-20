@@ -273,6 +273,7 @@ angular.module('PU.main', ['PU.factories'])
   */
 
   $scope.finalize = function(){
+    var newPairs = [];
     for(var i = 0; i < $scope.groups.length; i++){
       for(var j = 0; j < $scope.groups[i].length; j++){
         for(var k = j+1; k < $scope.groups[i].length; k++){
@@ -280,6 +281,7 @@ angular.module('PU.main', ['PU.factories'])
             $scope.pastPairs[$scope.groups[i][j].uid] = {};
           }
           $scope.pastPairs[$scope.groups[i][j].uid][$scope.groups[i][k].uid] = true;
+          newPairs.push([$scope.groups[i][j].uid, $scope.groups[i][k].uid]); //new pairs to save in DB
           if(!$scope.pastPairs[$scope.groups[i][k].uid]){
             $scope.pastPairs[$scope.groups[i][k].uid] = {};
           }
@@ -287,6 +289,7 @@ angular.module('PU.main', ['PU.factories'])
         }
       }
     }
+    DB.addPairs($scope.currentClass.name, newPairs, $scope.genTitle, $scope.groupSizeSelect);
     $scope.finalized = true;
   }
 
