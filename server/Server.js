@@ -127,7 +127,7 @@ app.get('/database/:groupName/members', (req,res) => {
 app.get('/database/:groupName/pairs', (req,res) => {
   db.getGroup({name: req.params.groupName})
   .then(data => {
-    db.getPairsForGroup(data[0].mks_id, req.params.groupName)
+    db.getPairsForGroup(data[0].id, req.params.groupName)
     .then((pairs) => {
       res.send(pairs)
     })
