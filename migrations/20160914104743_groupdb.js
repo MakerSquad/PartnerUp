@@ -3,6 +3,7 @@ exports.up = (knex, Promise) => Promise.all([
     table.increments('id');
     table.string('name');
     table.string('uid');
+    table.string('avatar_pic');
   }),
   knex.schema.createTableIfNotExists('groups', table => {
     table.increments('id');

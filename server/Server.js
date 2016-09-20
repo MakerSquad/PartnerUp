@@ -18,7 +18,7 @@ AuthPort.createServer({
 })
  
 AuthPort.on('auth', function(req, res, data) {
-  console.log("OAuth success!", data);
+  // console.log("OAuth success!", data);
   req.session.accessToken = data.token;
   req.session.uid = data.data.user.uid;
   req.session.user = data.data.user;
@@ -48,10 +48,6 @@ app.use(session({secret: "funnyGilby"}));
 app.use(express.static(path.join(__dirname, '../client'))); 
 app.use(express.static(path.join(__dirname, '../client/app')));
 app.use(express.static(path.join(__dirname, '../bower_components')));
-// app.use((req, res, next) => {
-  // TODO:
-  //  write a test that cehcks if user is logged in, if not redirect to log in page
-// })
 app.get("/auth/:service", AuthPort.app);
 
 app.get("/signout", function(req, res){
@@ -97,27 +93,36 @@ app.get('/database/myGroups', (req, res) =>{
 })
 
 app.get('/database/updateGroups', (req, res) => {
+    var promiseArray = []
     MP.user.groups(req.session.uid, req.session.accessToken)
       .then(function(data){
         for(let i=0; i<data.length; i++){
-        console.log("data inside update:", data);
-        db.addGroup({name: data[i].name, groupId:data[i].uid}).then((e) => {
+        promiseArray.push(db.addGroup({name: data[i].name, groupId:data[i].uid}).then((e) => {
            MP.memberships(data[i].name_id, req.session.accessToken)
             .then(function(members){
               db.addStudents(members)
-            }).catch((err) => {console.log("error: ",err); res.send(err)})
-          }).catch((err) => {console.log("error: ",err); res.send(err)})
+            }).catch((err) => {console.log("error: ",err); res.status(500).send(err)})
+          }).catch((err) => {console.log("error: ",err); res.status(500).send(err)}))
         }
-        res.redirect("/");
-      }).catch((err) => {console.log("error: ",err); res.send(err)})
+        Promise.all(promiseArray).then((e)=>{res.redirect("/")})
+        .catch((err) => {console.log("error at promise.all: ",err); res.status(500).send(err)})
+      }).catch((err) => {console.log("error: ",err); res.status(500).send(err)})
 
 })
 app.get('/database/:groupName/members', (req,res) => {
+  console.log(req.session);
+  var mergeGroup = [];
   db.getGroup({name: req.params.groupName})
   .then((data) => {
-    console.log(data);
     db.getStudentsByGroup(data[0].mks_id)
-    .then((students) => res.send(students) )
+    .then((data) => {
+      db.getStudentData(data).then((students) => {
+        console.log(students[0][0])
+      for(let i=0; i<students.length; i++) mergeGroup.push(students[i][0]);
+      console.log("mergegroup", mergeGroup);
+      res.send(mergeGroup);
+      }).catch((err) => res.status(500).send(err))
+    })
     .catch((err) => res.status(500).send(err))
   })
   .catch((err) => res.status(500).send(err));
@@ -125,7 +130,6 @@ app.get('/database/:groupName/members', (req,res) => {
 
 
 app.get('/database/getUsersPartOfSameGroup', (req, res) => {
-  console.log("session", req.session.user)
   db.findOrCreateAdmin({uid: req.session.uid, name: req.session.name}).then((id) => {
     console.log("id", id)
       db.getStudentsByGroup(id.uid).then((groups) => {
