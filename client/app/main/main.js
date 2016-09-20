@@ -1,7 +1,7 @@
 
 angular.module('PU.main', ['PU.factories'])
 
-.controller('MainController', function ($scope, $location, Makerpass, $http, StateSaver) {
+.controller('MainController', function ($scope, $location, Makerpass, $http, StateSaver, DB) {
   new Clipboard('.clipyclip');
   $http({ //Check the current user
     method: "GET",
@@ -71,7 +71,7 @@ angular.module('PU.main', ['PU.factories'])
         finalized: $scope.finalized,
         noPair: $scope.noPair
       })
-      $location.path(`/${$scope.currentClass.name_id}/history`);
+      $location.path(`/${$scope.currentClass.name}/history`);
     }
   }
 
@@ -100,11 +100,12 @@ angular.module('PU.main', ['PU.factories'])
   $scope.changeClass = function(){
     $scope.loading = true;
     //TODO: This should be a database call
-    return Makerpass.getMemberships($scope.currentClass.name_id)
+    return DB.getMemberships($scope.currentClass.name)
     .then(function(members){
-      $scope.students = members.data.filter(m => m.role === 'student');
-      $scope.fellows = members.data.filter(m => m.role === 'fellow');
-      $scope.instructors = members.data.filter(m => m.role === 'instructor');
+      console.log("Members: ", members);
+      $scope.students = members.filter(m => m.role === 'student');
+      $scope.fellows = members.filter(m => m.role === 'fellow');
+      $scope.instructors = members.filter(m => m.role === 'instructor');
       $scope.loading = false;
     })
   }
@@ -133,12 +134,12 @@ angular.module('PU.main', ['PU.factories'])
   $scope.trueRandomize = function(groupSize){
     $scope.groups = [];
     var stus = $scope.students.filter(function(stu){
-      return !$scope.lockedStus[stu.user.uid]; //don't shuffle the locked students
+      return !$scope.lockedStus[stu.uid]; //don't shuffle the locked students
     })
 
     var shuffled = [];
     for(var i = 0; i < stus.length % groupSize; i++){
-      stus.push({user:{name: "Code Monkey", uid: "-" + i, avatar_url:'https://s-media-cache-ak0.pinimg.com/564x/7e/e7/fe/7ee7fe7d2753c6c47715a95c8508533d.jpg'}}); //give them decrementing ids
+      stus.push({name: "Code Monkey", uid: "-" + i, avatar_pic:'https://s-media-cache-ak0.pinimg.com/564x/7e/e7/fe/7ee7fe7d2753c6c47715a95c8508533d.jpg'}); //give them decrementing ids
     }
 
     while(stus.length){
@@ -185,12 +186,12 @@ angular.module('PU.main', ['PU.factories'])
     }
     $scope.groups = [];
     var stus = $scope.students.filter(function(stu){
-      return !$scope.lockedStus[stu.user.uid]; //don't shuffle the locked students
+      return !$scope.lockedStus[stu.uid]; //don't shuffle the locked students
     })
 
     var shuffled = [];
     for(var i = 0; i < stus.length % groupSize; i++){
-      stus.push({user:{name: "Code Monkey", uid: "-" + i, avatar_url:'https://s-media-cache-ak0.pinimg.com/564x/7e/e7/fe/7ee7fe7d2753c6c47715a95c8508533d.jpg'}});
+      stus.push({name: "Code Monkey", uid: "-" + i, avatar_pic:'https://s-media-cache-ak0.pinimg.com/564x/7e/e7/fe/7ee7fe7d2753c6c47715a95c8508533d.jpg'});
     }
 
     while(stus.length){
@@ -205,8 +206,8 @@ angular.module('PU.main', ['PU.factories'])
         var failed = true;
         var noClashes = true;
         for(var k = 0; k < group.length; k++){
-          if($scope.pastPairs[group[k].user.uid]){
-            if($scope.pastPairs[group[k].user.uid][shuffled[j].user.uid]){
+          if($scope.pastPairs[group[k].uid]){
+            if($scope.pastPairs[group[k].uid][shuffled[j].uid]){
               noClashes = false;
               break;
             }
@@ -252,8 +253,8 @@ angular.module('PU.main', ['PU.factories'])
       for(var j = 0; j < group.length; j++){
         var pushed = false;
         for(var k = j; k < group.length; k++){
-          if($scope.pastPairs[group[j].user.uid]){            
-            if($scope.pastPairs[group[j].user.uid][group[k].user.uid]){
+          if($scope.pastPairs[group[j].uid]){            
+            if($scope.pastPairs[group[j].uid][group[k].uid]){
               $scope.clashes.push(group);
               pushed = true;
               break;
@@ -275,14 +276,14 @@ angular.module('PU.main', ['PU.factories'])
     for(var i = 0; i < $scope.groups.length; i++){
       for(var j = 0; j < $scope.groups[i].length; j++){
         for(var k = j+1; k < $scope.groups[i].length; k++){
-          if(!$scope.pastPairs[$scope.groups[i][j].user.uid]){
-            $scope.pastPairs[$scope.groups[i][j].user.uid] = {};
+          if(!$scope.pastPairs[$scope.groups[i][j].uid]){
+            $scope.pastPairs[$scope.groups[i][j].uid] = {};
           }
-          $scope.pastPairs[$scope.groups[i][j].user.uid][$scope.groups[i][k].user.uid] = true;
-          if(!$scope.pastPairs[$scope.groups[i][k].user.uid]){
-            $scope.pastPairs[$scope.groups[i][k].user.uid] = {};
+          $scope.pastPairs[$scope.groups[i][j].uid][$scope.groups[i][k].uid] = true;
+          if(!$scope.pastPairs[$scope.groups[i][k].uid]){
+            $scope.pastPairs[$scope.groups[i][k].uid] = {};
           }
-          $scope.pastPairs[$scope.groups[i][k].user.uid][$scope.groups[i][j].user.uid] = true; 
+          $scope.pastPairs[$scope.groups[i][k].uid][$scope.groups[i][j].uid] = true; 
         }
       }
     }
@@ -329,7 +330,24 @@ angular.module('PU.main', ['PU.factories'])
     })
   }
 
-  $scope.importFromMakerpass(); //Get the groups from makerpass on load
+  $scope.getClasses = function(){
+    DB.getClasses()
+    .then(function(classes){
+      var already = {};
+      for(var i = 0; i < $scope.classes.length; i++){
+        already[$scope.classes[i]] = true;
+      }
+      for(var j = 0; j < classes.length; j++){
+        console.log("classes: ", classes[j]);
+        if(!already[classes[j]]){
+          $scope.classes.push(classes[j]);
+        }
+      }
+      $scope.loading = false;
+    })
+  }
+
+  $scope.getClasses();
   //Functions for rearranging students
 
   /**
@@ -341,7 +359,7 @@ angular.module('PU.main', ['PU.factories'])
   */
 
   $scope.selectForSwap = function(student){
-    if($scope.lockedStus[student.user.uid]){
+    if($scope.lockedStus[student.uid]){
       alert("This student has been locked into a group; please unlock them before moving them around");
       return;
     }
@@ -406,7 +424,7 @@ angular.module('PU.main', ['PU.factories'])
       if($scope.lockedGroups[i][0] === group){ //found the group in the locked groups
         var unlocked = $scope.lockedGroups.splice(i, 1)[0][0];
         for(var j = 0; j < unlocked.length; j++){
-          $scope.lockedStus[unlocked[j].user.uid] = false; //unlock the students in the group
+          $scope.lockedStus[unlocked[j].uid] = false; //unlock the students in the group
         }      
         return "unlocked";
       }
@@ -419,7 +437,7 @@ angular.module('PU.main', ['PU.factories'])
         $scope.selectedForSwap = null;
         $scope.selectedForSwapIndex = null; //deselect them if they're selected
       }
-      $scope.lockedStus[group[j].user.uid] = true; //make sure the students don't get reshuffled
+      $scope.lockedStus[group[j].uid] = true; //make sure the students don't get reshuffled
     }
     return "locked";
   }

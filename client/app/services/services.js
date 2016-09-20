@@ -44,3 +44,31 @@ angular.module('PU.factories', [])
   }
 
 })
+
+.factory('DB', function($http){
+
+  var getClasses = function(){
+    return $http({
+      method: 'GET',
+      url: '/database/myGroups'
+    })
+    .then(resp => resp.data)
+    .catch(err => err);
+  }
+
+  var getMemberships = function(cls){
+    console.log("Cls: ", cls);
+    return $http({
+      method: 'GET',
+      url: `/database/${cls}/members`,
+    })
+    .then(resp => resp.data)
+    .catch(err => err)
+  }
+
+  return{
+    getClasses: getClasses,
+    getMemberships: getMemberships
+  }
+  
+})
