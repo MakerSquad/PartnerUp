@@ -132,8 +132,10 @@ app.get('/database/:groupName/pairs', (req,res) => {
       res.send(pairs)
     })
   })
+})
 
-
+app.post('/database/:groupName/pairs', (req, res) => {
+  res.send(db.addPairs(req.body, req.params.groupName))
 })
 
 app.get('/database/getUsersPartOfSameGroup', (req, res) => {

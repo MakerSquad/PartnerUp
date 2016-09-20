@@ -18,15 +18,17 @@ exports.up = (knex, Promise) => Promise.all([
   }),
   knex.schema.createTableIfNotExists('pairs', table => {
     table.increments('id');
-    table.integer('user1_id');
-    table.integer('user2_id');
+    table.string('user1_uid');
+    table.string('user2_uid');
     table.integer('group_id');
     table.integer('gen_id');
   }),
   knex.schema.createTableIfNotExists('generations', table => {
     table.increments('id');
+    table.integer('gen_id')
     table.string('title');
     table.integer('group_id');
+    table.integer('group_size');
   }),
   knex.schema.createTableIfNotExists('ignore', table => {
     table.increments('id');
