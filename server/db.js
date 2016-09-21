@@ -187,12 +187,12 @@ knex.addStudents = (students) => {
         else {
           knex('user_group').where({user_uid: students[i].user_uid, group_id: students[i].group_uid})
           .update({role_name: students[i].role})
-          .then((id) => 'updated')
+          .then((id) => console.log('updated'))
           .catch((err) => console.log('error no user: ', err))
         }
     }))
   }
-  Promise.all(promiseRay).then(data => "done")
+  return Promise.all(promiseRay).then(data => "done");
 }
 /**
   @params: mksId = (string)mks-UID
