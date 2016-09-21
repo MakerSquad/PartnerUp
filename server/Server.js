@@ -55,35 +55,11 @@ app.get("/signout", function(req, res){
   res.redirect("/")
 })
 
-app.get("/myGroups", function(req, res){
-  MP.user.groups(req.session.uid, req.session.accessToken)
-  .then(function(data){
-    console.log("Makerpass groups data: ", data);
-    res.send(data);
-  })
-})
-
 app.get("/currentUser", function(req, res){
   res.send(req.session.user);
 })
 
-app.get("/groups/:nameId", function(req, res){
-  MP.group(req.params.nameId, req.session.accessToken)
-  .then(function(data){
-    console.log("Data for this group: ", data);
-    res.send(data);
-  })
-})
-
-app.get("/groups/:nameId/memberships", function(req, res){
-  MP.memberships(req.params.nameId, req.session.accessToken)
-  .then(function(data){
-    console.log("Data for members: ", data);
-    res.send(data);
-  })
-})
-
-app.get('/database/myGroups', (req, res) =>{
+app.get('/myGroups', (req, res) =>{
   db.getGroupsForStudent(req.session.uid).then((groups) =>{
     var mergeGroup = [];
     for(let i=0; i<groups.length; i++) mergeGroup.push(groups[i][0])
@@ -92,7 +68,7 @@ app.get('/database/myGroups', (req, res) =>{
 
 })
 
-app.get('/database/updateGroups', (req, res) => {
+app.get('/updateGroups', (req, res) => {
     var promiseArray = []
     MP.user.groups(req.session.uid, req.session.accessToken)
       .then(function(data){
@@ -111,7 +87,7 @@ app.get('/database/updateGroups', (req, res) => {
       }).catch((err) => {console.log("error: ",err); res.status(500).send(err)})
 
 })
-app.get('/database/:groupName/members', (req,res) => {
+app.get('/:groupName/members', (req,res) => {
 
   db.getGroup({name: req.params.groupName})
   .then((data) => {
@@ -126,7 +102,7 @@ app.get('/database/:groupName/members', (req,res) => {
   .catch((err) => res.status(500).send(err));
 })
 
-app.get('/database/:groupName/pairs', (req,res) => {
+app.get('/:groupName/pairs', (req,res) => {
   db.getGroup({name: req.params.groupName})
   .then(data => {
     db.getPairsForGroup(data[0].id, req.params.groupName)
@@ -136,7 +112,7 @@ app.get('/database/:groupName/pairs', (req,res) => {
   })
 })
 
-app.post('/database/:groupName/pairs', (req, res) => {
+app.post('/:groupName/pairs', (req, res) => {
   res.send(db.addPairs(req.body, req.params.groupName))
 })
 
@@ -151,7 +127,6 @@ app.post('/database/:groupName/pairs', (req, res) => {
 //    res.status(401).send("error", err)
 //   })
 // })
-
 
 app.get('/test', (req, res) => {
   db.getTables()
