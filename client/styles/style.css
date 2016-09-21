@@ -165,3 +165,27 @@ td{
   width: 125px;
   font-size:12px;
 }
+.history{
+  margin-left:20px;
+  font-family: 'Josefin Sans', sans-serif;
+}
+.changers{
+    background-color: cornflowerblue;
+  color:white;
+  border-radius: 5px;
+  margin-top: 10px
+  margin-bottom:10px;
+  height:30px;
+  width: 125px;
+  font-size:12px;
+}
+.goHome{
+  background-color: cornflowerblue;
+  color:white;
+  border-radius: 5px;
+  float: right;
+  margin-bottom:10px;
+  height:30px;
+  width: 125px;
+  font-size:12px;
+}
