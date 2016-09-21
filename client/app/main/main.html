@@ -1,4 +1,4 @@
-<div ng-class="{toBackground: creatingGroup}">
+<div ng-class="{toBackground: creatingGroup}" ng-show="initialized">
   <h1 class="welcome">Hello, {{currentUser.name.includes("Gilbert") ? "Gilby" : currentUser.name || "Gilby"}}!</h1>
   <button class="signout" ng-click="signOut()">Log out</button>
 
@@ -60,6 +60,8 @@
     
     <button class="clipyclip" data-clipboard-target="#partners">copy me</button>
   </div>
+</div>
+
 
   <!--The modal for creating a group-->
   <div class="modal" ng-show="creatingGroup">
@@ -89,4 +91,9 @@
       <input type="submit" value="Cancel" class="cancel" ng-click="closeCreateModal()">
     </form>
   </div>
-</div>
+
+<div class="initialLoad" ng-show="!initialized">
+  Loading...
+  <br>
+  <img src="https://i.imgur.com/TGGiq9Z.gif">
+</div> 

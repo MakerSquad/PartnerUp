@@ -12,6 +12,7 @@ angular.module('PU.main', ['PU.factories'])
   $scope.groups = [];//the current assigned groups
   $scope.noPair = []; //the current students that are removed from pairings
   $scope.loading = true; //a loading state
+  $scope.initialized = false; //loading state, only changed on initial load
   $scope.partnerUp = false; //True if groups are assigned
   $scope.roles = ["instructor", "fellow", "student"]; //The possible roles 
 
@@ -530,7 +531,10 @@ angular.module('PU.main', ['PU.factories'])
         if(savedState){
           $scope = Object.assign($scope, savedState); //copy the saved state back into scope
         }
-        $scope.getClasses();
+        $scope.getClasses()
+        .then(function(){
+          $scope.initialized = true;
+        })
       }
     })
   }())
