@@ -11,7 +11,8 @@ angular.module('PU.main', ['PU.factories'])
   $scope.currentClass; //the current class
   $scope.groups = [];//the current assigned groups
   $scope.noPair = []; //the current students that are removed from pairings
-  $scope.loading = true; //a loading state
+  $scope.loadingGroups = false; //true if the partners are being grouped
+  $scope.loadingList = false; //true if the list of users are being loaded
   $scope.initialized = false; //loading state, only changed on initial load
   $scope.partnerUp = false; //True if groups are assigned
   $scope.roles = ["instructor", "fellow", "student"]; //The possible roles 
@@ -92,6 +93,7 @@ angular.module('PU.main', ['PU.factories'])
     $scope.finalized = true;
     $scope.partnerUp = false;
     $scope.noPair = [];
+    $scope.loadingGroups = false;
   }
 
   /**
@@ -102,7 +104,11 @@ angular.module('PU.main', ['PU.factories'])
 
   $scope.changeClass = function(){
     resetClass();
-    $scope.loading = true;
+    console.log("$scope.currentClass: ", $scope.currentClass);
+    if($scope.currentClass === null){
+      return; //do nothing if the default option is selected
+    }
+    $scope.loadingList = true;
     //TODO: This should be a database call
     return DB.getMemberships($scope.currentClass.name)
     .then(function(members){
@@ -124,7 +130,7 @@ angular.module('PU.main', ['PU.factories'])
             $scope.pastPairs[pairs[i].user2_uid][pairs[i].user1_uid] = true;
           }
           console.log("Scope pastPairs: ", $scope.pastPairs);
-          $scope.loading = false;
+          $scope.loadingList = false;
         })
     })
   }
@@ -179,6 +185,7 @@ angular.module('PU.main', ['PU.factories'])
     checkClashes();
     $scope.partnerUp = true;
     $scope.finalized = false;
+    $scope.loadingGroups = false;
     return $scope.groups;
   }
 
@@ -191,6 +198,7 @@ angular.module('PU.main', ['PU.factories'])
   */
 
   $scope.randomize = function(groupSize){
+    $scope.loadingGroups = true;
     if(!groupSize){
       groupSize = 2; //default group size to 2
     }
@@ -257,6 +265,7 @@ angular.module('PU.main', ['PU.factories'])
     $scope.finalized = false;
     checkClashes();
     timeoutCounter = 0;
+    $scope.loadingGroups = false;
     return $scope.groups;
   }
 

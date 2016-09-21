@@ -21,4 +21,10 @@ angular.module('PU', [
   })
 })
 
+.directive('loading', function(){
+  return{
+    templateUrl: 'loading.html'
+  }
+})
+
 // .run();

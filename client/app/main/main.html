@@ -22,31 +22,36 @@
   </div>
 
   <!--Lists of people in the current class-->
-  <div class="instructorList">
-    <h2>Instructors: </h2>
-      <div class="instructor" ng-repeat="instructor in instructors">{{instructor.name}}</div>
-  </div>
-  <div class="fellowList">
-    <h2>Fellows: </h2>
-      <div class="fellow" ng-repeat="fellow in fellows">{{fellow.name}}</div>
-  </div>
-  <div class="studentList">
-    <h2>Students: </h2> 
-    <div class="student" ng-repeat="student in students"><button ng-click="removeFromStudent(student);">x</button>{{student.name}}</div>
-  </div>
-  <div>
-    <h2>Removed Students:</h2>
-    <div class ="removedStudents" ng-repeat="nopair in noPair"><button ng-click="addStudentBackIn(nopair);">o</button>{{nopair.name}}
+  <div loading ng-show="loadingList" class="listLoad"></div>
+  <div class="peopleList" ng-show="!loadingList">
+    <div class="instructorList">
+      <h2>Instructors: </h2>
+        <div class="instructor" ng-repeat="instructor in instructors">{{instructor.name}}</div>
+    </div>
+    <div class="fellowList">
+      <h2>Fellows: </h2>
+        <div class="fellow" ng-repeat="fellow in fellows">{{fellow.name}}</div>
+    </div>
+    <div class="studentList">
+      <h2>Students: </h2> 
+      <div class="student" ng-repeat="student in students"><button ng-click="removeFromStudent(student);">x</button>{{student.name}}</div>
+    </div>
+    <div>
+      <h2>Removed Students:</h2>
+      <div class ="removedStudents" ng-repeat="nopair in noPair"><button ng-click="addStudentBackIn(nopair);">o</button>{{nopair.name}}
+      </div>
     </div>
   </div>
 
   <!--The table of current groupings-->
-  <div ng-show="partnerUp" class="studentGroups">
-    
-    <input ng-model="genTitle" placeholder="Title...">
-    <button  class='final' ng-click="finalize()" ng-show="partnerUp && !finalized">Finalize this pairing</button>
-    <table id="partners">
-    
+  <div ng-show="loadingGroups" loading class="studentGroups"></div>
+  <div ng-show="partnerUp && !loadingGroups" class="studentGroups">
+    <div class='genTitle' ng-show="partnerUp && !finalized">
+      <input ng-model="genTitle" placeholder="Title..." maxlength="17">
+      <button  class='final' ng-click="finalize()">Finalize this pairing</button>
+    </div>
+
+    <table id="partners"> 
       <tr>
       <th ng-repeat="index in getIndexArray(groupSizeSelect)">Partner {{index + 1}}</th>
       </tr>
@@ -95,8 +100,5 @@
     </form>
   </div>
 
-<div class="initialLoad" ng-show="!initialized">
-  Loading...
-  <br>
-  <img src="https://i.imgur.com/TGGiq9Z.gif">
+<div loading class="initialLoad" ng-show="!initialized">
 </div> 
