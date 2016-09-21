@@ -9,7 +9,7 @@
 <tr>
 <th ng-repeat="index in getIndexArray(groupSize)">Partner {{index + 1}}</th>
 </tr>
-<tr ng-repeat='pair in pastPairs | filter: {generation: generationId, groupName: currClass}' >
+<tr ng-repeat='pair in pastPairs' >
 <td  ng-repeat='student in pair' class='pastPairs'>{{student}}</td>
 <td><img src="http://www.clipartkid.com/images/400/bigstock-hand-making-a-stop-signal-sign-162901311-150x150-5-fatal-U3Vjqk-clipart.jpg" height="20px" width="20px" ng-click="toggleBadPartners(pair)" ng-class="{bad : badPartners.includes(pair)}"></td>
 </tr>

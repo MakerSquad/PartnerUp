@@ -87,6 +87,10 @@ angular.module('PU.main', ['PU.factories'])
     $scope.creatingGroup = false;
     $scope.selectedForSwap = null;
     $scope.selectedForSwapIndex = undefined;
+    $scope.lockedGroups = [];
+    $scope.lockedStus = [];
+    $scope.finalized = true;
+    $scope.partnerUp = false;
     $scope.noPair = [];
   }
 

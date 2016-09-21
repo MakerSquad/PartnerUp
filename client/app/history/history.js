@@ -1,11 +1,11 @@
 angular.module('PU.history', ['PU.factories'])
 
-.controller('HistoryController', function ($scope, $location, Makerpass, $http, $routeParams) {
+.controller('HistoryController', function ($scope, $location, Makerpass, $http, $routeParams, DB) {
   
   // //set up for copy to clipboard function 
   // new Clipboard('.clipyclip');
   // $scope.groupSize = 2
-  $scope.generationId = 1; 
+  $scope.generationId = 0; 
   $scope.pastPairs = [];
   $scope.generations = [];
   // $scope.prev=$scope.generations[($scope.generations.length-1)].title
@@ -19,15 +19,15 @@ angular.module('PU.history', ['PU.factories'])
   //this will get all the past pairs from the database by class id and generation id
   //*********************************************************************************
 
-  $scope.getHistory = function(classId, generationId){
+  $scope.getHistory = function(classId){
     //database function to get all data
-    $http({
-      method: 'GET',
-      url: `/database/${$routeParams.class}/pairs`
-    }).then(function(data){
-      console.log('hey hey hey',data.data)
-    $scope.pastPairs = data.data
-  })
+    DB.getPairs($scope.currClass)
+      .then(function(data){
+        console.log('hihihi: ',data)
+        $scope.pastPairs = data
+        console.log('lalala: ',$scope.pastPairs)
+      })
+
   }
 
   $scope.getHistory();
