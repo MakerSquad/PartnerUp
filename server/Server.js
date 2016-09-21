@@ -18,7 +18,7 @@ AuthPort.createServer({
 })
  
 AuthPort.on('auth', function(req, res, data) {
-  // console.log("OAuth success!", data);
+  console.log("OAuth success! user logged:", data.user);
   req.session.accessToken = data.token;
   req.session.uid = data.data.user.uid;
   req.session.user = data.data.user;
@@ -29,11 +29,7 @@ AuthPort.on('error', function(req, res, data) {
   console.log("OAuth failed.", data)
   res.status(500).send({ error: 'oauth_failed' })
 })
- 
- 
-// 
-// Adding to your express app 
-// 
+
 var express = require('express')
 var session = require('express-session')
 var app = express()
@@ -65,30 +61,38 @@ app.get('/myGroups', (req, res) =>{
     for(let i=0; i<groups.length; i++) mergeGroup.push(groups[i][0])
     res.send(mergeGroup)
   })
-
 })
 
 app.get('/updateGroups', (req, res) => {
     var promiseArray = []
     MP.user.groups(req.session.uid, req.session.accessToken)
-      .then(function(data){
-        for(let i=0; i<data.length; i++){
-        promiseArray.push(
-          db.addGroup({name: data[i].name, groupId:data[i].uid}).then((e) => {
-           return MP.memberships(data[i].name_id, req.session.accessToken)
-            .then((members) => db.addStudents(members))
-            .catch((err) => {console.log("error: ",err); res.status(500).send(err)})
-          }).catch((err) => {console.log("error: ",err); res.status(500).send(err)}))
-        }
-        Promise.all(promiseArray).then((e)=>{
-          res.send("true")
-        })
-        .catch((err) => {console.log("error at promise.all: ",err); res.status(500).send(err)})
-      }).catch((err) => {console.log("error: ",err); res.status(500).send(err)})
-
+    .then(function(data){
+      for(let i=0; i<data.length; i++){
+      promiseArray.push(
+        db.addGroup({name: data[i].name, groupId:data[i].uid}).then((e) => {
+         return MP.memberships(data[i].name_id, req.session.accessToken)
+          .then((members) => db.addStudents(members))
+          .catch((err) => {console.log("error: ",err); res.status(500).send(err)})
+        }).catch((err) => {console.log("error: ",err); res.status(500).send(err)}))
+      }
+      Promise.all(promiseArray).then((e)=>{
+        res.send("true")
+      })
+      .catch((err) => {console.log("error at promise.all: ",err); res.status(500).send(err)})
+  }).catch((err) => {console.log("error: ",err); res.status(500).send(err)})
 })
-app.get('/:groupName/members', (req,res) => {
 
+app.get('/:groupName/generations', (req,res) => {
+  db.getGroup({name: req.params.groupName})
+  .then((data) => 
+    db.getGenarationsByGroup(data[0].id)
+    .then((genarations) => {
+        res.send(genarations);
+    }).catch((err) => res.status(500).send(err))
+  ).catch((err) => res.status(500).send(err));
+})
+
+app.get('/:groupName/members', (req,res) => {
   db.getGroup({name: req.params.groupName})
   .then((data) => {
     db.getStudentsByGroup(data[0].mks_id)

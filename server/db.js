@@ -228,35 +228,14 @@ knex.getStudentsByGroup = (mksId) => {
 }
 
 /**
-  @params: data = {
-    student1Id: (int)id
-    groupId: (string)id
-  }
-  return: array of pairs the student was in
-*/
-knex.getPairsForStudent = (student) => {
-  return knex('pairs').where({'group_id': student.groupId, 'user1_id': student.studentId}).orWhere({'group_id': groupId, 'user2_id': studentId}).returning('*')
-    .then((pairs) => pairs )
-    .catch((err) => console.log('error: ', err))
-}
-
-/**
   @params: groupId = (string) group uid, groupName = (string) the name of the group
   return: array of pairs of the group
 */
 knex.getPairsForGroup = (groupId, groupName) => {
   var ray =[];
   return knex('pairs').where({'group_id': groupId}).returning('*')
-    .then((pairsWithId) => {
-      for(let i=0; i<pairsWithId.length; i++){
-        if(!ray.includes(pairsWithId[i].gen_id))ray.push(pairsWithId[i].gen_id);
-      }
-      return batchGetGenarationsById(ray).then((data) => {
-        for(let i=0; i<pairsWithId.length; i++) pairsWithId[i].gen_id = data[pairsWithId[i].gen_id-1] || "no Genaration";
-        return pairsWithId;
-      })
-      .catch((err) => console.log('error: ', err))
-    }).catch((err) => console.log('error: ', err))
+    .then((pairsWithId) => pairsWithId)
+    .catch((err) => console.log('error: ', err))
 }
 
 knex.removeStudentFromGroup = (student) => {
@@ -295,25 +274,23 @@ function addGeneration(genData) {
     }else return (exist[0].id)
   }).catch((err) => console.log('error: ', err))
 }
+
 /**
-  @params: id = (int) genaration table id
+  @params: groupId = (int) genaration table id
   return: return {
     genId: (int) gen_id,
     groupSize: (int) group_size,
     groupTitle: (string) group_title 
   }
 */
-function getGenwithId(id) {
-  return knex('generations').where('id', id).returning("*")
-  .then((gen) => {console.log(gen[0]); return gen[0]})
+knex.getGenarationsByGroup = (groupId) => {
+  return knex('generations').where('group_id', groupId).returning("*")
+  .then((gen) => gen)
   .catch((err) => console.log('error: ', err))
 }
 
-function batchGetGenarationsById(ids) {
-  return knex('generations').whereIn('id', ids).returning("*")
-  .then((gen) => {console.log(gen); return gen})
-  .catch((err) => console.log('error: ', err))
-}
+
+
 
 function findUserByID(ID) {
   return knex('users').where('uid', ID).returning("*")
