@@ -32,18 +32,6 @@ knex.findOrCreateAdmin = (uid) => {
   }).catch((err) => console.log('error: ', err))
 }
 
-/* 
-  params: genData = {
-            groupId: (integer)id,
-            genId: (integer)id,
-            title: (string)genTitle,
-            groupSize: (integer)groupSize
-          }
-  return: return 
-*/
-knex.getGenId = (genData) => {
-  
-}
 /**
   @params: group = {
     'name': (string)name,
@@ -68,6 +56,7 @@ knex.addGroup = (group) => {
   }, (string)groupName)
   return: 201 or error
 */
+
 knex.addPairs = (pairData, groupName) => {
   var gId;
   return knex.getGroup({name: groupName})
@@ -75,29 +64,29 @@ knex.addPairs = (pairData, groupName) => {
       console.log('group[0].id: ', group[0].id, 'groupName: ', groupName)
       gId = group[0].id
       return;
-    }).catch((err) => console.log('error: ', err))
-      .then(() => addGeneration({
+    })
+    .then(() => addGeneration({
         groupId: gId,
         genTitle: pairData.genTitle,
         groupSize: pairData.groupSize
-      })).catch((err) => console.log('error: ', err))
-        .then((genId) => {
-          console.log('genId: ', genId)
-          var rows = [];
-          for(var i = 0; i < pairData.pairs.length; i++){
-            rows.push({
-              user1_uid: pairData.pairs[i][0],
-              user2_uid: pairData.pairs[i][1],
-              group_id: gId,
-              gen_id: genId
-            })
-          }
-          var chunkSize = pairData.pairs.length;
-          return knex.batchInsert('pairs', rows, chunkSize)
-            .then(() => ('pairs added'))
-            .catch((err) => console.log('error: ', err))
-        }).catch((err) => console.log('error: ', err));
-}
+      })
+      .then((genId) => {
+        console.log('genId: ', genId)
+        var rows = [];
+        for(var i = 0; i < pairData.pairs.length; i++){
+          rows.push({
+            user1_uid: pairData.pairs[i][0],
+            user2_uid: pairData.pairs[i][1],
+            group_id: gId,
+            gen_id: genId
+          })
+        }
+        var chunkSize = pairData.pairs.length;
+        return knex.batchInsert('pairs', rows, chunkSize)
+          .then(() => ('pairs added'))
+      }))
+  }
+
 /* 
   params: 
     group = {
@@ -214,10 +203,11 @@ knex.getGroupsForStudent = (mksId) => {
   let ray = [];
   return knex('user_group').where('user_uid', mksId).returning('*')
     .then((student) => {
+      console.log('student', student.length)
       for(let i=0; i<student.length; i++){
         ray.push(knex('groups').where({mks_id: student[i].group_id}).returning("*")
           .then((group) => group))
-      }
+      } 
       return Promise.all(ray).then((groups) => groups).catch((err) => console.log(err))
     })
     .catch((err) => console.log(err))
