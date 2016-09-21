@@ -11,7 +11,7 @@ body {
   display: inline;
   position: absolute;
   top: 200px;
-  left: 250px;
+  left: 350px;
   float: left;
   margin-right: 200px;
 }
@@ -65,7 +65,11 @@ td{
   cursor: pointer;
   border-style: solid;
   border-width: 3px;
-  border-color: slategrey;
+ 
+  background-color: #ebebeb;
+  
+  border-color: #dbdbdb;
+
 }
 .selectedStu{
   color: #CCC;
@@ -92,4 +96,72 @@ td{
 .login{
   font-family: 'Josefin Sans', sans-serif;
 
+}
+.main{
+  font-family: 'Josefin Sans', sans-serif;
+  margin:20px;
+}
+.signout{
+  float: right;
+  background-color: cornflowerblue;
+  color:white;
+  border-radius: 5px;
+  height:30px;
+  width: 125px;
+  font-size:13px;
+}
+.partnerBtn{
+  background-color: cornflowerblue;
+  color:white;
+  border-radius: 5px;
+  margin-top: 10px;
+  height:30px;
+  width: 125px;
+  font-size:13px;
+}
+.createClass{
+  background-color: cornflowerblue;
+  color:white;
+  border-radius: 5px;
+  margin-top: 10px;
+  margin-bottom:10px;
+  height:30px;
+  width: 125px;
+  font-size:13px;
+}
+.histBtn{
+    background-color: cornflowerblue;
+  color:white;
+  border-radius: 5px;
+  margin-top: 10px;
+  margin-bottom:10px;
+  height:30px;
+  width: 125px;
+  font-size:13px;
+}
+.currClass{
+  font-size:20px;
+}
+.groupSize{
+  font-size:20px;
+}
+.clipyclip{
+  background-color: cornflowerblue;
+  color:white;
+  border-radius: 5px;
+  margin-top: 10px;
+  margin-bottom:10px;
+  height:30px;
+  width: 125px;
+  font-size:13px;
+}
+.final{
+  background-color: cornflowerblue;
+  color:white;
+  border-radius: 5px;
+  margin-top: 10px;
+  margin-bottom:10px;
+  height:30px;
+  width: 125px;
+  font-size:12px;
 }

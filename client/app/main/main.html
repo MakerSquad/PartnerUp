@@ -1,20 +1,23 @@
-<div ng-class="{toBackground: creatingGroup}" ng-show="initialized">
-  <h1 class="welcome">Hello, {{currentUser.name.includes("Gilbert") ? "Gilby" : currentUser.name || "Gilby"}}!</h1>
+<div ng-class="{toBackground: creatingGroup}" ng-show="initialized" class='main'>
   <button class="signout" ng-click="signOut()">Log out</button>
+  <h1 class="welcome">Welcome, {{currentUser.name.includes("Gilbert") ? "Gilby" : currentUser.name || "Gilby"}}!</h1>
 
   <!--Control buttons-->
   <div class="controls">
-    <button ng-click="randomize(groupSizeSelect)">Partner Up!</button>
     <div class="createButtons">
-      <button ng-click="openCreateModal()">Create a group</button>
+      <button ng-click="openCreateModal()" class='createClass'>Create a class</button>
     </div>
-    <div>Current class: {{currentClass.name}}</div>
+    <div class='currClass'>Current class: {{currentClass.name}}</div>
     <select ng-model="currentClass" ng-options="class as class.name for class in classes" ng-change="changeClass()">
+    <option value="">Choose a class</option>
     </select>
-    <div>Group Size: </div>
+    <br><br>
+    <div class='groupSize'>Group Size: </div>
     <select ng-init="groupSizeSelect = 2" ng-model="groupSizeSelect">
       <option ng-repeat="idx in getIndexArray(8)">{{idx+2}}</option>
     </select>
+    <br>
+    <button ng-click="randomize(groupSizeSelect)" class="partnerBtn">Partner Up!</button>
     <button ng-click="seeHistory()" class="histBtn">See History</button>
   </div>
 
@@ -40,8 +43,8 @@
   <!--The table of current groupings-->
   <div ng-show="partnerUp" class="studentGroups">
     
-    <input ng-model="genTitle">
-    <button ng-click="finalize()" ng-show="partnerUp && !finalized">Finalize this pairing</button>
+    <input ng-model="genTitle" placeholder="Title...">
+    <button  class='final' ng-click="finalize()" ng-show="partnerUp && !finalized">Finalize this pairing</button>
     <table id="partners">
     
       <tr>
