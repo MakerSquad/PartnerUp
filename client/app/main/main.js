@@ -2,19 +2,6 @@
 angular.module('PU.main', ['PU.factories'])
 
 .controller('MainController', function ($scope, $location, Makerpass, $http, StateSaver, DB) {
-  new Clipboard('.clipyclip');
-  $http({ //Check the current user
-    method: "GET",
-    url: "/currentUser"
-  })
-  .then(function(resp){
-    if(resp.data === ""){
-      $location.path('/signin');
-    } 
-    else{
-      $scope.currentUser = resp.data;
-    }
-  })
 
   $scope.currentUser = {} //Information for the current user
   $scope.classes = []; //all classes the user is a part of
@@ -48,12 +35,6 @@ angular.module('PU.main', ['PU.factories'])
 
   $scope.lockedGroups = []; //The groups that have been locked in
   $scope.lockedStus = {}; //Hash table of student uids to boolean values
-
-  var savedState = StateSaver.restoreState(); //if we previously saved state, grab it back
-  if(savedState){
-    $scope = Object.assign($scope, savedState); //copy the saved state back into scope
-  }
-
 
   $scope.seeHistory = function(){
     if($scope.currentClass){
@@ -106,7 +87,22 @@ angular.module('PU.main', ['PU.factories'])
       $scope.students = members.filter(m => m.role === 'student');
       $scope.fellows = members.filter(m => m.role === 'fellow');
       $scope.instructors = members.filter(m => m.role === 'instructor');
-      $scope.loading = false;
+      return DB.getPairs($scope.currentClass.name)
+        .then(function(pairs){
+          console.log("Pairs: ", pairs);
+          for(var i = 0; i < pairs.length; i++){
+            if(!$scope.pastPairs[pairs[i].user1_uid]){
+              $scope.pastPairs[pairs[i].user1_uid] = {};
+            }
+            $scope.pastPairs[pairs[i].user1_uid][pairs[i].user2_uid] = true;
+            if(!$scope.pastPairs[pairs[i].user2_uid]){
+              $scope.pastPairs[pairs[i].user2_uid] = {};
+            }
+            $scope.pastPairs[pairs[i].user2_uid][pairs[i].user1_uid] = true;
+          }
+          console.log("Scope pastPairs: ", $scope.pastPairs);
+          $scope.loading = false;
+        })
     })
   }
 
@@ -273,24 +269,29 @@ angular.module('PU.main', ['PU.factories'])
   */
 
   $scope.finalize = function(){
-    var newPairs = [];
-    for(var i = 0; i < $scope.groups.length; i++){
-      for(var j = 0; j < $scope.groups[i].length; j++){
-        for(var k = j+1; k < $scope.groups[i].length; k++){
-          if(!$scope.pastPairs[$scope.groups[i][j].uid]){
-            $scope.pastPairs[$scope.groups[i][j].uid] = {};
+    if($scope.genTitle && $scope.genTitle.length){      
+      var newPairs = [];
+      for(var i = 0; i < $scope.groups.length; i++){
+        for(var j = 0; j < $scope.groups[i].length; j++){
+          for(var k = j+1; k < $scope.groups[i].length; k++){
+            if(!$scope.pastPairs[$scope.groups[i][j].uid]){
+              $scope.pastPairs[$scope.groups[i][j].uid] = {};
+            }
+            $scope.pastPairs[$scope.groups[i][j].uid][$scope.groups[i][k].uid] = true;
+            newPairs.push([$scope.groups[i][j].uid, $scope.groups[i][k].uid]); //new pairs to save in DB
+            if(!$scope.pastPairs[$scope.groups[i][k].uid]){
+              $scope.pastPairs[$scope.groups[i][k].uid] = {};
+            }
+            $scope.pastPairs[$scope.groups[i][k].uid][$scope.groups[i][j].uid] = true; 
           }
-          $scope.pastPairs[$scope.groups[i][j].uid][$scope.groups[i][k].uid] = true;
-          newPairs.push([$scope.groups[i][j].uid, $scope.groups[i][k].uid]); //new pairs to save in DB
-          if(!$scope.pastPairs[$scope.groups[i][k].uid]){
-            $scope.pastPairs[$scope.groups[i][k].uid] = {};
-          }
-          $scope.pastPairs[$scope.groups[i][k].uid][$scope.groups[i][j].uid] = true; 
         }
       }
+      DB.addPairs($scope.currentClass.name, newPairs, $scope.genTitle, $scope.groupSizeSelect);
+      $scope.finalized = true;
+      $scope.genTitle = "";
+    }else{
+      alert("Please enter a title for this class list");
     }
-    DB.addPairs($scope.currentClass.name, newPairs, $scope.genTitle, $scope.groupSizeSelect);
-    $scope.finalized = true;
   }
 
   /**
@@ -350,7 +351,6 @@ angular.module('PU.main', ['PU.factories'])
     })
   }
 
-  $scope.getClasses();
   //Functions for rearranging students
 
   /**
@@ -509,6 +509,28 @@ angular.module('PU.main', ['PU.factories'])
     $scope.loading = false;
     $scope.closeCreateModal();
   }
+
+  var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
+    $scope.loading = true;
+    new Clipboard('.clipyclip');
+    $http({ //Check the current user; redirect if we aren't logged in
+      method: "GET",
+      url: "/currentUser"
+    })
+    .then(function(resp){
+      if(resp.data === ""){
+        $location.path('/signin');
+      } 
+      else{
+        $scope.currentUser = resp.data;
+        $scope.getClasses();
+        var savedState = StateSaver.restoreState(); //if we previously saved state, grab it back
+        if(savedState){
+          $scope = Object.assign($scope, savedState); //copy the saved state back into scope
+        }
+      }
+    })
+  }())
 
 })
 
