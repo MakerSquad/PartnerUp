@@ -65,6 +65,7 @@ knex.addPairs = (pairData, groupName) => {
       gId = group[0].id
       return;
     })
+    .catch((err) => console.log('error: ', err))
     .then(() => addGeneration({
         groupId: gId,
         genTitle: pairData.genTitle,
@@ -84,7 +85,8 @@ knex.addPairs = (pairData, groupName) => {
         var chunkSize = pairData.pairs.length;
         return knex.batchInsert('pairs', rows, chunkSize)
           .then(() => ('pairs added'))
-      }))
+          .catch((err) => console.log('error: ', err))
+      })).catch((err) => console.log('error: ', err))
   }
 
 /* 
@@ -284,14 +286,14 @@ function addGeneration(genData) {
   .then((exist) => {
     console.log('exist: ', exist)
     if(!exist.length){
-      return knex('generations').where({group_id:genData.groupId}).returning("gen_id")
+      knex('generations').where({group_id:genData.groupId}).returning("gen_id")
       .then((next) => knex('generations').insert({
           group_id:   genData.groupId,
           title:      genData.genTitle,
           gen_id:     next.length,
           group_size: genData.groupSize
         }).returning('id').then((id) => {
-          console.log('id: ', id[0])
+          console.log('id: ', id)
           return id[0]
         })
       ).catch((err) => console.log('error: ', err))
