@@ -98,8 +98,9 @@ app.get('/database/updateGroups', (req, res) => {
       .then(function(data){
         for(let i=0; i<data.length; i++){
         console.log("group data[i]:", data[i] )
-        promiseArray.push(db.addGroup({name: data[i].name, groupId:data[i].uid}).then((e) => {
-           MP.memberships(data[i].name_id, req.session.accessToken)
+        promiseArray.push(
+          db.addGroup({name: data[i].name, groupId:data[i].uid}).then((e) => {
+           return MP.memberships(data[i].name_id, req.session.accessToken)
             .then((members) => db.addStudents(members))
             .catch((err) => {console.log("error: ",err); res.status(500).send(err)})
           }).catch((err) => {console.log("error: ",err); res.status(500).send(err)}))

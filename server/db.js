@@ -139,7 +139,7 @@ knex.getStudentData = (studentRay) => {
 }
 
 knex.getTables = () => {
-  return knex('generations').returning('*')
+  return knex('user_group').returning('*')
 }
 
 /* 
@@ -187,7 +187,7 @@ knex.addStudents = (students) => {
         else {
           knex('user_group').where({user_uid: students[i].user_uid, group_id: students[i].group_uid})
           .update({role_name: students[i].role})
-          .then((id) => console.log('updated'))
+          .then((id) => 'updated')
           .catch((err) => console.log('error no user: ', err))
         }
     }))
@@ -247,24 +247,17 @@ knex.getPairsForGroup = (groupId, groupName) => {
   return knex('pairs').where({'group_id': groupId}).returning('*')
     .then((pairsWithId) => {
       //[{user1_id: 4, user2_id:30, group_id:1, genId},{user1_id: 42, user2_id:3, group_id:1}]
-      console.log('pair with id: ', pairsWithId)
       for(let i=0; i<pairsWithId.length; i++){
         ray.push(
-          findUserByID(pairsWithId[i].user1_id).then(user => {
-            pairsWithId.user1_id=user    
-          }).catch((err) => console.log('error 1: ', err)),
-          findUserByID(pairsWithId[i].user2_id).then(user => {
-            pairsWithId.user1_id=user
-          }).catch((err) => console.log('error 2: ', err)),
-          getGenwithId(pairsWithId[i].gen_id).then((genData) =>{
-            pairsWithId.gen_id = genData[0]; 
-          }).catch((err) => console.log('error genData: ', err))
+          getGenwithId(pairsWithId[i].gen_id).then((genData) => genData)
+          .catch((err) => console.log('error genData: ', err))
         )
       }
-      return Promise.all(ray).then((done) => {
-        console.log(pairsWithId);
-        return pairsWithId})
-      .catch((err) => console.log('error: ', err))
+      return Promise.all(ray).then((data) => {
+        for(let i=0; i<pairsWithId.length; i++) pairsWithId[i].gen_id = data || "no Genaration"; 
+        return pairsWithId;
+      })
+      .catch((err) => console.log('error getPairsForGroup: ', err))
     })
     .catch((err) => console.log('error: ', err))
 }
@@ -314,8 +307,9 @@ function addGeneration(genData) {
   }
 */
 function getGenwithId(id) {
-  return knex('generation').where('id', id).returning("*")
-  .then((gen) => gen[0])
+  console.log("id inside getGenwithId", id);
+  return knex('generations').where('id', id).returning("*")
+  .then((gen) => {console.log(gen[0]); return gen[0]})
   .catch((err) => console.log('error: ', err))
 }
 
