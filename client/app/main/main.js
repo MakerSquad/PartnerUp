@@ -37,6 +37,7 @@ angular.module('PU.main', ['PU.factories'])
   $scope.lockedGroups = []; //The groups that have been locked in
   $scope.lockedStus = {}; //Hash table of student uids to boolean values
 
+
   $scope.seeHistory = function(){
     if($scope.currentClass){
       StateSaver.saveState({ //save the state to restore later
@@ -74,12 +75,29 @@ angular.module('PU.main', ['PU.factories'])
   }
   
   /**
+  * ResetClass empties all the variables related to the current class
+  * Acts as a helper function for changeClass to get ready for the new class
+  */
+  
+  var resetClass = function(){
+    $scope.students = [];
+    $scope.instructors = [];
+    $scope.fellows = [];
+    $scope.groups = [];
+    $scope.creatingGroup = false;
+    $scope.selectedForSwap = null;
+    $scope.selectedForSwapIndex = undefined;
+    $scope.noPair = [];
+  }
+
+  /**
   * ChangeClass is called when the current class needs to change
   * ChangeClass updates the lists of people with a call to the database
   * @param cls : The new class object to switch to
   */
 
   $scope.changeClass = function(){
+    resetClass();
     $scope.loading = true;
     //TODO: This should be a database call
     return DB.getMemberships($scope.currentClass.name)
