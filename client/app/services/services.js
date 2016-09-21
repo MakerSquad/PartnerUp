@@ -47,6 +47,15 @@ angular.module('PU.factories', [])
 
 .factory('DB', function($http){
 
+  var updateGroups = function(){
+    return $http({
+      method: 'GET',
+      url: '/database/updateGroups'
+    })
+    .then(resp => resp.data)
+    .catch(err => err)
+  }
+
   var getClasses = function(){
     return $http({
       method: 'GET',
@@ -92,7 +101,8 @@ angular.module('PU.factories', [])
     getClasses: getClasses,
     getMemberships: getMemberships,
     getPairs: getPairs,
-    addPairs: addPairs
+    addPairs: addPairs,
+    updateGroups: updateGroups,
   }
   
 })

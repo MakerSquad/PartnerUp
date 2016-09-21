@@ -335,19 +335,22 @@ angular.module('PU.main', ['PU.factories'])
   }
 
   $scope.getClasses = function(){
-    DB.getClasses()
-    .then(function(classes){
-      var already = {};
-      for(var i = 0; i < $scope.classes.length; i++){
-        already[$scope.classes[i]] = true;
-      }
-      for(var j = 0; j < classes.length; j++){
-        console.log("classes: ", classes[j]);
-        if(!already[classes[j]]){
-          $scope.classes.push(classes[j]);
+    return DB.updateGroups()
+    .then(function(){
+      DB.getClasses()
+      .then(function(classes){
+        var already = {};
+        for(var i = 0; i < $scope.classes.length; i++){
+          already[$scope.classes[i]] = true;
         }
-      }
-      $scope.loading = false;
+        for(var j = 0; j < classes.length; j++){
+          console.log("classes: ", classes[j]);
+          if(!already[classes[j]]){
+            $scope.classes.push(classes[j]);
+          }
+        }
+        $scope.loading = false;
+      })
     })
   }
 
@@ -523,11 +526,11 @@ angular.module('PU.main', ['PU.factories'])
       } 
       else{
         $scope.currentUser = resp.data;
-        $scope.getClasses();
         var savedState = StateSaver.restoreState(); //if we previously saved state, grab it back
         if(savedState){
           $scope = Object.assign($scope, savedState); //copy the saved state back into scope
         }
+        $scope.getClasses();
       }
     })
   }())
