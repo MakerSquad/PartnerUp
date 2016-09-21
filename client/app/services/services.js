@@ -50,7 +50,7 @@ angular.module('PU.factories', [])
   var updateGroups = function(){
     return $http({
       method: 'GET',
-      url: '/database/updateGroups'
+      url: '/updateGroups'
     })
     .then(resp => resp.data)
     .catch(err => err)
@@ -59,7 +59,7 @@ angular.module('PU.factories', [])
   var getClasses = function(){
     return $http({
       method: 'GET',
-      url: '/database/myGroups'
+      url: '/myGroups'
     })
     .then(resp => resp.data)
     .catch(err => err);
@@ -68,7 +68,7 @@ angular.module('PU.factories', [])
   var getMemberships = function(cls){
     return $http({
       method: 'GET',
-      url: `/database/${cls}/members`,
+      url: `/${cls}/members`,
     })
     .then(resp => resp.data)
     .catch(err => err)
@@ -77,7 +77,7 @@ angular.module('PU.factories', [])
   var getPairs = function(cls){
     return $http({
       method: 'GET',
-      url: `/database/${cls}/pairs`
+      url: `/${cls}/pairs`
     })
     .then(resp => resp.data)
     .catch(err => err)
@@ -86,7 +86,7 @@ angular.module('PU.factories', [])
   var addPairs = function(cls, pairs, genTitle, groupSize){
     return $http({
       method: 'POST',
-      url: `/database/${cls}/pairs`,
+      url: `/${cls}/pairs`,
       data: {
         pairs: pairs,
         genTitle: genTitle,
