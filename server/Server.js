@@ -97,7 +97,6 @@ app.get('/database/updateGroups', (req, res) => {
     MP.user.groups(req.session.uid, req.session.accessToken)
       .then(function(data){
         for(let i=0; i<data.length; i++){
-        console.log("group data[i]:", data[i] )
         promiseArray.push(
           db.addGroup({name: data[i].name, groupId:data[i].uid}).then((e) => {
            return MP.memberships(data[i].name_id, req.session.accessToken)
@@ -141,17 +140,17 @@ app.post('/database/:groupName/pairs', (req, res) => {
   res.send(db.addPairs(req.body, req.params.groupName))
 })
 
-app.get('/database/getUsersPartOfSameGroup', (req, res) => {
-  db.findOrCreateAdmin({uid: req.session.uid, name: req.session.name}).then((id) => {
-    console.log("id", id)
-      db.getStudentsByGroup(id.uid).then((groups) => {
-        res.send(groups) // send back an array with students that have groups that you can control over
-      }).catch((err) => res.status(500).send(err)) // error probably db is down or something elsrong
-  }).catch((err) => {
-   console.log("error: ", err);
-   res.status(401).send("error", err)
-  })
-})
+// app.get('/database/getUsersPartOfSameGroup', (req, res) => {
+//   db.findOrCreateAdmin({uid: req.session.uid, name: req.session.name}).then((id) => {
+//     console.log("id", id)
+//       db.getStudentsByGroup(id.uid).then((groups) => {
+//         res.send(groups) // send back an array with students that have groups that you can control over
+//       }).catch((err) => res.status(500).send(err)) // error probably db is down or something elsrong
+//   }).catch((err) => {
+//    console.log("error: ", err);
+//    res.status(401).send("error", err)
+//   })
+// })
 
 
 app.get('/test', (req, res) => {

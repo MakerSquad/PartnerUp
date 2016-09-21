@@ -248,20 +248,15 @@ knex.getPairsForGroup = (groupId, groupName) => {
   var ray =[];
   return knex('pairs').where({'group_id': groupId}).returning('*')
     .then((pairsWithId) => {
-      //[{user1_id: 4, user2_id:30, group_id:1, genId},{user1_id: 42, user2_id:3, group_id:1}]
       for(let i=0; i<pairsWithId.length; i++){
-        ray.push(
-          getGenwithId(pairsWithId[i].gen_id).then((genData) => genData)
-          .catch((err) => console.log('error genData: ', err))
-        )
+        if(!ray.includes(pairsWithId[i].gen_id))ray.push(pairsWithId[i].gen_id);
       }
-      return Promise.all(ray).then((data) => {
-        for(let i=0; i<pairsWithId.length; i++) pairsWithId[i].gen_id = data || "no Genaration"; 
+      return batchGetGenarationsById(ray).then((data) => {
+        for(let i=0; i<pairsWithId.length; i++) pairsWithId[i].gen_id = data[pairsWithId[i].gen_id-1] || "no Genaration";
         return pairsWithId;
       })
-      .catch((err) => console.log('error getPairsForGroup: ', err))
-    })
-    .catch((err) => console.log('error: ', err))
+      .catch((err) => console.log('error: ', err))
+    }).catch((err) => console.log('error: ', err))
 }
 
 knex.removeStudentFromGroup = (student) => {
@@ -309,9 +304,14 @@ function addGeneration(genData) {
   }
 */
 function getGenwithId(id) {
-  console.log("id inside getGenwithId", id);
   return knex('generations').where('id', id).returning("*")
   .then((gen) => {console.log(gen[0]); return gen[0]})
+  .catch((err) => console.log('error: ', err))
+}
+
+function batchGetGenarationsById(ids) {
+  return knex('generations').whereIn('id', ids).returning("*")
+  .then((gen) => {console.log(gen); return gen})
   .catch((err) => console.log('error: ', err))
 }
 
