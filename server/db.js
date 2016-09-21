@@ -291,14 +291,14 @@ function addGeneration(genData) {
   .then((exist) => {
     console.log('exist: ', exist)
     if(!exist.length){
-      knex('generations').where({group_id:genData.groupId}).returning("gen_id")
+      return knex('generations').where({group_id:genData.groupId}).returning("gen_id")
       .then((next) => knex('generations').insert({
           group_id:   genData.groupId,
           title:      genData.genTitle,
           gen_id:     next.length,
           group_size: genData.groupSize
         }).returning('id').then((id) => {
-          console.log('id: ', id)
+          console.log('id: ', id[0])
           return id[0]
         })
       ).catch((err) => console.log('error: ', err))
