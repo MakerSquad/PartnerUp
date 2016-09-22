@@ -78,7 +78,7 @@ app.get('/:groupName/generations', (req,res) => {
     ).catch((err) => res.status(500).send(err))
   ).catch((err) => {
       console.log('errror: ', err)
-      res.redirect("/")
+      res.status(401).redirect("/")
     })
 })
 
@@ -93,8 +93,7 @@ app.get("/:groupName/members", function(req, res){
       }).catch((err) => res.status(500).send(err))
     }).catch((err) => res.status(500).send(err))
   }).catch((err) => {
-      console.log('errror: ', err)
-      res.redirect("/")
+      res.status(401).redirect("/")
     })    
 })
 
@@ -110,7 +109,7 @@ app.get('/:groupName/pairs', (req,res) => {
     })
   ).catch((err) => {
       console.log('errror: ', err)
-      res.redirect("/")
+      res.status(401).redirect("/")
     })
 })
 
@@ -120,7 +119,7 @@ app.post('/:groupName/pairs', (req, res) => {
     res.send(db.addPairs(req.body, req.params.groupName))
   ).catch((err) => {
       console.log('errror: ', err)
-      res.redirect("/")
+      res.status(401).redirect("/")
     })
 })
 
@@ -131,8 +130,7 @@ app.get('/test', (req, res) => {
       res.status(200).send(data)
     })
      .catch((err) => {
-      console.log('errror: ', err)
-      res.redirect("/")
+      res.status(401).redirect("/")
     })
 })
 
