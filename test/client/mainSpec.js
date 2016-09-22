@@ -11,23 +11,31 @@ describe('MainController', function() {
 
   var testStus = [
         {
-          name: "Elliot Cheung",
-          uid: "0",
+          user:{
+            name: "Elliot Cheung",
+            uid: "0",
+          },
           role: "student"
         },
         {
-          name: "Kathryn Hansen",
-          uid: "1",
+          user:{
+            name: "Kathryn Hansen",
+            uid: "1",
+          },
           role: "student"
         },
         {
-          name: "Ryan Walter",
-          uid: "2",
+          user:{            
+            name: "Ryan Walter",
+            uid: "2",
+          },
           role: "student"
         },
         {
-          name: "Iliya Svirsky",
-          uid: "3",
+          user:{            
+            name: "Iliya Svirsky",
+            uid: "3",
+          },
           role: "student"
         },
       ];

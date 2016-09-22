@@ -17,7 +17,7 @@ const knex = require('knex')({
 knex.migrate.latest([config]);
 
 knex.authenticate = (sessionUid) => {
-  if(sessionUid) {
+  if(sessionUid || process.env.TEST_AUTH) {
     return Promise.resolve();
   } else {
     return Promise.reject();

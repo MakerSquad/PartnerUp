@@ -7,8 +7,9 @@ describe("The Server", function() {
 
     expect(true).to.equal(true);
   })
-  var app = TestHelper.createApp()
-  app.use('/', routes)
+  var testUser = {"uid":"3a9137d82c2b","name":"Elliot Cheung","email":"elliotccheung@yahoo.com","avatar_url":"https://avatars.githubusercontent.com/u/9095159?v=3"}
+  var app = TestHelper.createApp();
+  app.use('/', routes);
   app.testReady()
 
   it_("can get to the default endpoint", function * () {
@@ -30,5 +31,17 @@ describe("The Server", function() {
     yield request(app)
       .post('/alsonotanendpoint')
       .expect(404)
+  })
+
+  describe("The past pair endpoints", function(){
+    it_("can retrieve pairs for a given class", function * (){
+      process.env.TEST_AUTH = true;
+      yield request(app)
+        .get('/MKS43/pairs')
+        .expect(200)
+        .expect(function(response){
+          expect(Array.isArray(response.body)).to.equal(true);
+        })
+    })
   })
 })
