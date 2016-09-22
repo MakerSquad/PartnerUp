@@ -95,7 +95,8 @@ app.get("/:groupName/members", function(req, res){
     }).catch((err) => res.status(500).send(err))
   }).catch((err) => {
       res.status(401).redirect("/")
-    })    
+    })
+})    
 
 app.get('/:groupName/pairs', (req,res) => {
   db.authenticate(req.session.uid)
