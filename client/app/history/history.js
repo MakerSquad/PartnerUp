@@ -15,46 +15,57 @@ angular.module('PU.history', ['PU.factories'])
   $scope.currClass = $routeParams.class //CURRENT CLASS ID!
   $scope.badPartners = []
   $scope.index = 0
+  $scope.library = {};
 
   //*********************************************************************************
   //this will get all the past pairs from the database by class id and generation id
   //*********************************************************************************
   $scope.getGen = function(cls){
-    DB.getGenerations($scope.currClass)
+  return   DB.getGenerations($scope.currClass)
     .then(function(data){
       console.log(data)
       for(var i = 0; i<data.length; i++){
         $scope.generations.push(data[i])
       }
       console.log('dddddddd', $scope.generations)
-      $scope.prev=$scope.generations[$scope.generations.length-1].title
-      $scope.nex= $scope.generations[1].title
       $scope.currGen = $scope.generations[0].title
       $scope.maxGen = $scope.generations.length-1
       $scope.generationId = $scope.generations[0].id
       console.log('fdfdfd',$scope.generationId)
+      if($scope.generations.length > 1){
+      $scope.prev=$scope.generations[$scope.generations.length-1].title
+      $scope.nex= $scope.generations[1].title
+    }
+    
 
   })
   }
 
   $scope.getHistory = function(classId){
     //database function to get all data
-    DB.getPairs($scope.currClass)
+   return DB.getPairs($scope.currClass)
       .then(function(data){
         console.log('hihihi: ',data)
         $scope.pastPairs = data
+        $scope.pastPairs = $scope.pastPairs.filter(m=>m.gen_table_id===$scope.generationId)
         console.log('lalala: ',$scope.pastPairs)
+        
       })
 
   }
-  $scope.setButtons = function(){
-    // $scope.prev=$scope.generations[2].title
-    // $scope.nex= $scope.generations[1].title
-    // $scope.currGen = $scope.generations[0].title
-  }
-  $scope.getGen();
-  $scope.getHistory();
-  $scope.setButtons();
+   
+   $scope.makeMap = function (){
+    return DB.getMemberships($scope.currClass)
+    .then(function(data){console.log('flaflafla', data[0].user)
+      for (var i = 0; i<data.length; i++){
+        console.log(data[i].user)
+        $scope.library[data[i].user.uid]= data[i].user.name
+      }
+  })
+
+   }
+
+
   // *********************************************************************************
   // this sets the generation and sets the next and previous generations so that they
   // go in orders (asc). this allows you to click on the generation title in the html
@@ -91,7 +102,7 @@ angular.module('PU.history', ['PU.factories'])
   //*********************************************************************************
 
   $scope.next = function(){
-
+    if($scope.generations.length > 1){
     if($scope.index >= $scope.maxGen){
       $scope.index = 0;
       $scope.prev=$scope.generations[($scope.generations.length-1)].title
@@ -115,13 +126,14 @@ angular.module('PU.history', ['PU.factories'])
 
     $scope.getHistory($routeParams.class, $scope.generations[$scope.index].id);
   }
+}
   //*********************************************************************************
   //When the preious button is clicked, this sets the current generation to the previous 
   //generation and sets the prev and next generations and then calls get history to 
   //get the history of the current generation
   //*********************************************************************************
   $scope.previous = function(){
-    
+    if($scope.generations.length > 1){
     if($scope.index>=1){
     $scope.index--
     $scope.currGen = $scope.generations[($scope.index)].title
@@ -143,6 +155,7 @@ angular.module('PU.history', ['PU.factories'])
     }
     $scope.getHistory($routeParams.class, $scope.generations[$scope.index].id);
   }
+}
 
   $scope.toggleBadPartners = function(pair){
     console.log(pair)
@@ -160,7 +173,6 @@ angular.module('PU.history', ['PU.factories'])
     }
     return arr;
   }
-
   //*********************************************************************************
   //takes you back to the homepage when homepage button is clicked 
   //*********************************************************************************
@@ -180,7 +192,13 @@ angular.module('PU.history', ['PU.factories'])
       if(resp.data === ""){
         $location.path('/signin');
       } 
-     
+        $scope.getGen()
+        .then(function(stuff){$scope.getHistory()
+          .then(function(morestuff){$scope.makeMap()
+            .then(function(evenmorestuff){console.log('init complete')})
+          })
+        })
+        
       
     })
   }())
