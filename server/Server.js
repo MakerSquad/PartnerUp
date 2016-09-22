@@ -103,9 +103,11 @@ app.get('/:groupUid/pairs', (req,res) => {
 
 app.post('/:groupUid/pairs', (req, res) => {
   db.authenticate(req.session.uid)
-  .then(() => 
-    res.status(201).send(db.addPairs(req.body, req.params.groupUid))
-  ).catch((err) => res.status(401).send(err))
+  .then(() => {
+    db.addPairs(req.body, req.params.groupUid).then(data => {
+      res.status(201).send(data)
+    }).catch((err) => res.status(500).send(err))
+  }).catch((err) => res.status(401).send(err))
 })
 
 app.get('/test', (req, res) => {

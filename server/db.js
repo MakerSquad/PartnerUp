@@ -20,7 +20,7 @@ knex.authenticate = (sessionUid) => {
   if(sessionUid || process.env.TEST_AUTH) {
     return Promise.resolve();
   } else {
-    return Promise.reject();
+    return Promise.reject("401 Unauthorized, please make sure you are logged in");
   }
 }
 
