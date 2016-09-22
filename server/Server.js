@@ -18,7 +18,7 @@ AuthPort.createServer({
 })
  
 AuthPort.on('auth', function(req, res, data) {
-  console.log("OAuth success! user logged:", data.user);
+  // console.log("OAuth success! user logged:", data.user);
   req.session.accessToken = data.token;
   req.session.uid = data.data.user.uid;
   req.session.user = data.data.user;
@@ -60,7 +60,7 @@ app.get("/myGroups", function(req, res){
   .then(function(data){ 
     db.addGroups(data)
       .then((groups) => {
-        console.log("Makerpass groups data: ", groups);   
+        // console.log("Makerpass groups data: ", groups);   
         res.send(groups);   
       })
   })    
@@ -88,14 +88,14 @@ app.get("/:groupName/members", function(req, res){
     db.getGroup({name: req.params.groupName})
     .then((group) => {
       MP.memberships(group.mks_id, req.session.accessToken)    
-      .then(function(students){      
+      .then(function(students){  
+        console.log("students", students)    
         res.send(students);   
       }).catch((err) => res.status(500).send(err))
     }).catch((err) => res.status(500).send(err))
   }).catch((err) => {
       res.status(401).redirect("/")
     })    
-})
 
 app.get('/:groupName/pairs', (req,res) => {
   db.authenticate(req.session.uid)
@@ -124,14 +124,9 @@ app.post('/:groupName/pairs', (req, res) => {
 })
 
 app.get('/test', (req, res) => {
-  console.log('session: ', req.session)
-  db.authenticate(req.session.uid)
-    .then((data) => {
-      res.status(200).send(data)
-    })
-     .catch((err) => {
-      res.status(401).redirect("/")
-    })
+  // console.log('session: ', req.session)
+  db.getTables().then( (d) => res.send(d))
+  .catch((err) => res.send(err));
 })
 
 var port = process.env.PORT || 4000

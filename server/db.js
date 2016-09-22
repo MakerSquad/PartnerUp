@@ -47,19 +47,27 @@ knex.findOrCreateAdmin = (uid) => {
   return: 'added student to group' or error
 */
 knex.addGroups = (groups) => {
-  var groupArray = [];
-  var chunkSize;
   return getGroupIds()
     .then((dbGroupIds) => {
-      for(let i = 0; i < groups.length; i++) 
+      var groupArray = [], oldGroups =[];
+      // console.log("dbGroupIds", dbGroupIds)
+
+      for(let i = 0; i < groups.length; i++){
         if(!dbGroupIds.includes(groups[i].uid)) 
           groupArray.push({name: groups[i].name, mks_id: groups[i].uid});
-      chunkSize = groupArray.length;
-      return knex.batchInsert('groups', groupArray, chunkSize)
-        .returning('*')
-        .then((groups) =>  groups)
-        .catch((err) => console.log('error: ', err))
+        else oldGroups.push({name: groups[i].name, mks_id: groups[i].uid});
+      }
+      console.log("array:",groupArray)
+      var chunkSize = groupArray.length;
+      if(chunkSize){
+        return knex.batchInsert('groups', groupArray, chunkSize)
+          .returning('*')
+          .then((groups) =>  groups)
+          .catch((err) => console.log('error: ', err))
+      }
+      else return Promise.resolve(oldGroups);
     }).catch((err) => console.log('error: ', err))
+
 }
 
 /**
@@ -155,7 +163,7 @@ knex.getStudentData = (studentRay) => {
 }
 
 knex.getTables = () => {
-  return knex('user_group').returning('*')
+  return knex('groups').returning('*')
 }
 
 /**
@@ -214,8 +222,12 @@ knex.getGenarationsByGroup = (groupId) => {
 }
 
 function getGroupIds() {
-  return knex('groups').returning('mks_id')
-    .then((ids) => ids)
+  return knex('groups').select('mks_id')
+    .then((ids) => {
+      var mergeIds = []
+      for(let i=0; i<ids.length; i++) mergeIds.push(ids[i].mks_id);
+      return mergeIds
+    })
     .catch((err) => console.log('error: ', err))
 }
 
