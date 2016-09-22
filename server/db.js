@@ -139,36 +139,15 @@ knex.getGroup = (group) => {
   if(typeof group.name == "string")
     return knex('groups').where('name', group.names).returning('*')
       .then((groupData) => groupData[0])
-      .catch((err) => {throw new Error(", ", err)})
+      .catch((err) => {throw new Error("incorrect format, ", err)})
   if(typeof group.id == 'integer')
     return knex('groups').where('id', group.id).returning('*')
       .then((groupData) => groupData[0])
-      .catch((err) => console.log('error: ', err))
-  return knex('groups').where({mks_id: group.mksId}).returning('*')
+      .catch((err) => {throw new Error("incorrect format, ", err)})
+  return knex('groups').where({mks_id: group.mks_id}).returning('*')
     .then((groupData) => {
       return groupData[0]})
-    .catch((err) => console.log('error: ', err))  
-}
-
-/**
-  @params: studentRay array of studentId objects 
-  }
-  return: 'same array with more student details
-*/
-knex.getStudentData = (studentRay) => {
-  let ray = [];
-  for(let i=0; i<studentRay.length; i++){
-    ray.push(knex('users').where({uid: studentRay[i].user_uid}).returning("*")
-    .then((group) =>  group))
-  }
-  return Promise.all(ray).then((groups) =>{
-    var mergeGroup = [];
-    for(let i=0; i<groups.length; i++){ 
-      groups[i][0].role = studentRay[i].role_name;
-      mergeGroup.push(groups[i][0]);
-    }
-    return mergeGroup
-  }).catch((err) => console.log(err))
+    .catch((err) => {throw new Error("incorrect format, ", err)})  
 }
 
 knex.getTables = () => {
@@ -183,7 +162,7 @@ knex.getPairsForGroup = (groupId, groupName) => {
   var ray =[];
   return knex('pairs').where({'group_id': groupId}).returning('*')
     .then((pairsWithId) => pairsWithId)
-    .catch((err) => console.log('error: ', err))
+    .catch((err) => {throw new Error("database off-line, ", err)})
 }
 
 
@@ -198,7 +177,7 @@ knex.getPairsForGroup = (groupId, groupName) => {
 knex.getGenerationsByGroup = (groupId) => {
   return knex('generations').where('group_id', groupId).returning("*")
   .then((gen) => gen)
-  .catch((err) => console.log('error: ', err))
+  .catch((err) => {throw new Error("database off-line, ", err)})
 }
 
 function getGroupIds() {
@@ -208,14 +187,7 @@ function getGroupIds() {
       for(let i=0; i<ids.length; i++) mergeIds.push(ids[i].mks_id);
       return mergeIds
     })
-    .catch((err) => console.log('error: ', err))
-}
-
-
-function findUserByID(ID) {
-  return knex('users').where('uid', ID).returning("*")
-    .then((user) => user[0])
-    .catch((err) => console.log('error: ', err))
+    .catch((err) => {throw new Error("database off-line, ", err)})
 }
 
 module.exports = knex;
