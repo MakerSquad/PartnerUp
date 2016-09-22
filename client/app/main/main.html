@@ -1,6 +1,6 @@
 <div ng-class="{toBackground: creatingGroup}" ng-show="initialized" class='main'>
   <button class="signout" ng-click="signOut()">Log out</button>
-  <h1 class="welcome">Welcome, {{currentUser.name.includes("Gilbert") ? "Gilby" : currentUser.name || "Gilby"}}!</h1>
+  <h1 class="welcome">Welcome, {{currentUser.user.name.includes("Gilbert") ? "Gilby" : currentUser.user.name || "Gilby"}}!</h1>
 
   <!--Control buttons-->
   <div class="controls">
@@ -26,19 +26,19 @@
   <div class="peopleList" ng-show="!loadingList">
     <div class="instructorList">
       <h2>Instructors: </h2>
-        <div class="instructor" ng-repeat="instructor in instructors">{{instructor.name}}</div>
+        <div class="instructor" ng-repeat="instructor in instructors">{{instructor.user.name}}</div>
     </div>
     <div class="fellowList">
       <h2>Fellows: </h2>
-        <div class="fellow" ng-repeat="fellow in fellows">{{fellow.name}}</div>
+        <div class="fellow" ng-repeat="fellow in fellows">{{fellow.user.name}}</div>
     </div>
     <div class="studentList">
       <h2>Students: </h2> 
-      <div class="student" ng-repeat="student in students"><button ng-click="removeFromStudent(student);">x</button>{{student.name}}</div>
+      <div class="student" ng-repeat="student in students"><button ng-click="removeFromStudent(student);">x</button>{{student.user.name}}</div>
     </div>
     <div>
       <h2>Removed Students:</h2>
-      <div class ="removedStudents" ng-repeat="nopair in noPair"><button ng-click="addStudentBackIn(nopair);">o</button>{{nopair.name}}
+      <div class ="removedStudents" ng-repeat="nopair in noPair"><button ng-click="addStudentBackIn(nopair);">o</button>{{nopair.user.name}}
       </div>
     </div>
   </div>
@@ -56,8 +56,8 @@
       <th ng-repeat="index in getIndexArray(groupSizeSelect)">Partner {{index + 1}}</th>
       </tr>
       <tr  ng-repeat="group in groups" ng-class="{clash: !finalized && clashes.includes(group), locked: searchLockedGroups(group)}" >
-        <td  ng-repeat="stu in group" ng-click="selectForSwap(stu)" ng-class="{selectedStu: selectedForSwap === stu}" class="stu"> <img src='{{stu.avatar_pic}}' width='40px' height='50px'>
-          {{stu.name}}
+        <td  ng-repeat="stu in group" ng-click="selectForSwap(stu)" ng-class="{selectedStu: selectedForSwap === stu}" class="stu"> <img src='{{stu.user.avatar_url}}' width='40px' height='50px'>
+          {{stu.user.name}}
         </td>
           <td>
           <img src= "http://simpleicon.com/wp-content/uploads/lock-3.png" width='15px' height='15px' ng-show='!searchLockedGroups(group)' class="lockBtn" ng-click="toggleLockGroup(group)">
@@ -91,7 +91,7 @@
           <th>Role:</th>
         </tr>
         <tr ng-repeat="user in modalUserList">
-          <td>{{user.name}}</td>
+          <td>{{user.user.name}}</td>
           <td>{{user.role}}</td>
         </tr>
       </table>

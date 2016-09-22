@@ -159,12 +159,12 @@ angular.module('PU.main', ['PU.factories'])
   $scope.trueRandomize = function(groupSize){
     $scope.groups = [];
     var stus = $scope.students.filter(function(stu){
-      return !$scope.lockedStus[stu.uid]; //don't shuffle the locked students
+      return !$scope.lockedStus[stu.user.uid]; //don't shuffle the locked students
     })
 
     var shuffled = [];
     for(var i = 0; i < stus.length % groupSize; i++){
-      stus.push({name: "Code Monkey", uid: "-" + i, avatar_pic:'https://s-media-cache-ak0.pinimg.com/564x/7e/e7/fe/7ee7fe7d2753c6c47715a95c8508533d.jpg'}); //give them decrementing ids
+      stus.push({user: {name: "Code Monkey", uid: "-" + i, avatar_url:'https://s-media-cache-ak0.pinimg.com/564x/7e/e7/fe/7ee7fe7d2753c6c47715a95c8508533d.jpg'}}); //give them decrementing ids
     }
 
     while(stus.length){
@@ -213,12 +213,12 @@ angular.module('PU.main', ['PU.factories'])
     }
     $scope.groups = [];
     var stus = $scope.students.filter(function(stu){
-      return !$scope.lockedStus[stu.uid]; //don't shuffle the locked students
+      return !$scope.lockedStus[stu.user.uid]; //don't shuffle the locked students
     })
 
     var shuffled = [];
     for(var i = 0; i < stus.length % groupSize; i++){
-      stus.push({name: "Code Monkey", uid: "-" + i, avatar_pic:'https://s-media-cache-ak0.pinimg.com/564x/7e/e7/fe/7ee7fe7d2753c6c47715a95c8508533d.jpg'});
+      stus.push({user: {name: "Code Monkey", uid: "-" + i, avatar_url:'https://s-media-cache-ak0.pinimg.com/564x/7e/e7/fe/7ee7fe7d2753c6c47715a95c8508533d.jpg'}});
     }
 
     while(stus.length){
@@ -233,8 +233,8 @@ angular.module('PU.main', ['PU.factories'])
         var failed = true;
         var noClashes = true;
         for(var k = 0; k < group.length; k++){
-          if($scope.pastPairs[group[k].uid]){
-            if($scope.pastPairs[group[k].uid][shuffled[j].uid]){
+          if($scope.pastPairs[group[k].user.uid]){
+            if($scope.pastPairs[group[k].user.uid][shuffled[j].user.uid]){
               noClashes = false;
               break;
             }
@@ -281,8 +281,8 @@ angular.module('PU.main', ['PU.factories'])
       for(var j = 0; j < group.length; j++){
         var pushed = false;
         for(var k = j; k < group.length; k++){
-          if($scope.pastPairs[group[j].uid]){            
-            if($scope.pastPairs[group[j].uid][group[k].uid]){
+          if($scope.pastPairs[group[j].user.uid]){            
+            if($scope.pastPairs[group[j].user.uid][group[k].user.uid]){
               $scope.clashes.push(group);
               pushed = true;
               break;
@@ -306,15 +306,15 @@ angular.module('PU.main', ['PU.factories'])
       for(var i = 0; i < $scope.groups.length; i++){
         for(var j = 0; j < $scope.groups[i].length; j++){
           for(var k = j+1; k < $scope.groups[i].length; k++){
-            if(!$scope.pastPairs[$scope.groups[i][j].uid]){
-              $scope.pastPairs[$scope.groups[i][j].uid] = {};
+            if(!$scope.pastPairs[$scope.groups[i][j].user.uid]){
+              $scope.pastPairs[$scope.groups[i][j].user.uid] = {};
             }
-            $scope.pastPairs[$scope.groups[i][j].uid][$scope.groups[i][k].uid] = true;
-            newPairs.push([$scope.groups[i][j].uid, $scope.groups[i][k].uid]); //new pairs to save in DB
-            if(!$scope.pastPairs[$scope.groups[i][k].uid]){
-              $scope.pastPairs[$scope.groups[i][k].uid] = {};
+            $scope.pastPairs[$scope.groups[i][j].user.uid][$scope.groups[i][k].user.uid] = true;
+            newPairs.push([$scope.groups[i][j].user.uid, $scope.groups[i][k].user.uid]); //new pairs to save in DB
+            if(!$scope.pastPairs[$scope.groups[i][k].user.uid]){
+              $scope.pastPairs[$scope.groups[i][k].user.uid] = {};
             }
-            $scope.pastPairs[$scope.groups[i][k].uid][$scope.groups[i][j].uid] = true; 
+            $scope.pastPairs[$scope.groups[i][k].user.uid][$scope.groups[i][j].user.uid] = true; 
           }
         }
       }
@@ -397,7 +397,7 @@ angular.module('PU.main', ['PU.factories'])
   */
 
   $scope.selectForSwap = function(student){
-    if($scope.lockedStus[student.uid]){
+    if($scope.lockedStus[student.user.uid]){
       alert("This student has been locked into a group; please unlock them before moving them around");
       return;
     }
@@ -462,7 +462,7 @@ angular.module('PU.main', ['PU.factories'])
       if($scope.lockedGroups[i][0] === group){ //found the group in the locked groups
         var unlocked = $scope.lockedGroups.splice(i, 1)[0][0];
         for(var j = 0; j < unlocked.length; j++){
-          $scope.lockedStus[unlocked[j].uid] = false; //unlock the students in the group
+          $scope.lockedStus[unlocked[j].user.uid] = false; //unlock the students in the group
         }      
         return "unlocked";
       }
@@ -475,7 +475,7 @@ angular.module('PU.main', ['PU.factories'])
         $scope.selectedForSwap = null;
         $scope.selectedForSwapIndex = null; //deselect them if they're selected
       }
-      $scope.lockedStus[group[j].uid] = true; //make sure the students don't get reshuffled
+      $scope.lockedStus[group[j].user.uid] = true; //make sure the students don't get reshuffled
     }
     return "locked";
   }
