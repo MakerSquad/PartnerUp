@@ -55,7 +55,7 @@ angular.module('PU.main', ['PU.factories'])
         finalized: $scope.finalized,
         noPair: $scope.noPair
       })
-      $location.path(`/${$scope.currentClass.name}/history`);
+      $location.path(`/${$scope.currentClass.mks_id}/history`);
     }
   }
 
@@ -109,14 +109,14 @@ angular.module('PU.main', ['PU.factories'])
       return; //do nothing if the default option is selected
     }
     $scope.loadingList = true;
-    //TODO: This should be a database call
-    return DB.getMemberships($scope.currentClass.name)
+    
+    return DB.getMemberships($scope.currentClass.mks_id)
     .then(function(members){
       console.log("Members: ", members);
       $scope.students = members.filter(m => m.role === 'student');
       $scope.fellows = members.filter(m => m.role === 'fellow');
       $scope.instructors = members.filter(m => m.role === 'instructor');
-      return DB.getPairs($scope.currentClass.name)
+      return DB.getPairs($scope.currentClass.mks_id)
         .then(function(pairs){
           console.log("Pairs: ", pairs);
           for(var i = 0; i < pairs.length; i++){
@@ -318,7 +318,7 @@ angular.module('PU.main', ['PU.factories'])
           }
         }
       }
-      DB.addPairs($scope.currentClass.name, newPairs, $scope.genTitle, $scope.groupSizeSelect);
+      DB.addPairs($scope.currentClass.mks_id, newPairs, $scope.genTitle, $scope.groupSizeSelect);
       $scope.finalized = true;
       $scope.genTitle = "";
     }else{
