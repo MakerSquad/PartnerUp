@@ -71,7 +71,7 @@ app.get('/:groupName/generations', (req,res) => {
   .then(() => 
     db.getGroup({name: req.params.groupName})
     .then((data) => 
-      db.getGenarationsByGroup(data[0].id)
+      db.getGenarationsByGroup(data.id)
       .then((genarations) => {
           res.send(genarations);
       }).catch((err) => res.status(500).send(err))
@@ -104,9 +104,7 @@ app.get('/:groupName/pairs', (req,res) => {
     db.getGroup({name: req.params.groupName})
     .then(data => {
       db.getPairsForGroup(data.id, req.params.groupName)
-      .then((pairs) => {
-        res.send(pairs)
-      })
+      .then((pairs) => res.send(pairs))
     })
   ).catch((err) => {
       console.log('errror: ', err)
@@ -117,7 +115,7 @@ app.get('/:groupName/pairs', (req,res) => {
 app.post('/:groupName/pairs', (req, res) => {
   db.authenticate(req.session.uid)
   .then(() => 
-    res.send(db.addPairs(req.body, req.params.groupName))
+    res.status(201).send(db.addPairs(req.body, req.params.groupName))
   ).catch((err) => {
       console.log('errror: ', err)
       res.status(401).redirect("/")
