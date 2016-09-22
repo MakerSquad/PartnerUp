@@ -17,13 +17,11 @@ const knex = require('knex')({
 knex.migrate.latest([config]);
 
 knex.authenticate = (sessionUid) => {
-  return knex('users').where('uid', sessionUid)
-    .then((user) => {
-      console.log('auth returns: ', user)
-      if(user) {
-        return true
-      }
-    })
+  if(sessionUid) {
+    return Promise.resolve();
+  } else {
+    return Promise.reject();
+  }
 }
 /* 
   params: uid = {
