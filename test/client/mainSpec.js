@@ -7,6 +7,7 @@ describe('MainController', function() {
   var $httpBackend;
   var $scope;
   var createController;
+  var StateSaver;
 
   var testStus = [
         {
@@ -36,6 +37,7 @@ describe('MainController', function() {
     // mock out our dependencies
     $rootScope = $injector.get('$rootScope');
     $httpBackend = $injector.get('$httpBackend');
+    StateSaver = $injector.get('StateSaver')
     $scope = $rootScope.$new();
 
     var $controller = $injector.get('$controller');
@@ -81,7 +83,7 @@ describe('MainController', function() {
     })
     it('should make groups from $scope.students', function(){
       createController();
-      $scope.students = testStus;
+      $scope.students = testStus.slice();
       var groupSize = 2;
       $scope.randomize(groupSize);
       expect($scope.groups.length).not.toBeLessThan($scope.students.length/groupSize);
@@ -92,6 +94,21 @@ describe('MainController', function() {
       $scope.pastPairs = {'0':{'1' : true}, '1': {'0' : true}};
       $scope.randomize(2);
       expect($scope.clashes.length).toBeGreaterThan(0);
+    })
+  })
+
+  describe('StateSaver', function(){
+    it('should save the current scope when visiting other routes', function(){
+      createController();
+      $scope.currentClass = {name: "Test"};
+      $scope.students = testStus.slice();
+      $scope.instructors = ['Gilbert'];
+      var tmpStus = $scope.students;
+      var tmpInstructors = $scope.instructors;
+      $scope.seeHistory();
+      var restoredState = StateSaver.restoreState();
+      expect(restoredState.students).toBe(tmpStus);
+      expect(restoredState.instructors).toBe(tmpInstructors);
     })
   })
 });

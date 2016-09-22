@@ -8,14 +8,20 @@
   "scripts": {
     "postinstall": "bower install",
     "start": "./node_modules/.bin/nodemon --ignore node_modules server/Server.js",
-    "test": "karma start spec/client/karma-conf.js"
+    "test": "mocha test/server",
+    "frontendTest": "karma start test/client/karma-conf.js"
   },
   "devDependencies": {
+    "bluebird": "^3.4.6",
     "browser-sync": "^1.5.7",
+    "chai": "^3.5.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-jasmine": "^1.0.2",
     "karma-nyan-reporter": "^0.2.4",
-    "karma-spec-reporter": "0.0.26"
+    "karma-spec-reporter": "0.0.26",
+    "mocha": "^3.0.2",
+    "supertest": "^2.0.0",
+    "supertest-as-promised": "^4.0.0"
   },
   "dependencies": {
     "authport": "^1.0.0",
