@@ -66,8 +66,7 @@ app.get("/myGroups", function(req, res){
 
 app.get('/:groupUid/generations', (req,res) => {
   db.authenticate(req.session.uid)
-  .then(() => 
-    db.getGroup({mks_id: req.params.groupUid})
+  .then(() => db.getGroup({mks_id: req.params.groupUid})
     .then((data) => 
       db.getGenerationsByGroup(data.id)
       .then((generations) => {
@@ -79,8 +78,7 @@ app.get('/:groupUid/generations', (req,res) => {
 
 app.get("/:groupUid/members", function(req, res){    
   db.authenticate(req.session.uid)
-  .then(() => {
-    db.getGroup({mks_id: req.params.groupUid})
+  .then(() => {db.getGroup({mks_id: req.params.groupUid})
     .then((group) => {
       MP.memberships(group.mks_id, req.session.accessToken)    
       .then(function(students){   
@@ -92,8 +90,7 @@ app.get("/:groupUid/members", function(req, res){
 
 app.get('/:groupUid/pairs', (req,res) => {
   db.authenticate(req.session.uid)
-  .then(() =>
-    db.getGroup({mks_id: req.params.groupUid})
+  .then(() => db.getGroup({mks_id: req.params.groupUid})
     .then(data => {
       db.getPairsForGroup(data.id, req.params.groupName)
       .then((pairs) => res.send(pairs))
@@ -104,9 +101,9 @@ app.get('/:groupUid/pairs', (req,res) => {
 app.post('/:groupUid/pairs', (req, res) => {
   db.authenticate(req.session.uid)
   .then(() => {
-    db.addPairs(req.body, req.params.groupUid).then(data => {
+    db.addPairs(req.body, req.params.groupUid).then(data => 
       res.status(201).send(data)
-    }).catch((err) => res.status(500).send(err))
+    ).catch((err) => res.status(500).send(err))
   }).catch((err) => res.status(401).send(err))
 })
 

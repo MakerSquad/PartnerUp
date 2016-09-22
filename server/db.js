@@ -1,18 +1,9 @@
 var pg = require('pg');
-const config = require('../knexfile.js');
-// const env = 'development';
+var config = require('../knexfile.js')
+var env = process.env.NODE_ENV || 'production';
+var knex = require('knex')(config[env]);
 
-const knex = require('knex')({
-  client: 'pg',
-  connection: {
-    host: 'ec2-54-163-245-32.compute-1.amazonaws.com',
-    user: 'hzhzhysgpursgg',
-    password: 'Mkih7oW9Ek6dGdTSmyuVgxw3kr',
-    database: 'dd9bnae9j8734d',
-    ssl: true,
-    port: 5432,
-  }
-});
+
 "use strict";
 knex.migrate.latest([config]);
 
