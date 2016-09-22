@@ -60,32 +60,28 @@ app.get("/myGroups", function(req, res){
   .then(function(data){ 
     db.addGroups(data)
       .then((groups) => {
-        // console.log("Makerpass groups data: ", groups);   
         res.send(groups);   
       })
   })    
 })
 
-app.get('/:groupName/generations', (req,res) => {
+app.get('/:groupUid/generations', (req,res) => {
   db.authenticate(req.session.uid)
   .then(() => 
-    db.getGroup({name: req.params.groupName})
+    db.getGroup({mks_id: req.params.groupUid})
     .then((data) => 
-      db.getGenarationsByGroup(data.id)
-      .then((genarations) => {
-          res.send(genarations);
+      db.getGenerationsByGroup(data.id)
+      .then((generations) => {
+          res.send(generations);
       }).catch((err) => res.status(500).send(err))
     ).catch((err) => res.status(500).send(err))
-  ).catch((err) => {
-      console.log('errror: ', err)
-      res.status(401).redirect("/")
-    })
+  ).catch((err) => res.status(401).redirect("/"))
 })
 
-app.get("/:groupName/members", function(req, res){    
+app.get("/:groupUid/members", function(req, res){    
   db.authenticate(req.session.uid)
   .then(() => {
-    db.getGroup({name: req.params.groupName})
+    db.getGroup({mks_id: req.params.groupUid})
     .then((group) => {
       MP.memberships(group.mks_id, req.session.accessToken)    
       .then(function(students){  
@@ -93,33 +89,25 @@ app.get("/:groupName/members", function(req, res){
         res.send(students);   
       }).catch((err) => res.status(500).send(err))
     }).catch((err) => res.status(500).send(err))
-  }).catch((err) => {
-      res.status(401).redirect("/")
-    })
+  }).catch((err) => res.status(401).redirect("/"))
 })    
 
-app.get('/:groupName/pairs', (req,res) => {
+app.get('/:groupUid/pairs', (req,res) => {
   db.authenticate(req.session.uid)
   .then(() =>
-    db.getGroup({name: req.params.groupName})
+    db.getGroup({mks_id: req.params.groupUid})
     .then(data => {
       db.getPairsForGroup(data.id, req.params.groupName)
       .then((pairs) => res.send(pairs))
     })
-  ).catch((err) => {
-      console.log('errror: ', err)
-      res.status(401).redirect("/")
-    })
+  ).catch((err) => res.status(401).redirect("/"))
 })
 
-app.post('/:groupName/pairs', (req, res) => {
+app.post('/:groupUid/pairs', (req, res) => {
   db.authenticate(req.session.uid)
   .then(() => 
-    res.status(201).send(db.addPairs(req.body, req.params.groupName))
-  ).catch((err) => {
-      console.log('errror: ', err)
-      res.status(401).redirect("/")
-    })
+    res.status(201).send(db.addPairs(req.body, req.params.groupUid))
+  ).catch((err) => res.status(401).redirect("/"))
 })
 
 app.get('/test', (req, res) => {

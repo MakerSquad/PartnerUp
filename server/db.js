@@ -48,10 +48,10 @@ knex.addGroups = (groups) => {
         return knex.batchInsert('groups', groupArray, chunkSize)
           .returning('*')
           .then((groups) =>  groups)
-          .catch((err) => console.log('error: ', err))
+          .catch((err) => {throw new Error("unable to add to group due to: ", err)})
       }
       else return Promise.resolve(oldGroups);
-    }).catch((err) => console.log('error: ', err))
+    }).catch((err) => {throw new Error("Unable to create genaration, ", err)})
 
 }
 
@@ -64,19 +64,17 @@ knex.addGroups = (groups) => {
   return: 201 or error
 */
 
-knex.addPairs = (pairData, groupName) => {
+knex.addPairs = (pairData, groupUid) => {
   var gId;
-  return knex.getGroup({name: groupName})
+  return knex.getGroup({mks_id: groupUid})
   .then((group) => {
-    // console.log('group[0].id: ', group.id, 'groupName: ', groupName)
-    gId = group.id
+    gId = group.id;
     return;
   })
   .catch((err) => console.log('error: ', err))
   .then(() => {
     return addGeneration({groupId: gId, genTitle: pairData.genTitle, groupSize: pairData.groupSize})
     .then((genId) => {
-      // console.log('genId: ', genId)
       var rows = [];
       for(var i = 0; i < pairData.pairs.length; i++){
         rows.push({
@@ -89,9 +87,9 @@ knex.addPairs = (pairData, groupName) => {
       var chunkSize = pairData.pairs.length;
       return knex.batchInsert('pairs', rows, chunkSize)
         .then(() => ('pairs added'))
-        .catch((err) => console.log('error adding pairs: ', err))
-    }).catch((err) => console.log('error adding genaration: ', err))
-  }).catch((err) => console.log('error finding group: ', err))
+        .catch((err) => {throw new Error("Batch Inrest Failed due to: ", err)})
+    }).catch((err) => {throw new Error("Unable to create genaration, ", err)})
+  }).catch((err) => {throw new Error("Unable to find the group in database, ", err)})
 }
 
 /**
@@ -104,12 +102,10 @@ knex.addPairs = (pairData, groupName) => {
   return: return id 
 */
 function addGeneration(genData) {
-  // console.log('genData: ', genData)
   return knex('generations').where({group_id: genData.groupId, title: genData.genTitle, group_size: genData.groupSize}).returning("*")
   .then((exist) => {
-    // console.log('exist: ', exist)
     if(!exist.length){
-      knex('generations').where({group_id:genData.groupId}).returning("gen_id")
+      return knex('generations').where({group_id:genData.groupId}).returning("gen_id")
       .then((next) => knex('generations').insert({
           group_id:   genData.groupId,
           title:      genData.genTitle,
@@ -119,9 +115,9 @@ function addGeneration(genData) {
           console.log('id: ', id)
           return id[0]
         })
-      ).catch((err) => console.log('error: ', err))
-    }else return (exist[0].id)
-  }).catch((err) => console.log('error: ', err))
+      ).catch((err) => {throw new Error("unable to create new generation,", err)})
+    }else return (exist[0].id) // if exist it will just return old id
+  }).catch((err) => {throw new Error("parems aren't correct when calling addGeneration, ", err)})
 }
 
 /* 
@@ -141,9 +137,9 @@ function addGeneration(genData) {
 */
 knex.getGroup = (group) => {
   if(typeof group.name == "string")
-    return knex('groups').where('name', group.name.toUpperCase()).returning('*')
+    return knex('groups').where('name', group.names).returning('*')
       .then((groupData) => groupData[0])
-      .catch((err) => console.log('error: ', err))
+      .catch((err) => {throw new Error(", ", err)})
   if(typeof group.id == 'integer')
     return knex('groups').where('id', group.id).returning('*')
       .then((groupData) => groupData[0])
@@ -199,7 +195,7 @@ knex.getPairsForGroup = (groupId, groupName) => {
     groupTitle: (string) group_title 
   }
 */
-knex.getGenarationsByGroup = (groupId) => {
+knex.getGenerationsByGroup = (groupId) => {
   return knex('generations').where('group_id', groupId).returning("*")
   .then((gen) => gen)
   .catch((err) => console.log('error: ', err))
