@@ -3,21 +3,39 @@ angular.module('PU.history', ['PU.factories'])
 .controller('HistoryController', function ($scope, $location, Makerpass, $http, $routeParams, DB) {
   
   // //set up for copy to clipboard function 
-  // new Clipboard('.clipyclip');
-  // $scope.groupSize = 2
+  new Clipboard('.clipyclip');
+  $scope.groupSize = 2
   $scope.generationId = 0; 
   $scope.pastPairs = [];
   $scope.generations = [];
-  // $scope.prev=$scope.generations[($scope.generations.length-1)].title
-  // $scope.nex= $scope.generations[1].title
-  // $scope.currGen = $scope.generations[0].title
-  // $scope.maxGen = $scope.generations.length
+  $scope.prev='prev'
+  $scope.nex= 'next'
+  $scope.currGen = 0
+  $scope.maxGen = 0
   $scope.currClass = $routeParams.class //CURRENT CLASS ID!
-  // $scope.badPartners = []
+  $scope.badPartners = []
+  $scope.index = 0
 
   //*********************************************************************************
   //this will get all the past pairs from the database by class id and generation id
   //*********************************************************************************
+  $scope.getGen = function(cls){
+    DB.getGenerations($scope.currClass)
+    .then(function(data){
+      console.log(data)
+      for(var i = 0; i<data.length; i++){
+        $scope.generations.push(data[i])
+      }
+      console.log('dddddddd', $scope.generations)
+      $scope.prev=$scope.generations[$scope.generations.length-1].title
+      $scope.nex= $scope.generations[1].title
+      $scope.currGen = $scope.generations[0].title
+      $scope.maxGen = $scope.generations.length-1
+      $scope.generationId = $scope.generations[0].id
+      console.log('fdfdfd',$scope.generationId)
+
+  })
+  }
 
   $scope.getHistory = function(classId){
     //database function to get all data
@@ -29,111 +47,123 @@ angular.module('PU.history', ['PU.factories'])
       })
 
   }
-
+  $scope.setButtons = function(){
+    // $scope.prev=$scope.generations[2].title
+    // $scope.nex= $scope.generations[1].title
+    // $scope.currGen = $scope.generations[0].title
+  }
+  $scope.getGen();
   $scope.getHistory();
+  $scope.setButtons();
+  // *********************************************************************************
+  // this sets the generation and sets the next and previous generations so that they
+  // go in orders (asc). this allows you to click on the generation title in the html
+  // and set that to the current generation.
+  // *********************************************************************************
+
+  $scope.setGen = function(generation){
+    $scope.currGen = generation.title;
+    $scope.groupSize = generation.group_size;
+    $scope.index = $scope.generations.indexOf(generation)
+    $scope.generationId = $scope.generations[$scope.index].id
+    if($scope.index === 0){
+      $scope.nex = $scope.generations[$scope.index+1].title
+      $scope.prev = $scope.generations[$scope.generations.length-1].title
+    }
+    else if($scope.index === $scope.maxGen){
+      $scope.prev = $scope.generations[$scope.index-1].title
+      $scope.nex = $scope.generations[0].title
+    }
+    else{
+      console.log("$scope.index: ", $scope.index);
+      $scope.prev = $scope.generations[$scope.index-1].title
+      $scope.nex = $scope.generations[$scope.index+1].title
+    }
+
+    $scope.getHistory($scope.currClass, $scope.generations[$scope.index].id);
+
+  }
 
   //*********************************************************************************
-  //this sets the generation and sets the next and previous generations so that they
-  //go in orders (asc). this allows you to click on the generation title in the html
-  //and set that to the current generation.
+  //When the next button is clicked, this sets the current generation to the next 
+  //generation and sets the prev and next generations and then calls get history to 
+  //get the history of the current generation
   //*********************************************************************************
 
-  // $scope.setGen = function(generation){
-  //   $scope.currGen = generation.title;
-  //   $scope.generationId = $scope.generations.indexOf(generation)+1
-  //   if($scope.generationId === 1){
-  //     $scope.nex = $scope.generations[$scope.generationId].title
-  //     $scope.prev = $scope.generations[$scope.generations.length-1].title
-  //   }
-  //   else if($scope.generationId === $scope.maxGen){
-  //     $scope.prev = $scope.generations[$scope.generationId-2].title
-  //     $scope.nex = $scope.generations[0].title
-  //   }
-  //   else{
-  //     $scope.prev = $scope.generations[$scope.generationId-2].title
-  //     $scope.nex = $scope.generations[$scope.generationId].title
-  //   }
+  $scope.next = function(){
 
-  //   $scope.getHistory($scope.currClass, $scope.generationId);
+    if($scope.index >= $scope.maxGen){
+      $scope.index = 0;
+      $scope.prev=$scope.generations[($scope.generations.length-1)].title
+      $scope.currGen = $scope.generations[$scope.index].title
+      $scope.nex= $scope.generations[$scope.index+1].title
+      $scope.generationId = $scope.generations[$scope.index].id
+    }
 
-  // }
+    else{
+      $scope.index++;
+      $scope.currGen = $scope.generations[($scope.index)].title
+      $scope.prev=$scope.generations[($scope.index-1)].title
+      $scope.generationId = $scope.generations[$scope.index].id
+      if($scope.index === $scope.maxGen){
+        $scope.nex = $scope.generations[0].title;
+      }
+      else{
+        $scope.nex= $scope.generations[$scope.index+1].title
+      }
+    }
 
-  // //*********************************************************************************
-  // //When the next button is clicked, this sets the current generation to the next 
-  // //generation and sets the prev and next generations and then calls get history to 
-  // //get the history of the current generation
-  // //*********************************************************************************
-
-  // $scope.next = function(){
-
-  //   if($scope.generationId >= $scope.maxGen){
-  //     $scope.generationId = 1;
-  //     $scope.prev=$scope.generations[($scope.generations.length-1)].title
-  //     $scope.currGen = $scope.generations[($scope.generationId-1)].title
-  //     $scope.nex= $scope.generations[$scope.generationId].title
-  //   }
-
-  //   else{
-  //     $scope.generationId++;
-  //     $scope.currGen = $scope.generations[($scope.generationId-1)].title
-  //     $scope.prev=$scope.generations[($scope.generationId-2)].title
-  //     if($scope.generationId === $scope.generations.length){
-  //       $scope.nex = $scope.generations[0].title;
-  //     }
-  //     else{
-  //       $scope.nex= $scope.generations[$scope.generationId].title
-  //     }
-  //   }
-
-  //   $scope.getHistory($routeParams.class, $scope.generationId);
-  // }
-  // //*********************************************************************************
-  // //When the preious button is clicked, this sets the current generation to the previous 
-  // //generation and sets the prev and next generations and then calls get history to 
-  // //get the history of the current generation
-  // //*********************************************************************************
-  // $scope.previous = function(){
+    $scope.getHistory($routeParams.class, $scope.generations[$scope.index].id);
+  }
+  //*********************************************************************************
+  //When the preious button is clicked, this sets the current generation to the previous 
+  //generation and sets the prev and next generations and then calls get history to 
+  //get the history of the current generation
+  //*********************************************************************************
+  $scope.previous = function(){
     
-  //   if($scope.generationId>=2){
-  //   $scope.generationId--
-  //   $scope.currGen = $scope.generations[($scope.generationId-1)].title
-  //   $scope.nex= $scope.generations[$scope.generationId].title
-  //     if($scope.generationId === 1){
-  //       $scope.prev = $scope.generations[($scope.maxGen-1)].title
-  //     }
-  //     else{
-  //       $scope.prev=$scope.generations[($scope.generationId-2)].title
-  //     }
-  //   }
-  //   else if($scope.generationId <= 1){
-  //     $scope.generationId = $scope.maxGen
-  //     $scope.currGen = $scope.generations[($scope.generationId-1)].title
-  //     $scope.nex= $scope.generations[0].title
-  //     $scope.prev=$scope.generations[($scope.generations.length-2)].title
-  //   }
-  //   $scope.getHistory($routeParams.class, $scope.generationId);
-  // }
+    if($scope.index>=1){
+    $scope.index--
+    $scope.currGen = $scope.generations[($scope.index)].title
+    $scope.nex= $scope.generations[$scope.index+1].title
+    $scope.generationId = $scope.generations[$scope.index].id
+      if($scope.index=== 0){
+        $scope.prev = $scope.generations[($scope.maxGen)].title
+      }
+      else{
+        $scope.prev=$scope.generations[($scope.index-1)].title
+      }
+    }
+    else if($scope.index <= 0){
+      $scope.index = $scope.maxGen
+      $scope.currGen = $scope.generations[($scope.index)].title
+      $scope.nex= $scope.generations[0].title
+      $scope.prev=$scope.generations[($scope.generations.length-2)].title
+      $scope.generationId = $scope.generations[$scope.index].id
+    }
+    $scope.getHistory($routeParams.class, $scope.generations[$scope.index].id);
+  }
 
-  // $scope.toggleBadPartners = function(pair){
-  //   console.log(pair)
-  //     $scope.badPartners.push(pair);
+  $scope.toggleBadPartners = function(pair){
+    console.log(pair)
+      $scope.badPartners.push(pair);
     
-  //     console.log($scope.badPartners)
-  //   }
+      console.log($scope.badPartners)
+    }
 
   
 
-  //   $scope.getIndexArray = function(num){
-  //   var arr = [];
-  //   for(var i = 0; i < num; i++){
-  //     arr[i] = i;
-  //   }
-  //   return arr;
-  // }
+    $scope.getIndexArray = function(num){
+    var arr = [];
+    for(var i = 0; i < num; i++){
+      arr[i] = i;
+    }
+    return arr;
+  }
 
-  // //*********************************************************************************
-  // //takes you back to the homepage when homepage button is clicked 
-  // //*********************************************************************************
+  //*********************************************************************************
+  //takes you back to the homepage when homepage button is clicked 
+  //*********************************************************************************
 
   $scope.goHome = function(){
     $location.path('/');

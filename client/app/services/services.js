@@ -97,12 +97,22 @@ angular.module('PU.factories', [])
     .catch(err => err)
   }
 
+  var getGenerations = function(cls){
+    return $http({
+      method: 'GET',
+      url:`/${cls}/generations`
+    })
+    .then(resp => resp.data)
+    .catch(err => err)
+  }
+
   return{
     getClasses: getClasses,
     getMemberships: getMemberships,
     getPairs: getPairs,
     addPairs: addPairs,
     updateGroups: updateGroups,
+    getGenerations: getGenerations
   }
   
 })
