@@ -55,94 +55,89 @@ app.get("/currentUser", function(req, res){
   res.send(req.session.user);
 })
 
-app.get('/myGroups', (req, res) =>{
-  db.getGroupsForStudent(req.session.uid).then((groups) =>{
-    var mergeGroup = [];
-    for(let i=0; i<groups.length; i++) mergeGroup.push(groups[i][0])
-    res.send(mergeGroup)
-  })
-})
-
-app.get('/updateGroups', (req, res) => {
-    var promiseArray = []
-    MP.user.groups(req.session.uid, req.session.accessToken)
-    .then(function(data){
-      for(let i=0; i<data.length; i++){
-      promiseArray.push(
-        db.addGroup({name: data[i].name, groupId:data[i].uid}).then((e) => {
-         return MP.memberships(data[i].name_id, req.session.accessToken)
-          .then((members) => db.addStudents(members))
-          .catch((err) => {console.log("error: ",err); res.status(500).send(err)})
-        }).catch((err) => {console.log("error: ",err); res.status(500).send(err)}))
-      }
-      Promise.all(promiseArray).then((e)=>{
-        res.send("true")
+app.get("/myGroups", function(req, res){    
+  MP.user.groups(req.session.uid, req.session.accessToken)    
+  .then(function(data){ 
+    db.addGroups(data)
+      .then((groups) => {
+        console.log("Makerpass groups data: ", groups);   
+        res.send(groups);   
       })
-      .catch((err) => {console.log("error at promise.all: ",err); res.status(500).send(err)})
-  }).catch((err) => {console.log("error: ",err); res.status(500).send(err)})
+  })    
 })
 
 app.get('/:groupName/generations', (req,res) => {
-  db.getGroup({name: req.params.groupName})
-  .then((data) => 
-    db.getGenarationsByGroup(data[0].id)
-    .then((genarations) => {
-        res.send(genarations);
-    }).catch((err) => res.status(500).send(err))
-  ).catch((err) => res.status(500).send(err));
+  db.authenticate(req.session.uid)
+  .then(() => 
+    db.getGroup({name: req.params.groupName})
+    .then((data) => 
+      db.getGenarationsByGroup(data[0].id)
+      .then((genarations) => {
+          res.send(genarations);
+      }).catch((err) => res.status(500).send(err))
+    ).catch((err) => res.status(500).send(err))
+  ).catch((err) => {
+      console.log('errror: ', err)
+      res.redirect("/")
+    })
 })
 
-app.get('/:groupName/members', (req,res) => {
-  db.getGroup({name: req.params.groupName})
-  .then((data) => {
-    db.getStudentsByGroup(data[0].mks_id)
-    .then((data) => {
-      db.getStudentData(data).then((students) => {
-      res.send(students);
+app.get("/:groupName/members", function(req, res){    
+  db.authenticate(req.session.uid)
+  .then(() => {
+    db.getGroup({name: req.params.groupName})
+    .then((group) => {
+      MP.memberships(group.mks_id, req.session.accessToken)    
+      .then(function(students){      
+        res.send(students);   
       }).catch((err) => res.status(500).send(err))
-    })
-    .catch((err) => res.status(500).send(err))
-  })
-  .catch((err) => res.status(500).send(err));
+    }).catch((err) => res.status(500).send(err))
+  }).catch((err) => {
+      console.log('errror: ', err)
+      res.redirect("/")
+    })    
 })
 
 app.get('/:groupName/pairs', (req,res) => {
-  db.getGroup({name: req.params.groupName})
-  .then(data => {
-    db.getPairsForGroup(data[0].id, req.params.groupName)
-    .then((pairs) => {
-      res.send(pairs)
+  db.authenticate(req.session.uid)
+  .then(() =>
+    db.getGroup({name: req.params.groupName})
+    .then(data => {
+      db.getPairsForGroup(data.id, req.params.groupName)
+      .then((pairs) => {
+        res.send(pairs)
+      })
     })
-  })
+  ).catch((err) => {
+      console.log('errror: ', err)
+      res.redirect("/")
+    })
 })
 
 app.post('/:groupName/pairs', (req, res) => {
-  res.send(db.addPairs(req.body, req.params.groupName))
+  db.authenticate(req.session.uid)
+  .then(() => 
+    res.send(db.addPairs(req.body, req.params.groupName))
+  ).catch((err) => {
+      console.log('errror: ', err)
+      res.redirect("/")
+    })
 })
 
-// app.get('/database/getUsersPartOfSameGroup', (req, res) => {
-//   db.findOrCreateAdmin({uid: req.session.uid, name: req.session.name}).then((id) => {
-//     console.log("id", id)
-//       db.getStudentsByGroup(id.uid).then((groups) => {
-//         res.send(groups) // send back an array with students that have groups that you can control over
-//       }).catch((err) => res.status(500).send(err)) // error probably db is down or something elsrong
-//   }).catch((err) => {
-//    console.log("error: ", err);
-//    res.status(401).send("error", err)
-//   })
-// })
-
 app.get('/test', (req, res) => {
-  db.getTables()
+  console.log('session: ', req.session)
+  db.authenticate(req.session.uid)
     .then((data) => {
       res.status(200).send(data)
     })
      .catch((err) => {
       console.log('errror: ', err)
-      res.status(404).send()
+      res.redirect("/")
     })
 })
 
 var port = process.env.PORT || 4000
 app.listen(port)
 console.log('listening on port ' + port)
+module.exports = app
+
