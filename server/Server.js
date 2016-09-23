@@ -27,6 +27,7 @@ AuthPort.on('auth', function(req, res, data) {
  
 AuthPort.on('error', function(req, res, data) {
   console.log("OAuth failed.", data)
+  console.log("error:", err);
   res.status(500).send({ error: 'oauth_failed' })
 })
 
@@ -71,9 +72,9 @@ app.get('/:groupUid/generations', (req,res) => {
       db.getGenerationsByGroup(data.id)
       .then((generations) => {
           res.send(generations);
-      }).catch((err) => res.status(500).send(err))
-    ).catch((err) => res.status(500).send(err))
-  ).catch((err) => res.status(401).send(err))
+      }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+    ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
 })
 
 app.get("/:groupUid/members", function(req, res){    
@@ -83,9 +84,9 @@ app.get("/:groupUid/members", function(req, res){
       MP.memberships(group.mks_id, req.session.accessToken)    
       .then(function(students){   
         res.send(students);   
-      }).catch((err) => res.status(500).send(err))
-    }).catch((err) => res.status(500).send(err))
-  }).catch((err) => res.status(401).send(err))
+      }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+    }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  }).catch((err) => {console.log("error:", err); res.status(401).send(err)})
 })    
 
 app.get('/:groupUid/pairs', (req,res) => {
@@ -103,7 +104,7 @@ app.post('/:groupUid/pairs', (req, res) => {
   .then(() => {
     db.addPairs(req.body, req.params.groupUid).then(data => 
       res.status(201).send(data)
-    ).catch((err) => res.status(500).send(err))
+    ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
   }).catch((err) => res.status(401).send(err))
 })
 
