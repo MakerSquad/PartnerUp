@@ -9,6 +9,7 @@ describe('The History Page', function() {
   var createController;
   var DB;
   var $routeParams;
+  var StateSaver;
 
   var testStus = [
         {
@@ -48,6 +49,7 @@ describe('The History Page', function() {
     $httpBackend = $injector.get('$httpBackend');
     $scope = $rootScope.$new();
     $routeParams = $injector.get('$routeParams');
+    StateSaver = $injector.get('StateSaver');
     DB = $injector.get('DB');
     var $controller = $injector.get('$controller');
 
@@ -71,6 +73,7 @@ describe('The History Page', function() {
   
   it('should pull generations from the back-end', function(){
     $routeParams.class = "test";
+    StateSaver.saveState({currentClass: {name: "test"}});
     var mockGens = [{classid: "test", title: "one", id: '1'}];
     var currUser = {name: "test"};
     $httpBackend.expectGET("/currentUser").respond(currUser);
