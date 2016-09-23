@@ -10,12 +10,18 @@ module.exports = {
         database: 'dd9bnae9j8734d',
         ssl: true,
         port: 5432,
+      },
+      migrations: {
+        tableName: 'knex_migrations'
       }
     },
     test :{ 
       client: 'pg',
       connection: {
-        filename: path.join(__dirname, './test/fakeDB.pg')
+       database: 'partner_up_test'
+      },
+      migrations: {
+        tableName: 'knex_migrations'
       }
     }
 }

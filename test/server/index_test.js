@@ -1,5 +1,4 @@
 require('../test-helper.js') // <--- This must be at the top of every test file.
-
 var request = require('supertest-as-promised')
 var routes = require(__server + '/Server.js')
 describe("The Server", function() {
@@ -33,6 +32,24 @@ describe("The Server", function() {
       .expect(404)
   })
 
+  it_("will give 401 when tring to get data without session", function *(){
+
+    yield request(app)
+      .get('/mygroups')
+      .expect(401)
+
+    yield request(app)
+      .get('/group/generations')
+      .expect(401)
+
+    yield request(app)
+      .get('/group/members')
+      .expect(401)
+
+    yield request(app)
+      .get('/group/pairs')
+      .expect(401)  
+  })
   describe("The past pair endpoints", function(){
     it_("can retrieve pairs for a given class", function * (){
       process.env.TEST_AUTH = true;

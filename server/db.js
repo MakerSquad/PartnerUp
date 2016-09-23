@@ -13,6 +13,7 @@ knex.migrate.latest([config[env]]);
   return: throws 401 if no session
 */
 knex.authenticate = (sessionUid) => {
+  console.log('process test auth: ', process.env.TEST_AUTH)
   if(sessionUid || process.env.TEST_AUTH) {
     return Promise.resolve();
   } else {
@@ -41,7 +42,6 @@ knex.addGroups = (groups) => {
           .catch((err) => {throw new Error("unable to add to group due to: "+ err)}) // throw error if something went horribly wrong
       } else return Promise.resolve(oldGroups); // else return old groups
     }).catch((err) => {throw new Error("Unable to add to groups, "+ err)}) // throw error if something went horribly wrong
-
 }
 
 /**

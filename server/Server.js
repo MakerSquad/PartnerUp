@@ -61,8 +61,8 @@ app.get("/myGroups", function(req, res){
   .then(function(data){ 
     db.addGroups(data)
       .then((groups) => res.send(groups))
-      .catch
-  })    
+      .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  }).catch((err) => {res.status(401).send(err)})    
 })
 
 app.get('/:groupUid/generations', (req,res) => {
@@ -74,7 +74,7 @@ app.get('/:groupUid/generations', (req,res) => {
           res.send(generations);
       }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
     ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  ).catch((err) => {res.status(401).send(err)})
 })
 
 app.get("/:groupUid/members", function(req, res){    
@@ -86,7 +86,7 @@ app.get("/:groupUid/members", function(req, res){
         res.send(students);   
       }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
     }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => {console.log("error:", err); res.status(401).send(err)})
+  }).catch((err) => {res.status(401).send(err)})
 })    
 
 app.get('/:groupUid/pairs', (req,res) => {
@@ -95,7 +95,8 @@ app.get('/:groupUid/pairs', (req,res) => {
     .then(data => {
       db.getPairsForGroup(data.id, req.params.groupName)
       .then((pairs) => res.send(pairs))
-    })
+      .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+    }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
   ).catch((err) => res.status(401).send(err))
 })
 
