@@ -1,7 +1,7 @@
 
-angular.module('PU.main', ['PU.factories'])
+angular.module('PU.main', ['PU.factories', angularDragula(angular)])
 
-.controller('MainController', function ($scope, $location, Makerpass, $http, StateSaver, DB) {
+.controller('MainController', function ($scope, $location, Makerpass, $http, StateSaver, DB, dragulaService) {
 
   $scope.currentUser = {} //Information for the current user
   $scope.classes = []; //all classes the user is a part of
@@ -544,7 +544,33 @@ angular.module('PU.main', ['PU.factories'])
     $scope.loading = false;
     $scope.closeCreateModal();
   }
+//***********************dragula under here ***********************************************
+//   dragulaService.options($scope, 'bag-one', {
+        
+//         invalid: function (el, target) { // prevent buttons and anchor tags from starting a drag
+//             return  el.tagName === 'IMG';
+//         },
 
+//          moves: function (el, source, handle, sibling) {
+//     return el.tagName !== 'IMG';
+//   // elements are always draggable by default
+//   }
+//         ,
+//           direction: 'vertical', // Y axis is considered when determining where an element would be dropped
+//           // mirrorContainer: $scope.groups,
+          
+//     });
+  
+
+//   $scope.$on('bag-one.drop-model', function (e, el, target, source) {
+//     console.log(el);
+// //    $scope.groups.length = 0; 
+// //    console.log('I GOT HERE WOAH')//clears the array
+// // groups.forEach(function(item) {
+// //   $scope.groups.push(item);
+// // })
+// })
+//**************************dragula above here (no touchie!!!!)*******************************
   var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
     $scope.loading = true;
     new Clipboard('.clipyclip');

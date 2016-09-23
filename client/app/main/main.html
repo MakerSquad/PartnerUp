@@ -55,8 +55,11 @@
       <tr>
       <th ng-repeat="index in getIndexArray(groupSizeSelect)">Partner {{index + 1}}</th>
       </tr>
-      <tr  ng-repeat="group in groups" ng-class="{clash: !finalized && clashes.includes(group), locked: searchLockedGroups(group)}" >
-        <td  ng-repeat="stu in group" ng-click="selectForSwap(stu)" ng-class="{selectedStu: selectedForSwap === stu}" class="stu"> <img src='{{stu.user.avatar_url}}' width='40px' height='50px'>
+        <tr   ng-repeat="group in groups" ng-class="{clash: !finalized && clashes.includes(group), locked: searchLockedGroups(group)}" >
+         <!-- dragula-scope="$parent" dragula='"bag-one"' this goes in the tr above it!!-->  
+        <td  ng-repeat="stu in group" ng-click="selectForSwap(stu)" ng-class="{selectedStu: selectedForSwap === stu}" class="stu" dragula-model='groups'> 
+        <!--dragula-model='groups' this goes in td above!!! -->
+        <img src='{{stu.user.avatar_url}}' width='40px' height='50px'>
           {{stu.user.name}}
         </td>
           <td>
