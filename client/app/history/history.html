@@ -9,10 +9,10 @@
 <tr>
 <th ng-repeat="index in getIndexArray(groupSize)">Partner {{index + 1}}</th>
 </tr>
-<tr ng-repeat='pair in pastPairs' >
+<tr ng-repeat='pair in displayPairs' ng-class="{ bad : badPartners.includes(pair)}"  >
 <td>{{library[pair.user1_uid]}}</td>
 <td>{{library[pair.user2_uid]}}</td>
-<td><img src="http://www.clipartkid.com/images/400/bigstock-hand-making-a-stop-signal-sign-162901311-150x150-5-fatal-U3Vjqk-clipart.jpg" height="20px" width="20px" ng-click="toggleBadPartners(pair)" ng-class="{bad : badPartners.includes(pair)}"></td>
+<td><img src="http://www.clipartkid.com/images/400/bigstock-hand-making-a-stop-signal-sign-162901311-150x150-5-fatal-U3Vjqk-clipart.jpg" height="20px" width="20px" ng-click="toggleBadPartners(pair)" ></td>
 </tr>
 </table>
 <button class="clipyclip" data-clipboard-target="#pair">copy me</button>
