@@ -154,6 +154,7 @@ td{
   height:30px;
   width: 125px;
   font-size:13px;
+  margin-right:70px;
 }
 .final{
   background-color: cornflowerblue;
@@ -176,7 +177,7 @@ td{
   margin-top: 10px
   margin-bottom:10px;
   height:30px;
-  width: 125px;
+  width: 30px;
   font-size:12px;
 }
 .goHome{
@@ -185,11 +186,93 @@ td{
   border-radius: 5px;
   float: right;
   margin-bottom:10px;
-  height:30px;
-  width: 125px;
+  height:35px;
+  width: 150px;
   font-size:12px;
+  margin-right: 100px;
 }
+.generations{
+  float: left;
+  clear: left;
+/*  position: absolute;
+  right: 0px;*/
+  display: block;
+  border-style: solid;
+  border-width: 3px;
+  background-color: #ebebeb;
+  border-color: #dbdbdb;
+  width: 150px;
+  /*margin-right:100px;*/
+  cursor: pointer;
+  margin-bottom: 1px;
+}
+.genTitle{
+  float: left;
+  clear: left;
+  /*margin-right: 130px ;*/
+  margin-bottom: 0px;
+}
+.genSearch{
+    float: left;
+  clear: left;
+  margin-left: 0px ;
+  margin-bottom:10px;
+}
+.pair{
+  margin-left: 300px;
+align: center;
 
+}
+.stopit{
+  border: none !important;
+  background-color: none !important;
+}
+.indPair{
+  border-style: solid;
+  border-width: 3px;
+  background-color: #ebebeb;
+  border-color: #dbdbdb;
+
+}
+.currGen{
+  margin-left:300px;
+  align: center;
+}
+.previous{
+  position: absolute;
+  top: 110px;
+  left:300px;
+}
+.next{
+  position:absolute;
+  top: 110px;
+  left: 605px;
+}
 .listLoad{
   margin-top: 20px
+}
+.titleGen{
+  margin-right: 200px;
+}
+.histclip{
+ float: right;
+ margin-right: 495px;
+}
+.instructorList{
+ margin-right: 50px;
+ float: right;
+ clear: right;
+ border: 1px solid cornflowerblue;
+ border-radius: 25px;
+ padding: 10px;
+ margin-bottom: 15px;
+}
+
+.fellowList{
+ margin-right: 40px;
+ float: right;
+ clear: right;
+ border: 1px solid cornflowerblue;
+ border-radius: 25px;
+ padding: 10px;
 }

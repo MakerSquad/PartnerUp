@@ -1,6 +1,6 @@
 angular.module('PU.history', ['PU.factories'])
 
-.controller('HistoryController', function ($scope, $location, Makerpass, $http, $routeParams, DB) {
+.controller('HistoryController', function ($scope, $location, Makerpass, $http, $routeParams, DB, StateSaver) {
   
   new Clipboard('.clipyclip');
   $scope.groupSize = 2;
@@ -16,6 +16,7 @@ angular.module('PU.history', ['PU.factories'])
   $scope.badPartners = [];
   $scope.index = 0;
   $scope.library = {};
+  $scope.currClassName = ''
 
   //*********************************************************************************
   //this will get all the past pairs from the database by class id and generation id
@@ -27,6 +28,7 @@ angular.module('PU.history', ['PU.factories'])
       for(var i = 0; i<data.length; i++){
         $scope.generations.push(data[i]);
       }
+      
       $scope.currGen = $scope.generations[0].title;
       $scope.maxGen = $scope.generations.length-1;
       $scope.generationId = $scope.generations[0].id;
@@ -70,6 +72,15 @@ angular.module('PU.history', ['PU.factories'])
       }
     });
    }
+
+  //*********************************************************************************
+  //gets class name by giving the class's uid
+  //*********************************************************************************
+    $scope.getName = function(){
+      var states = StateSaver.checkState();
+      $scope.currClassName = states.currentClass.name
+      console.log('STATES STATES', $scope.currClassName)
+    }
 
   // *********************************************************************************
   // this sets the generation and sets the next and previous generations so that they
@@ -213,6 +224,7 @@ angular.module('PU.history', ['PU.factories'])
         .then(function(morestuff){$scope.makeMap()
           .then(function(evenmorestuff){
             $scope.changeGen();
+            $scope.getName();
             console.log('init complete')
           })
         })

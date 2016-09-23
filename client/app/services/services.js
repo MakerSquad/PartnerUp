@@ -30,6 +30,9 @@ angular.module('PU.factories', [])
     console.log('Saving: ', toSave);
     state = toSave;
   }
+  var checkState = function(){
+    return state
+  }
 
   var restoreState = function(){
     var tmp = state;
@@ -40,7 +43,8 @@ angular.module('PU.factories', [])
 
   return {
     saveState: saveState,
-    restoreState: restoreState
+    restoreState: restoreState,
+    checkState: checkState
   }
 
 })
