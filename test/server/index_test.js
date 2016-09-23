@@ -51,13 +51,29 @@ describe("The Server", function() {
       .expect(401)  
   })
   describe("The past pair endpoints", function(){
-    it_("can retrieve pairs for a given class", function * (){
+    it_("can post and retrieve pairs for a given class", function * (){
       process.env.TEST_AUTH = true;
       yield request(app)
         .get('/MKS43/pairs')
         .expect(200)
         .expect(function(response){
           expect(Array.isArray(response.body)).to.equal(true);
+        })
+
+      yield request(app)
+        .post('/MKS43/pairs')
+        .send({
+          "pairs": [["ddad747d5fab", "77955d3eb662"],["06df31cdd4bf", "90b72025841d"]],
+          "genTitle": "Dem Boyz",
+          "groupSize": 2
+        })
+        .expect(201)
+
+      yield request(app)
+        .get('/MKS43/pairs')
+        .expect(200)
+        .expect(function(response){
+          expect(response.body.length).to.not.equal(null);
         })
     })
   })

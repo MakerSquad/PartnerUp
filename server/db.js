@@ -13,7 +13,7 @@ knex.migrate.latest([config[env]]);
   return: throws 401 if no session
 */
 knex.authenticate = (sessionUid) => {
-  console.log('process test auth: ', process.env.TEST_AUTH)
+  // console.log('process test auth: ', process.env.TEST_AUTH)
   if(sessionUid || process.env.TEST_AUTH) {
     return Promise.resolve();
   } else {
@@ -117,15 +117,15 @@ function addGeneration(genData) {
 knex.getGroup = (group) => {
   if(typeof group.name == "string") // checks if givin a name
     return knex('groups').where('name', group.names).returning('*')
-      .then((groupData) => groupData[0])
+      .then((groupData) => groupData[0] || {id: -1})
       .catch((err) => {throw new Error("incorrect format, "+ err)}) // throw error if something went horribly wrong
   if(typeof group.id == 'integer') // checks if givin a non mks id
     return knex('groups').where('id', group.id).returning('*')
-      .then((groupData) => groupData[0]) 
+      .then((groupData) => groupData[0] || {id: -1}) 
       .catch((err) => {throw new Error("incorrect format, "+ err)})
   //else just assumes that its mks_id and checks for that 
   return knex('groups').where({mks_id: group.mks_id}).returning('*') // throw error if something went horribly wrong
-    .then((groupData) => groupData[0]) 
+    .then((groupData) => groupData[0] || {id: -1}) 
     .catch((err) => {throw new Error("incorrect format, "+ err)})  // throw error if something went horribly wrong 
 }
 

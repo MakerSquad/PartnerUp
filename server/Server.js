@@ -91,13 +91,15 @@ app.get("/:groupUid/members", function(req, res){
 
 app.get('/:groupUid/pairs', (req,res) => {
   db.authenticate(req.session.uid)
-  .then(() => db.getGroup({mks_id: req.params.groupUid})
+  .then(() => {
+    console.log(req.params.groupUid)
+    db.getGroup({mks_id: req.params.groupUid})
     .then(data => {
       db.getPairsForGroup(data.id, req.params.groupName)
       .then((pairs) => res.send(pairs))
       .catch((err) => {console.log("error:", err); res.status(500).send(err)})
     }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  ).catch((err) => res.status(401).send(err))
+  }).catch((err) => res.status(401).send(err))
 })
 
 app.post('/:groupUid/pairs', (req, res) => {
