@@ -269,6 +269,12 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
     return $scope.groups;
   }
 
+  $scope.filterGroupsByName = function(group){
+    if(!$scope.groupSearch) return true;
+    var search = $scope.groupSearch.toLowerCase();
+    return group.filter(stu => stu.user.name.toLowerCase().includes(search)).length;
+  }
+
   /**
   * CheckClashes checks the current groups for any groups in which students have previously worked together
   * Any clashing groups will be pushed to $scope.groups

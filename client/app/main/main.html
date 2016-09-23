@@ -46,6 +46,7 @@
   <!--The table of current groupings-->
   <div ng-show="loadingGroups" loading class="studentGroups"></div>
   <div ng-show="partnerUp && !loadingGroups" class="studentGroups">
+    <input class='groupSearch' ng-model="groupSearch" placeholder="Search groups">
     <div class='genTitle' ng-show="partnerUp && !finalized">
       <input ng-model="genTitle" placeholder="Title..." maxlength="17">
       <button  class='final' ng-click="finalize()">Finalize this pairing</button>
@@ -55,7 +56,7 @@
       <tr>
       <th ng-repeat="index in getIndexArray(groupSizeSelect)">Partner {{index + 1}}</th>
       </tr>
-        <tr   ng-repeat="group in groups" ng-class="{clash: !finalized && clashes.includes(group), locked: searchLockedGroups(group)}" >
+        <tr ng-repeat="group in groups | filter : filterGroupsByName" ng-class="{clash: !finalized && clashes.includes(group), locked: searchLockedGroups(group)}" >
          <!-- dragula-scope="$parent" dragula='"bag-one"' this goes in the tr above it!!-->  
         <td  ng-repeat="stu in group" ng-click="selectForSwap(stu)" ng-class="{selectedStu: selectedForSwap === stu}" class="stu" dragula-model='groups'> 
         <!--dragula-model='groups' this goes in td above!!! -->
