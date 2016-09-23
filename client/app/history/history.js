@@ -210,7 +210,7 @@ angular.module('PU.history', ['PU.factories'])
   //*********************************************************************************
 
   var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
-    
+    $scope.loading = true;
     $http({ //Check the current user; redirect if we aren't logged in
       method: "GET",
       url: "/currentUser"
@@ -226,6 +226,7 @@ angular.module('PU.history', ['PU.factories'])
             $scope.changeGen();
             $scope.getName();
             console.log('init complete')
+            $scope.loading = false;
           })
         })
       })

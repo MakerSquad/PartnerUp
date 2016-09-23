@@ -4,7 +4,7 @@
 
   <!--Control buttons-->
   <div class="controls">
-    <div class="createButtons">
+    <div class="createButtons" ng-show='neverlol'>
       <button ng-click="openCreateModal()" class='createClass'>Create a class</button>
     </div>
     <div class='currClass'>Current class: {{currentClass.name}}</div>
@@ -23,22 +23,22 @@
 
   <!--Lists of people in the current class-->
   <div loading ng-show="loadingList" class="listLoad"></div>
-  <div class="peopleList" ng-show="!loadingList">
+  <div class="peopleList" ng-show="!loadingList && currentClass">
+      <h2 class="instructorTitle">Instructors: </h2>
     <div class="instructorList">
-      <h2>Instructors: </h2>
         <div class="instructor" ng-repeat="instructor in instructors">{{instructor.user.name}}</div>
     </div>
+      <h2 class="fellowTitle">Fellows: </h2>
     <div class="fellowList">
-      <h2>Fellows: </h2>
         <div class="fellow" ng-repeat="fellow in fellows">{{fellow.user.name}}</div>
     </div>
-    <div class="studentList">
       <h2>Students: </h2> 
-      <div class="student" ng-repeat="student in students"><button ng-click="removeFromStudent(student);">x</button>{{student.user.name}}</div>
+    <div class="studentList">
+      <div class="student" ng-repeat="student in students"><button class="addOrRemove" ng-click="removeFromStudent(student);">x</button>{{student.user.name}}</div>
     </div>
-    <div>
       <h2>Removed Students:</h2>
-      <div class ="removedStudents" ng-repeat="nopair in noPair"><button ng-click="addStudentBackIn(nopair);">o</button>{{nopair.user.name}}
+    <div class="removedStudents" ng-show="noPair.length">
+      <div ng-repeat="nopair in noPair"><button class="addOrRemove" ng-click="addStudentBackIn(nopair);">o</button>{{nopair.user.name}}
       </div>
     </div>
   </div>
@@ -46,7 +46,7 @@
   <!--The table of current groupings-->
   <div ng-show="loadingGroups" loading class="studentGroups"></div>
   <div ng-show="partnerUp && !loadingGroups" class="studentGroups">
-    <input class='groupSearch' ng-model="groupSearch" placeholder="Search groups">
+    <input class='groupSearch' ng-model="groupSearch" placeholder="Search groups"><br>
     <div class='genTitle' ng-show="partnerUp && !finalized">
       <input ng-model="genTitle" placeholder="Title..." maxlength="17">
       <button  class='final' ng-click="finalize()">Finalize this pairing</button>
