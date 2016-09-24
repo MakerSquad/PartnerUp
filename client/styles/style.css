@@ -314,3 +314,21 @@ align: center;
   border-radius: 50%;
   margin-right: 5px;
 }
+
+.fade {
+  -webkit-transition:all linear 0.5s;
+  transition:all linear 0.5s;
+}
+.fade.ng-hide {
+  opacity:0;
+}
+
+.slide{
+  transition:all linear 0.5s;
+  -webkit-transition:all linear 0.5s;
+}
+.slide.ng-hide{
+  line-height:0;
+  opacity:0;
+  padding:0 10px;
+}

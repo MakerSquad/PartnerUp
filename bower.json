@@ -14,6 +14,7 @@
     "angular-route": "~1.2.18",
     "angular-mocks": "~1.2.18",
     "clipboard": "^1.5.12",
-    "angular-dragula": "^1.2.8"
+    "angular-dragula": "^1.2.8",
+    "angular-animate": "1.2.30"
   }
 }

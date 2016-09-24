@@ -3,7 +3,8 @@ angular.module('PU', [
   'ngRoute',
   'PU.signin',
   'PU.main',
-  'PU.history'
+  'PU.history',
+  'ngAnimate',
   ])
 .config(function($routeProvider, $httpProvider) {
   $routeProvider

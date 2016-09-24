@@ -16,14 +16,15 @@ angular.module('PU.history', ['PU.factories'])
   $scope.badPartners = [];
   $scope.index = 0;
   $scope.library = {};
-  $scope.currClassName = ''
+  $scope.currClassName = '';
+  $scope.pastGens = {};
 
   //*********************************************************************************
   //this will get all the past pairs from the database by class id and generation id
   //*********************************************************************************
 
   $scope.getGen = function(cls){
-  return   DB.getGenerations($scope.currClass)
+  return DB.getGenerations($scope.currClass)
     .then(function(data){
       for(var i = 0; i<data.length; i++){
         $scope.generations.push(data[i]);
@@ -36,6 +37,7 @@ angular.module('PU.history', ['PU.factories'])
         $scope.prev=$scope.generations[$scope.generations.length-1].title;
         $scope.nex= $scope.generations[1].title;
       }
+      return data;
     });
   };
 
@@ -48,6 +50,7 @@ angular.module('PU.history', ['PU.factories'])
    return DB.getPairs($scope.currClass)
       .then(function(data){
         $scope.pastPairs = data;
+        return data;
       });
   };
 
@@ -56,7 +59,8 @@ angular.module('PU.history', ['PU.factories'])
   //*********************************************************************************
 
   $scope.changeGen = function(){
-    $scope.displayPairs = $scope.pastPairs.filter(pp => pp.gen_table_id===$scope.generationId);
+    //$scope.displayPairs = $scope.pastPairs.filter(pp => pp.gen_table_id===$scope.generationId);
+    //$scope.groupSize = $scope.generations[$scope.currGen].group_size;
   };
 
   //*********************************************************************************
@@ -220,9 +224,39 @@ angular.module('PU.history', ['PU.factories'])
         $location.path('/signin');
       } 
       $scope.getGen()
-      .then(function(stuff){$scope.getHistory()
-        .then(function(morestuff){$scope.makeMap()
+      .then(function(generations){$scope.getHistory()
+        .then(function(pairs){$scope.makeMap()
           .then(function(evenmorestuff){
+            var pastGens = {};
+            var seen = {}; //object of objects
+            for(var i = 0; i < pairs.length; i++){
+              var currPair = pairs[i];
+              var currGen = currPair.gen_table_id;
+              if(!seen[currGen]){
+                seen[currGen] = {};
+              }
+              var currUser1 = $scope.library[currPair.user1_uid];
+              if(seen[currGen][currUser1]){
+                continue;
+              }
+              var currUser2 = $scope.library[currPair.user2_uid];
+              if(!pastGens[currGen]){
+                pastGens[currGen] = {};
+              }
+              if(!pastGens[currGen][currUser1]){
+                pastGens[currGen][currUser1] = [currUser1];
+              }
+              pastGens[currGen][currUser1].push(currUser2);
+              seen[currGen][currUser2] = true;
+            }
+            for(var gen in pastGens){
+              for(var user in pastGens[gen]){
+                if(!$scope.pastGens[gen]){
+                  $scope.pastGens[gen] = [];
+                }
+                $scope.pastGens[gen].push(pastGens[gen][user]); //pushes the group (as an array) to pastgens
+              }
+            }
             $scope.changeGen();
             $scope.getName();
             console.log('init complete')

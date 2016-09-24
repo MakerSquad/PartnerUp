@@ -1,4 +1,4 @@
-<div ng-class="{toBackground: creatingGroup}" ng-show="initialized" class='main'>
+<div ng-class="{toBackground: creatingGroup}" ng-show="initialized" class='main fade'>
   <button class="signout" ng-click="signOut()">Log out</button>
   <h1 class="welcome">Welcome, {{currentUser.name.includes("Gilbert") ? "Gilby" : currentUser.name || "Gilby"}}!</h1>
 
@@ -45,7 +45,7 @@
 
   <!--The table of current groupings-->
   <div ng-show="loadingGroups" loading class="studentGroups"></div>
-  <div ng-show="partnerUp && !loadingGroups" class="studentGroups">
+  <div ng-show="partnerUp && !loadingGroups" class="studentGroups slide">
     <input class='groupSearch' ng-model="groupSearch" placeholder="Search groups"><br>
     <div class='genTitle' ng-show="partnerUp && !finalized">
       <input ng-model="genTitle" placeholder="Title..." maxlength="17">
