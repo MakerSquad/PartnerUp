@@ -1,34 +1,35 @@
 <div loading ng-show="loading"></div>
-<div class='history' ng-show="!loading">
+<div class='history fade' ng-show="!loading">
 <button class='goHome' ng-click='goHome()'>Back to PartnerUp</button>
 <h1>{{currClassName}}'s History</h1>
 <br>
 
-<h3 class='genTitle'>Generation Table<h3>
-<input class="genSearch" ng-model='search' placeholder="type generation name...">
+<div ng-show="generations.length">
+  <div class='sidebar'>
+    <h3 class='genTitle'>Generation Table</h3>
+    <input class="genSearch" ng-model='search' placeholder="type generation name...">
 
-<div ng-repeat='generation in generations| filter: {title: search}' ng-click='setGen(generation)' class="generations">{{generation.title}}
+    <div ng-repeat='generation in generations| filter: {title: search}' ng-click='setGen(generation)' ng-class='{selectedGen: generation.title === currGen}' class="generations">{{generation.title}}
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="currGen">
+      <button class='changers prev' ng-click='previous()'><</button>
+      <h3 class="currGenTitle">{{currGen}}</h3>
+      <button class= 'changers next' ng-click='next()'>></button>
+    </div>
+    <table class="pair" id="pair">
+      <tr>
+      <th class="indPair" ng-repeat="index in getIndexArray(pastGens[generationId][0].length)">Partner {{index + 1}}</th>
+      </tr>
+      <tr ng-repeat='group in pastGens[generationId]' ng-class="{ bad : badPartners.includes(group)}">
+      <td class="indPair" ng-repeat='partner in group'>{{partner}}</td>
+      <td class='stopit'><img class='stop' src="/assets/stopsign.png" height="20px" width="20px" ng-click="toggleBadPartners(group)" ></td>
+      </tr>
+    </table>
+    <button class="clipyclip histclip" data-clipboard-target="#pair">copy me</button>
+  </div>
 </div>
-
-<h3 class="currGen"><button class='changers prev' ng-click='previous()'><</button> Current Generation: {{currGen}} <button class= 'changers next' ng-click='next()'>></button></h3>
-<!-- <table class="pair" id="pair">
-<tr>
-<th class="indPair" ng-repeat="index in getIndexArray(groupSize)">Partner {{index + 1}}</th>
-</tr>
-<tr ng-repeat='pair in displayPairs' ng-class="{ bad : badPartners.includes(pair)}"  >
-<td class="indPair" >{{library[pair.user1_uid]}}</td>
-<td class="indPair" >{{library[pair.user2_uid]}}</td>
-<td class='stopit'><img class='stop' src="http://www.clipartkid.com/images/400/bigstock-hand-making-a-stop-signal-sign-162901311-150x150-5-fatal-U3Vjqk-clipart.jpg" height="20px" width="20px" ng-click="toggleBadPartners(pair)" ></td>
-</tr>
-</table> -->
-<table class="pair" id="pair">
-<tr>
-<th class="indPair" ng-repeat="index in getIndexArray(pastGens[generationId][0].length)">Partner {{index + 1}}</th>
-</tr>
-<tr ng-repeat='group in pastGens[generationId]'>
-<td class="indPair" ng-repeat='partner in group'>{{partner}}</td>
-<td class='stopit'><img class='stop' src="http://www.clipartkid.com/images/400/bigstock-hand-making-a-stop-signal-sign-162901311-150x150-5-fatal-U3Vjqk-clipart.jpg" height="20px" width="20px" ng-click="toggleBadPartners(pair)" ></td>
-</tr>
-</table>
-<button class="clipyclip histclip" data-clipboard-target="#pair">copy me</button>
-<div>
+<h3 class='genTitle' ng-show="!generations.length">This class has no past groupings! Go partner up!</h3>
+</div>

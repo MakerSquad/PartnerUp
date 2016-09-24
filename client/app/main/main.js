@@ -373,9 +373,7 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
   }
 
   $scope.getClasses = function(){
-    return DB.updateGroups()
-    .then(function(){
-      DB.getClasses()
+      return DB.getClasses()
       .then(function(classes){
         var already = {};
         for(var i = 0; i < $scope.classes.length; i++){
@@ -389,7 +387,6 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
         }
         $scope.loading = false;
       })
-    })
   }
 
   //Functions for rearranging students

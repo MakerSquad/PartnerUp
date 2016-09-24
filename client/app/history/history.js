@@ -26,6 +26,9 @@ angular.module('PU.history', ['PU.factories'])
   $scope.getGen = function(cls){
   return DB.getGenerations($scope.currClass)
     .then(function(data){
+      if(!data.length) {
+        return data;
+      }
       for(var i = 0; i<data.length; i++){
         $scope.generations.push(data[i]);
       }
@@ -52,15 +55,6 @@ angular.module('PU.history', ['PU.factories'])
         $scope.pastPairs = data;
         return data;
       });
-  };
-
-  //*********************************************************************************
-  //filters the data with the current generationId
-  //*********************************************************************************
-
-  $scope.changeGen = function(){
-    //$scope.displayPairs = $scope.pastPairs.filter(pp => pp.gen_table_id===$scope.generationId);
-    //$scope.groupSize = $scope.generations[$scope.currGen].group_size;
   };
 
   //*********************************************************************************
@@ -109,7 +103,6 @@ angular.module('PU.history', ['PU.factories'])
       $scope.prev = $scope.generations[$scope.index-1].title;
       $scope.nex = $scope.generations[$scope.index+1].title;
     }
-    $scope.changeGen();
   };
 
   //*********************************************************************************
@@ -140,7 +133,6 @@ angular.module('PU.history', ['PU.factories'])
         $scope.nex= $scope.generations[$scope.index+1].title;
       }
     }
-    $scope.changeGen();
   }
 };
 
@@ -171,7 +163,6 @@ angular.module('PU.history', ['PU.factories'])
         $scope.prev=$scope.generations[($scope.generations.length-2)].title;
         $scope.generationId = $scope.generations[$scope.index].id;
       }
-    $scope.changeGen();
   }
 };
 
@@ -224,40 +215,44 @@ angular.module('PU.history', ['PU.factories'])
         $location.path('/signin');
       } 
       $scope.getGen()
-      .then(function(generations){$scope.getHistory()
+      .then(function(generations){
+        $scope.getHistory()
         .then(function(pairs){$scope.makeMap()
           .then(function(evenmorestuff){
-            var pastGens = {};
-            var seen = {}; //object of objects
-            for(var i = 0; i < pairs.length; i++){
-              var currPair = pairs[i];
-              var currGen = currPair.gen_table_id;
-              if(!seen[currGen]){
-                seen[currGen] = {};
-              }
-              var currUser1 = $scope.library[currPair.user1_uid];
-              if(seen[currGen][currUser1]){
-                continue;
-              }
-              var currUser2 = $scope.library[currPair.user2_uid];
-              if(!pastGens[currGen]){
-                pastGens[currGen] = {};
-              }
-              if(!pastGens[currGen][currUser1]){
-                pastGens[currGen][currUser1] = [currUser1];
-              }
-              pastGens[currGen][currUser1].push(currUser2);
-              seen[currGen][currUser2] = true;
-            }
-            for(var gen in pastGens){
-              for(var user in pastGens[gen]){
-                if(!$scope.pastGens[gen]){
-                  $scope.pastGens[gen] = [];
+            if(generations.length){
+              var pastGens = {};
+              var seen = {}; //object of objects
+              for(var i = 0; i < pairs.length; i++){
+                var currPair = pairs[i];
+                var currGen = currPair.gen_table_id;
+                if(!seen[currGen]){
+                  seen[currGen] = {};
                 }
-                $scope.pastGens[gen].push(pastGens[gen][user]); //pushes the group (as an array) to pastgens
+                var currUser1 = $scope.library[currPair.user1_uid];
+                if(seen[currGen][currUser1]){
+                  continue;
+                }
+                var currUser2 = $scope.library[currPair.user2_uid];
+                if(!pastGens[currGen]){
+                  pastGens[currGen] = {};
+                }
+                if(!pastGens[currGen][currUser1]){
+                  pastGens[currGen][currUser1] = [currUser1];
+                }
+                pastGens[currGen][currUser1].push(currUser2);
+                seen[currGen][currUser2] = true;
               }
+              for(var gen in pastGens){
+                for(var user in pastGens[gen]){
+                  if(!$scope.pastGens[gen]){
+                    $scope.pastGens[gen] = [];
+                  }
+                  $scope.pastGens[gen].push(pastGens[gen][user]); //pushes the group (as an array) to pastgens
+                }
+              }
+              console.log("$scope pastGens: ", $scope.pastGens);   
             }
-            $scope.changeGen();
+      
             $scope.getName();
             console.log('init complete')
             $scope.loading = false;
