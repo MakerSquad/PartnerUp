@@ -19,15 +19,18 @@ AuthPort.createServer({
  
 AuthPort.on('auth', function(req, res, data) {
   // console.log("OAuth success! user logged:", data.user);
-  req.session.accessToken = data.token;
-  req.session.uid = data.data.user.uid;
-  req.session.user = data.data.user;
-  res.redirect('/')
+  // req.session.accessToken = data.token;
+  // req.session.uid = data.data.user.uid;
+  // req.session.user = data.data.user;
+  db.addToken(data.token, data.data.user.uid)
+    .then((dbData) => {
+      res.send(data.token)
+    })
 })
  
 AuthPort.on('error', function(req, res, data) {
   console.log("OAuth failed.", data)
-  console.log("error:", err);
+  console.log("error:", data.err);
   res.status(500).send({ error: 'oauth_failed' })
 })
 
@@ -53,7 +56,11 @@ app.get("/signout", function(req, res){
 })
 
 app.get("/currentUser", function(req, res){
-  res.send(req.session.user);
+  console.log('header: ', req.headers)
+  db.authenticate(req.headers.token)
+    .then((uid) => {
+      res.send(uid);
+    })
 })
 
 app.get("/myGroups", function(req, res){    
@@ -66,7 +73,7 @@ app.get("/myGroups", function(req, res){
 })
 
 app.get('/:groupUid/generations', (req,res) => {
-  db.authenticate(req.session.uid)
+  db.authenticate(req.headers.token)
   .then(() => db.getGroup({mks_id: req.params.groupUid})
     .then((data) => 
       db.getGenerationsByGroup(data.id)
@@ -78,7 +85,7 @@ app.get('/:groupUid/generations', (req,res) => {
 })
 
 app.get("/:groupUid/members", function(req, res){    
-  db.authenticate(req.session.uid)
+  db.authenticate(req.headers.token)
   .then(() => {db.getGroup({mks_id: req.params.groupUid})
     .then((group) => {
       MP.memberships(group.mks_id, req.session.accessToken)    
@@ -90,7 +97,7 @@ app.get("/:groupUid/members", function(req, res){
 })    
 
 app.get('/:groupUid/pairs', (req,res) => {
-  db.authenticate(req.session.uid)
+  db.authenticate(req.headers.token)
   .then(() => {
     console.log(req.params.groupUid)
     db.getGroup({mks_id: req.params.groupUid})
@@ -103,7 +110,7 @@ app.get('/:groupUid/pairs', (req,res) => {
 })
 
 app.post('/:groupUid/pairs', (req, res) => {
-  db.authenticate(req.session.uid)
+  db.authenticate(req.headers.token)
   .then(() => {
     db.addPairs(req.body, req.params.groupUid).then(data => 
       res.status(201).send(data)
@@ -114,6 +121,12 @@ app.post('/:groupUid/pairs', (req, res) => {
 app.get('/test', (req, res) => {
   // console.log('session: ', req.session)
   db.getTables().then( (d) => res.send(d))
+  .catch((err) => res.send(err));
+})
+
+app.post('/test1', (req, res) => {
+  // console.log('session: ', req.session)
+  db.addToken(req.body.user, req.body.token).then( (d) => res.send(d))
   .catch((err) => res.send(err));
 })
 

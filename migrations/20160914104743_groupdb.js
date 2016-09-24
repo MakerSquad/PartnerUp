@@ -1,4 +1,9 @@
 exports.up = (knex, Promise) => Promise.all([
+  knex.schema.createTableIfNotExists('auth', table => {
+    table.increments('id');
+    table.string('user_uid');
+    table.string('token');
+  }),
   knex.schema.createTableIfNotExists('groups', table => {
     table.increments('id');
     table.string('name');
@@ -23,5 +28,6 @@ exports.up = (knex, Promise) => Promise.all([
 exports.down = (knex, Promise) => Promise.all([
   knex.schema.dropTableIfExists('groups'),
   knex.schema.dropTableIfExists('pairs'),
-  knex.schema.dropTableIfExists('generations')
+  knex.schema.dropTableIfExists('generations'),
+  knex.schema.dropTableIfExists('auth')
 ]);

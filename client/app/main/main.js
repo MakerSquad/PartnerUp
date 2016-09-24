@@ -585,6 +585,7 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
       url: "/currentUser"
     })
     .then(function(resp){
+      console.log("resp", resp)
       if(resp.data === ""){
         $location.path('/signin');
       } 

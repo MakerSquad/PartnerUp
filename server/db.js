@@ -12,15 +12,28 @@ knex.migrate.latest([config[env]]);
   @params: sessionUid = (string) Session
   return: throws 401 if no session
 */
-knex.authenticate = (sessionUid) => {
-  // console.log('process test auth: ', process.env.TEST_AUTH)
-  if(sessionUid || process.env.TEST_AUTH) {
-    return Promise.resolve();
-  } else {
-    return Promise.reject("401 Unauthorized, please make sure you are logged in");
-  }
+knex.authenticate = (token) => {
+  return knex('auth').where('token', token).returning('user_uid')
+    .then((userUid) => {
+      if(userUid.length || process.env.TEST_AUTH) {
+        return Promise.resolve(userUid[0]);
+      } else {
+        return Promise.reject("401 Unauthorized, please make sure you are logged in");
+      }
+    }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
 }
 
+knex.addToken = (userToken, userUid) => {
+  return knex('auth').where('user_uid', userUid).returning('user_uid')
+    .then((uid) => {
+      if(uid.length) {
+        return
+      } else {
+        return knex('auth').insert({user_uid: userUid, token: userToken}).returning('*')
+          .then((authData) => authData)
+      }
+    })
+}
 /**
   @params: group = {
     'name': (string)name,
@@ -130,7 +143,7 @@ knex.getGroup = (group) => {
 }
 
 knex.getTables = () => {
-  return knex('pairs').returning('*')
+  return knex('auth').returning('*')
 }
 
 /**
