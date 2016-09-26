@@ -54,7 +54,8 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
         instructors: $scope.instructors,
         partnerUp: $scope.partnerUp,
         finalized: $scope.finalized,
-        noPair: $scope.noPair
+        noPair: $scope.noPair,
+        stuView: $scope.stuView,
       })
       $location.path(`/${$scope.currentClass.mks_id}/history`);
     }
@@ -66,6 +67,7 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
 
   $scope.signOut = function(){
     CurrentUser.destroy();
+    document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'; //delete the token cookie
     return $http({
       method: 'GET',
       url: '/signout'
@@ -220,6 +222,10 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
     }
     groupSize = Number(groupSize);
     timeoutCounter += 1;
+
+    if(!$scope.noRepeats){
+      return $scope.trueRandomize(groupSize);
+    }
 
     if(timeoutCounter > timeoutThreshold){
       alert(`Uh oh! We were unable to generate a list without repeating pairs; this is likely because ` +

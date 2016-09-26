@@ -19,7 +19,7 @@
       </select>
       <br>
       <button ng-click="randomize(groupSizeSelect)" class="partnerBtn">Partner Up!</button>
-      <input type="checkbox" id="chbx" checked > No repeats
+      <input ng-model="noRepeats" ng-init="noRepeats=true" type="checkbox" id="chbx" checked > No repeats
     </div>
     <button ng-click="seeHistory()" class="histBtn">See History</button>
   </div>
