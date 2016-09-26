@@ -67,7 +67,6 @@ app.get("/currentUser", (req, res) =>{
 })
 
 app.get("/myGroups", (req, res) => {  
-  console.log("token in /mygroups:", req.cookies.token)
   db.authenticate(req.cookies.token).then( (uid) => {
     MP.user.groups(uid.user_uid, req.cookies.token)    
     .then((data)=> { 
@@ -75,6 +74,19 @@ app.get("/myGroups", (req, res) => {
         .then((groups) => res.send(groups))
         .catch((err) => {console.log("error:", err); res.status(500).send(err)})
     }).catch((err) => {res.status(401).send(err)})   
+  }).catch((err) => {res.status(401).send(err)}) 
+})
+
+app.get("/:groupUid/recent", (req, res) => {  
+  db.authenticate(req.cookies.token)
+  .then(() => 
+  db.getGroup({name: req.params.groupUid})
+    .then((group) => 
+      db.getNewGen(group.id)
+      .then((newGen) => {
+          res.send(newGen);
+      }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+    ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
   }).catch((err) => {res.status(401).send(err)}) 
 })
 
@@ -94,7 +106,7 @@ app.delete("/:groupUid/generation/:genId", (req, res) => {
   db.authenticate(req.cookies.token)
   .then((userUid) => db.getGroup({mks_id: req.params.groupUid})
     .then((group) => 
-      db.deleteGenaration(group.id, req.params.genId)
+      db.deleteGeneration(group.id, req.params.genId)
       .then((e) => {
           res.status(202).send(e);
       }).catch((err) => {console.log("error:", err); res.status(500).send(err)})

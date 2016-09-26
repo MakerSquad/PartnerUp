@@ -13,22 +13,21 @@ knex.migrate.latest([config[env]]);
   return: throws 401 if no session
 */
 knex.authenticate = (token) => {
-  return Promise.resolve()
-  // if(process.env.TEST_AUTH) return Promise.resolve();
-  //   console.log("token in auth", token)
-  // return knex('auth').where('token', token).returning('user_uid')
-  //   .then((userUid) => {
-  //     console.log("user:", userUid)
-  //     if(userUid.length) {
-  //       return Promise.resolve(userUid[0]);
-  //     } else {
-  //       return Promise.reject("401 Unauthorized, please make sure you are logged in");
-  //     }
-  //   }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
+  if(process.env.TEST_AUTH) return Promise.resolve();
+    // console.log("token in auth", token)
+  return knex('auth').where('token', token).returning('user_uid')
+    .then((userUid) => {
+      // console.log("user:", userUid)
+      if(userUid.length) {
+        return Promise.resolve(userUid[0]);
+      } else {
+        return Promise.reject("401 Unauthorized, please make sure you are logged in");
+      }
+    }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
 }
 
 knex.addToken = (userToken, userUid) => {
-  console.log("user and token", userUid, " ", userToken)
+  // console.log("user and token", userUid, " ", userToken)
   return knex('auth').where('user_uid', userUid).returning('user_uid')
     .then((uid) => {
       if(uid.length) 
@@ -77,20 +76,20 @@ knex.addPairs = (pairData, groupUid) => {
   .then((group) => group.id ) // sets the gId for generations and pairs tables in database
   .catch((err) => {throw new Error("Unable to to access groups, "+ err)})
   .then((gId) => {
-    return addGeneration({groupId: gId, genTitle: pairData.genTitle, groupSize: pairData.groupSize}) //adds or finds genaration for group
+    return addGeneration({groupId: gId, genTitle: pairData.genTitle, groupSize: pairData.groupSize}) //adds or finds generation for group
     .then((genId) => {
       for(var i = 0, rows = []; i < pairData.pairs.length; i++) // creates an object for the database 
         rows.push({
           user1_uid: pairData.pairs[i][0], // user 1
           user2_uid: pairData.pairs[i][1], // user 2
           group_id: gId, // groudn if in our database
-          gen_table_id: genId // genaration id on database
+          gen_table_id: genId // generation id on database
         });
       
       return knex.batchInsert('pairs', rows, pairData.pairs.length) 
         .then((e) => ('pairs added')) // returns string for client that pair is added
         .catch((err) => {throw new Error("Batch Inrest Failed due to: "+ err)}) // throw error if something went horribly wrong
-    }).catch((err) => {throw new Error("Unable to create genaration, "+ err)}) // throw error if something went horribly wrong
+    }).catch((err) => {throw new Error("Unable to create generation, "+ err)}) // throw error if something went horribly wrong
   }).catch((err) => {throw new Error("Unable to find the group in database, "+ err)}) // throw error if something went horribly wrong
 }
 
@@ -115,12 +114,12 @@ knex.addBadPairs = (pairData, GroupUid) => {
 
   return: return id 
 */
-knex.deleteGenaration = (groupId, genTableId) => {
+knex.deleteGeneration = (groupId, genTableId) => {
   return knex('generations').where({id: genTableId}).del()
   .then((e) => knex('pairs').where({gen_table_id: genTableId, group_id: groupId}).del()
-    .then((e) => "deleted genaration and pairs related to genId " +genTableId
+    .then((e) => "deleted generation and pairs related to genId " +genTableId
     ).catch((err) => {throw new Error("Unable to delete pairs for gen from DataBase, "+ err)}) // throw error if something went horribly wrong
-  ).catch((err) => {throw new Error("Unable to delete genaration and pairs from DataBase, "+ err)}) // throw error if something went horribly wrong
+  ).catch((err) => {throw new Error("Unable to delete generation and pairs from DataBase, "+ err)}) // throw error if something went horribly wrong
 }
 
 /**
@@ -137,14 +136,16 @@ function addGeneration(genData) {
   .then((exist) => {
     if(!exist.length){ // if array is empty  
       return knex('generations').where({group_id:genData.groupId}).returning("gen_id")
-      .then((next) => knex('generations').insert({
+      .then((next) => {
+        for(var i=0, max =0; i<next.length;i++) if(next[i].gen_id > max) max = next[i].gen_id;
+        return knex('generations').insert({
           group_id:   genData.groupId, // adds the group
           title:      genData.genTitle,// adds the title
-          gen_id:     next.length,     // adds the genaration by finding how many genaration were before
+          gen_id:     max+1,     // adds the generation by finding how many generation were before
           group_size: genData.groupSize// group size for better history 
         }).returning('id').then((id) => id[0])// returns the id
-      ).catch((err) => {throw new Error("unable to create new generation,"+ err)}) // throw error if something went horribly wrong
-    }else return (exist[0].id) // if exist it will just return old genaration id
+      }).catch((err) => {throw new Error("unable to create new generation,"+ err)}) // throw error if something went horribly wrong
+    }else return (exist[0].id) // if exist it will just return old generation id
   }).catch((err) => {throw new Error("parems aren't correct when calling addGeneration, "+ err)}) // throw error if something went horribly wrong
 }
 
@@ -182,7 +183,7 @@ knex.getTables = () => {
   return knex('pairs').returning('*')
 }
 knex.getTables2 = () => {
-  return knex('auth').returning('*')
+  return knex('generations').returning('*')
 }
 
 /**
@@ -196,7 +197,7 @@ knex.getPairsForGroup = (groupId, groupName) => {
 }
 
 /**
-  @params: groupId = (int) genaration table id
+  @params: groupId = (int) generation table id
   return: return {
     genId: (int) gen_id,
     groupSize: (int) group_size,
@@ -219,6 +220,18 @@ function getGroupIds() {
       return mergeIds; // return the uid array 
     })
     .catch((err) => {throw new Error("database off-line, "+ err)}) // throw error if something went horribly wrong
+}
+
+knex.getNewGen = (groupId) =>{
+  return knex('generations').where('group_id', groupId).returning("*")
+  .then((next) => {
+    for(var i=0, max =0; i<next.length;i++) if(next[i].gen_id > max) max = i;
+    console.log('max:',max, "group id:", groupId)
+    return knex('pairs').where({gen_table_id: next[max].id, group_id: groupId}).returning("*")
+    .then((pairs) => [pairs, next[max]])
+  })
+  .catch((err) => {throw new Error("cannot find gen_id, "+ err)}) // throw error if something went horribly wrong
+
 }
 
 /**
