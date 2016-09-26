@@ -13,27 +13,32 @@ knex.migrate.latest([config[env]]);
   return: throws 401 if no session
 */
 knex.authenticate = (token) => {
-  return Promise.resolve()
-  // return knex('auth').where('token', token).returning('user_uid')
-  //   .then((userUid) => {
-  //     if(userUid.length || process.env.TEST_AUTH) {
-  //       return Promise.resolve(userUid[0]);
-  //     } else {
-  //       return Promise.reject("401 Unauthorized, please make sure you are logged in");
-  //     }
-  //   }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
+  if(process.env.TEST_AUTH) return Promise.resolve();
+    console.log("token in auth", token)
+  return knex('auth').where('token', token).returning('user_uid')
+    .then((userUid) => {
+      console.log("user:", userUid)
+      if(userUid.length) {
+        return Promise.resolve(userUid[0]);
+      } else {
+        return Promise.reject("401 Unauthorized, please make sure you are logged in");
+      }
+    }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
 }
 
 knex.addToken = (userToken, userUid) => {
+  console.log("user and token", userUid, " ", userToken)
   return knex('auth').where('user_uid', userUid).returning('user_uid')
     .then((uid) => {
-      if(uid.length) {
-        return uid[0]
-      } else {
+      if(uid.length) 
+        return knex('auth').where({user_uid: userUid}).update("token", userToken).returning('*')
+          .then((authData) => authData[0])
+          .catch((err) => {console.log("err:",err); throw new Error("Unable to add token, "+ err)}); // throw error if something went horribly wrong
+      else 
         return knex('auth').insert({user_uid: userUid, token: userToken}).returning('*')
-          .then((authData) => authData)
-      }
-    })
+          .then((authData) => authData[0])
+          .catch((err) => {console.log("err:",err); throw new Error("Unable to add token, "+ err)});// throw error if something went horribly wrong
+    }).catch((err) => {console.log("err2:",err); throw new Error("Unable to find token, "+ err)}) // throw error if something went horribly wrong
 }
 /**
   @params: group = {
@@ -162,6 +167,9 @@ knex.getGroup = (group) => {
 
 knex.getTables = () => {
   return knex('pairs').returning('*')
+}
+knex.getTables2 = () => {
+  return knex('auth').returning('*')
 }
 
 /**

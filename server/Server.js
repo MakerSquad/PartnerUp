@@ -17,24 +17,25 @@ AuthPort.createServer({
   callbackURL: process.env.HOST + '/auth/makerpass',
 })
  
-AuthPort.on('auth', function(req, res, data) {
+AuthPort.on('auth', (req, res, data) => {
   // console.log("OAuth success! user logged:", data.user);
   // req.session.accessToken = data.token;
   // req.session.uid = data.data.user.uid;
   // req.session.user = data.data.user;
   db.addToken(data.token, data.data.user.uid)
-    .then((dbData) => {
-      console.log("data in auth", data)
+    .then((e) => {
+      // console.log("data in auth", data)
       res.send(data)
     })
 })
  
-AuthPort.on('error', function(req, res, data) {
+AuthPort.on('error', (req, res, data) => {
   console.log("OAuth failed.", data)
   console.log("error:", data.err);
   res.status(500).send({ error: 'oauth_failed' })
 })
 
+var cookieParser = require('cookie-parser')
 var express = require('express')
 var session = require('express-session')
 var app = express()
@@ -44,37 +45,41 @@ var db = require('./db');
 var bodyParser = require('body-parser');
 
 app.use(bodyParser.json());
-
 app.use(session({secret: "funnyGilby"}));
 app.use(express.static(path.join(__dirname, '../client'))); 
 app.use(express.static(path.join(__dirname, '../client/app')));
 app.use(express.static(path.join(__dirname, '../bower_components')));
+app.use(cookieParser());
+
 app.get("/auth/:service", AuthPort.app);
 
-app.get("/signout", function(req, res){
+app.get("/signout", (req, res) =>{
   req.session.destroy();
   res.redirect("/")
 })
 
-app.get("/currentUser", function(req, res){
+app.get("/currentUser", (req, res) =>{
   console.log('header: ', req.headers)
-  db.authenticate(req.headers.token)
+  db.authenticate(req.cookies.token)
     .then((uid) => {
       res.send(uid);
     })
 })
 
-app.get("/myGroups", function(req, res){    
-  MP.user.groups(req.session.uid, req.session.accessToken)    
-  .then(function(data){ 
-    db.addGroups(data)
-      .then((groups) => res.send(groups))
-      .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => {res.status(401).send(err)})    
+app.get("/myGroups", (req, res) => {  
+  console.log("token in /mygroups:", req.cookies.token)
+  db.authenticate(req.cookies.token).then( (uid) => {
+    MP.user.groups(uid.user_uid, req.cookies.token)    
+    .then((data)=> { 
+      db.addGroups(data)
+        .then((groups) => res.send(groups))
+        .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+    }).catch((err) => {res.status(401).send(err)})   
+  }).catch((err) => {res.status(401).send(err)}) 
 })
 
 app.get('/:groupUid/generations', (req,res) => {
-  db.authenticate(req.headers.token)
+  db.authenticate(req.cookies.token)
   .then(() => db.getGroup({mks_id: req.params.groupUid})
     .then((group) => 
       db.getGenerationsByGroup(group.id)
@@ -85,24 +90,24 @@ app.get('/:groupUid/generations', (req,res) => {
   ).catch((err) => {res.status(401).send(err)})
 })
 
-app.delete("/:groupUid/generation/:genId", function(req, res){    
-  db.authenticate(req.headers.token)
-  .then(() => db.getGroup({mks_id: req.params.groupUid})
+app.delete("/:groupUid/generation/:genId", (req, res) => {    
+  db.authenticate(req.cookies.token)
+  .then((userUid) => db.getGroup({mks_id: req.params.groupUid})
     .then((group) => 
       db.deleteGenaration(group.id, req.params.genId)
       .then((e) => {
-          res.send(e);
+          res.status(202).send(e);
       }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
     ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
   ).catch((err) => {res.status(401).send(err)})
 })    
 
-app.get("/:groupUid/members", function(req, res){    
-  db.authenticate(req.headers.token)
+app.get("/:groupUid/members", (req, res) => {    
+  db.authenticate(req.cookies.token)
   .then(() => {db.getGroup({mks_id: req.params.groupUid})
     .then((group) => {
-      MP.memberships(group.mks_id, req.session.accessToken)    
-      .then(function(students){   
+      MP.memberships(group.mks_id, req.cookies.token)    
+      .then((students) => {   
         res.send(students);   
       }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
     }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
@@ -110,7 +115,7 @@ app.get("/:groupUid/members", function(req, res){
 })    
 
 app.get('/:groupUid/pairs', (req,res) => {
-  db.authenticate(req.headers.token)
+  db.authenticate(req.cookies.token)
   .then(() => {
     console.log(req.params.groupUid)
     db.getGroup({mks_id: req.params.groupUid})
@@ -123,7 +128,7 @@ app.get('/:groupUid/pairs', (req,res) => {
 })
 
 app.post('/:groupUid/pairs', (req, res) => {
-  db.authenticate(req.headers.token)
+  db.authenticate(req.cookies.token)
   .then(() => {
     db.addPairs(req.body, req.params.groupUid).then(data => 
       res.status(201).send(data)
@@ -144,8 +149,16 @@ app.delete('/:groupUid/deletePairs', (req, res) => {
 })
 app.get('/test', (req, res) => {
   // console.log('session: ', req.session)
-  db.getTables().then( (d) => res.send(d))
-  .catch((err) => res.send(err));
+ db.authenticate(req.cookies.token)
+  .then(() => {
+    db.getTables().then((d) => res.send(d))
+    .catch((err) => res.send(err));
+  }).catch((err) => res.status(401).send(err))
+})
+
+app.get('/test2', (req, res) => {
+    db.getTables2().then((d) => res.send(d))
+    .catch((err) => res.send(err));
 })
 
 app.post('/test1', (req, res) => {
