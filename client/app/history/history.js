@@ -4,13 +4,13 @@ angular.module('PU.history', ['PU.factories'])
   
   new Clipboard('.clipyclip');
   $scope.groupSize = 2;
-  $scope.generationId = 0; 
+  $scope.generationId = 0; //THE CURRENT GENERATION
   $scope.pastPairs = [];
   $scope.displayPairs = [];
   $scope.generations = [];
   $scope.prev='prev';
   $scope.nex= 'next';
-  $scope.currGen = 0;
+  $scope.currGen = 0; //THE CURRENT GENERATION NAME
   $scope.maxGen = 0;
   $scope.currClass = $routeParams.class; //CURRENT CLASS ID!
   $scope.badPartners = [];
@@ -199,6 +199,31 @@ angular.module('PU.history', ['PU.factories'])
   $scope.goHome = function(){
     $location.path('/');
   };
+  //*********************************************************************************
+  //deletes a generation from the table
+  //*********************************************************************************
+
+  $scope.deleteGen = function(){
+    //delete generation from databasee
+    DB.deleteGeneration(currClass, generationId)
+      .then(function(resp){
+        console.log(resp)
+      })
+  }
+
+  //*********************************************************************************
+  //deletes a generation from the table
+  //*********************************************************************************
+
+  $scope.deleteAllGen = function(){
+    DB.deleteAllGenerations(currClass)
+      .then(function(resp){
+        console.log(resp);
+      })
+      .catch(function(err){
+        console.log(err)
+      })
+  }
 
   //*********************************************************************************
   //sets the page up for success! calls all necessary functions. 

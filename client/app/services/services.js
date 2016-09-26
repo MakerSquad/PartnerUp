@@ -100,6 +100,23 @@ angular.module('PU.factories', [])
     .catch(err => err)
   }
 
+  var deleteGenerations = function(groupId, genId){
+    return $http({
+      method: 'DELETE',
+      url: `/${groupId}/generations/${genId}`
+    })
+    .then(resp => resp.data)
+    .catch(err => err)
+  }
+
+  var deleteAllGenerations = function(groudId){
+    return $http({
+      method: 'DELETE',
+      url: `/${groupId}/pairs`
+    })
+    .then(resp => resp.data)
+    .catch(err => err)
+  }
   return{
     getClasses: getClasses,
     getMemberships: getMemberships,
