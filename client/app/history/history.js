@@ -1,12 +1,11 @@
 angular.module('PU.history', ['PU.factories'])
 
-.controller('HistoryController', function ($scope, $location, Makerpass, $http, $routeParams, DB, StateSaver) {
+.controller('HistoryController', function ($scope, $location, $http, $routeParams, DB, StateSaver) {
   
   new Clipboard('.clipyclip');
-  $scope.groupSize = 2;
   $scope.generationId = 0; //THE CURRENT GENERATION
-  $scope.pastPairs = [];
-  $scope.displayPairs = [];
+  $scope.pastPairs = []; //all of past pairs for the group
+  $scope.displayPairs = []; //all of the filtered pair
   $scope.generations = [];
   $scope.prev='prev';
   $scope.nex= 'next';
@@ -18,6 +17,12 @@ angular.module('PU.history', ['PU.factories'])
   $scope.library = {};
   $scope.currClassName = '';
   $scope.pastGens = {};
+
+  var mainState;
+
+  $scope.changeClass = function(clsUid){
+    $location.path(`/${clsUid}/history`);
+  }
 
   //*********************************************************************************
   //this will get all the past pairs from the database by class id and generation id
@@ -75,9 +80,15 @@ angular.module('PU.history', ['PU.factories'])
   //gets class name by giving the class's uid
   //*********************************************************************************
     $scope.getName = function(){
-      var states = StateSaver.checkState();
-      $scope.currClassName = states.currentClass.name
-      console.log('STATES STATES', $scope.currClassName)
+      // var states = StateSaver.checkState();
+      // $scope.currClassName = states.currentClass.name
+      // console.log('STATES STATES', $scope.currClassName)
+      for(var i = 0; i < mainState.classes.length; i++){
+        if($routeParams.class === mainState.classes[i].mks_id){
+          $scope.currClassName = mainState.classes[i].name;
+          break;
+        }
+      }
     }
 
   // *********************************************************************************
@@ -88,7 +99,6 @@ angular.module('PU.history', ['PU.factories'])
 
   $scope.setGen = function(generation){
     $scope.currGen = generation.title;
-    $scope.groupSize = generation.group_size;
     $scope.index = $scope.generations.indexOf(generation);
     $scope.generationId = $scope.generations[$scope.index].id;
     if($scope.index === 0){
@@ -205,7 +215,7 @@ angular.module('PU.history', ['PU.factories'])
 
   $scope.deleteGen = function(){
     //delete generation from databasee
-    DB.deleteGeneration(currClass, generationId)
+    DB.deleteGeneration($scope.currClass, $scope.generationId)
       .then(function(resp){
         console.log(resp)
       })
@@ -216,7 +226,8 @@ angular.module('PU.history', ['PU.factories'])
   //*********************************************************************************
 
   $scope.deleteAllGen = function(){
-    DB.deleteAllGenerations(currClass)
+    console.log($scope.currClass)
+    DB.deleteAllGenerations($scope.currClass)
       .then(function(resp){
         console.log(resp);
       })
@@ -231,6 +242,7 @@ angular.module('PU.history', ['PU.factories'])
 
   var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
     $scope.loading = true;
+    mainState = StateSaver.checkState();
     $http({ //Check the current user; redirect if we aren't logged in
       method: "GET",
       url: "/currentUser"

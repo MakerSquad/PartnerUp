@@ -2,7 +2,7 @@
 <div class='history fade' ng-show="!loading">
 <button class='goHome' ng-click='goHome()'>Back to PartnerUp</button>
 <h1>{{currClassName}}'s History</h1>
-<button ng-click="if(confirm('ARE YOU SURE YOU WANT TO DO THIS?? NO TAKESIES BACKSIES THIS WILL DELETE IT ALLLLLLLLLL!!!!!!')) deleteAllGen(); return false">DELETE THEM ALL!</button>
+<button ng-click="deleteAllGen() ">DELETE THEM ALL!</button>
 <br>
 
 <div ng-show="generations.length">
@@ -19,7 +19,7 @@
       <button class='changers prev' ng-click='previous()'><</button>
       <h3 class="currGenTitle">{{currGen}}</h3>
       <button class= 'changers next' ng-click='next()'>></button>
-      <button class="oopsies" ng-click="if(confirm('ARE YOU SURE YOU WANT TO DO THIS?? NO TAKESIES BACKSIES')) whoops(); return false" >delete this generation</button>
+      <button class="oopsies" ng-click="deleteGen()" >delete this generation</button>
     </div>
     <table class="pair" id="pair">
       <tr>
