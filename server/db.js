@@ -13,17 +13,18 @@ knex.migrate.latest([config[env]]);
   return: throws 401 if no session
 */
 knex.authenticate = (token) => {
-  if(process.env.TEST_AUTH) return Promise.resolve();
-    console.log("token in auth", token)
-  return knex('auth').where('token', token).returning('user_uid')
-    .then((userUid) => {
-      console.log("user:", userUid)
-      if(userUid.length) {
-        return Promise.resolve(userUid[0]);
-      } else {
-        return Promise.reject("401 Unauthorized, please make sure you are logged in");
-      }
-    }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
+  return Promise.resolve()
+  // if(process.env.TEST_AUTH) return Promise.resolve();
+  //   console.log("token in auth", token)
+  // return knex('auth').where('token', token).returning('user_uid')
+  //   .then((userUid) => {
+  //     console.log("user:", userUid)
+  //     if(userUid.length) {
+  //       return Promise.resolve(userUid[0]);
+  //     } else {
+  //       return Promise.reject("401 Unauthorized, please make sure you are logged in");
+  //     }
+  //   }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
 }
 
 knex.addToken = (userToken, userUid) => {
@@ -73,7 +74,7 @@ knex.addGroups = (groups) => {
 */
 knex.addPairs = (pairData, groupUid) => {
   return knex.getGroup({mks_id: groupUid}) // returns genId
-  .then((group) => group.id ) // sets the gId for genarations and pairs tables in database
+  .then((group) => group.id ) // sets the gId for generations and pairs tables in database
   .catch((err) => {throw new Error("Unable to to access groups, "+ err)})
   .then((gId) => {
     return addGeneration({groupId: gId, genTitle: pairData.genTitle, groupSize: pairData.groupSize}) //adds or finds genaration for group
@@ -91,6 +92,18 @@ knex.addPairs = (pairData, groupUid) => {
         .catch((err) => {throw new Error("Batch Inrest Failed due to: "+ err)}) // throw error if something went horribly wrong
     }).catch((err) => {throw new Error("Unable to create genaration, "+ err)}) // throw error if something went horribly wrong
   }).catch((err) => {throw new Error("Unable to find the group in database, "+ err)}) // throw error if something went horribly wrong
+}
+
+/**
+  @params: pairData = ({
+    'pairs': (array)[(user1_uid, user2_uid), (user1_uid, user2_uid), ...],
+    'genTitle': (string)title,
+    'groupSize': (integer)groupSize
+  }, (string)groupName)
+  return: 201 or error
+*/
+knex.addBadPairs = (pairData, GroupUid) => {
+  //return knex('bad_pairs').insert({})
 }
 
 /**

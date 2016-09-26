@@ -59,10 +59,10 @@ app.get("/signout", (req, res) =>{
 })
 
 app.get("/currentUser", (req, res) =>{
-  console.log('header: ', req.headers)
-  db.authenticate(req.cookies.token)
-    .then((uid) => {
-      res.send(uid);
+  MP.me(req.cookies.token)
+    .then((user) => {
+      console.log('user: ', user);
+      res.send(user)
     })
 })
 
@@ -150,15 +150,14 @@ app.delete('/:groupUid/deletePairs', (req, res) => {
 })
 app.get('/test', (req, res) => {
   // console.log('session: ', req.session)
- db.authenticate(req.cookies.token)
-  .then(() => {
-    db.getTables().then((d) => res.send(d))
-    .catch((err) => res.send(err));
+ db.addPairs(req.body.name)
+  .then((d) => {
+     res.send(d)
   }).catch((err) => res.status(401).send(err))
 })
 
 app.get('/test2', (req, res) => {
-    db.getTables2().then((d) => res.send(d))
+    db.getTables().then((d) => res.send(d))
     .catch((err) => res.send(err));
 })
 
