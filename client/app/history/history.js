@@ -1,6 +1,6 @@
 angular.module('PU.history', ['PU.factories'])
 
-.controller('HistoryController', function ($scope, $location, $http, $routeParams, DB, StateSaver) {
+.controller('HistoryController', function ($scope, $location, $http, $routeParams, DB, StateSaver, CurrentUser) {
   
   new Clipboard('.clipyclip');
   $scope.generationId = 0; //THE CURRENT GENERATION
@@ -243,14 +243,14 @@ angular.module('PU.history', ['PU.factories'])
   var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
     $scope.loading = true;
     mainState = StateSaver.checkState();
-    $http({ //Check the current user; redirect if we aren't logged in
-      method: "GET",
-      url: "/currentUser"
-    })
-    .then(function(resp){
-      if(resp.data === ""){
+     if(!mainState){
+      $location.path('/');
+     }
+     if(!CurrentUser.get()){
         $location.path('/signin');
-      } 
+      }
+      else{
+   
       $scope.getGen()
       .then(function(generations){
         $scope.getHistory()
@@ -296,6 +296,6 @@ angular.module('PU.history', ['PU.factories'])
           })
         })
       })
-    })
+    }
   }())
 });
