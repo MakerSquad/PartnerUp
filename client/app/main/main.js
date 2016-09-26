@@ -15,6 +15,7 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
   $scope.loadingList = false; //true if the list of users are being loaded
   $scope.initialized = false; //loading state, only changed on initial load
   $scope.partnerUp = false; //True if groups are assigned
+  $scope.stuView = false;
   $scope.roles = ["instructor", "fellow", "student"]; //The possible roles 
 
   $scope.selectedForSwap = null; //The student object that has been selected to swap
@@ -114,9 +115,23 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
     return DB.getMemberships($scope.currentClass.mks_id)
     .then(function(members){
       console.log("Members: ", members);
-      $scope.students = members.filter(m => m.role === 'student');
-      $scope.fellows = members.filter(m => m.role === 'fellow');
-      $scope.instructors = members.filter(m => m.role === 'instructor');
+      // $scope.students = members.filter(m => m.role === 'student');
+      // $scope.fellows = members.filter(m => m.role === 'fellow');
+      // $scope.instructors = members.filter(m => m.role === 'instructor');
+      var isStu = false;
+      for(var i = 0; i < members.length; i++){
+        if(members[i].role === 'student'){
+          $scope.students.push(members[i]);
+          if(members[i].user.name === CurrentUser.get().name){
+            isStu = true;
+          }
+        }else if(members[i].role === 'fellow'){
+          $scope.fellows.push(members[i]);
+        }else if(members[i].role === 'instructor'){
+          $scope.instructors.push(members[i]);
+        }
+      }
+      $scope.stuView = isStu; //set to student view if current user is a student
       return DB.getPairs($scope.currentClass.mks_id)
         .then(function(pairs){
           console.log("Pairs: ", pairs);

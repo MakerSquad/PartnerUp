@@ -12,14 +12,15 @@
     <option value="">Choose a class</option>
     </select>
     <br><br>
-    <div class='groupSize'>Group Size: </div>
-    <select ng-init="groupSizeSelect = 2" ng-model="groupSizeSelect">
-      <option ng-repeat="idx in getIndexArray(8)">{{idx+2}}</option>
-    </select>
-    <br>
-    <button ng-click="if(checkbox.checked === false) randomize(groupSizeSelect); trueRandomnize(groupSizeSelect)" class="partnerBtn">Partner Up!</button>
-    <input type="checkbox" id="chbx" checked > No repeats
-    <br>
+    <div class='groupControls' ng-hide='stuView'>
+      <div class='groupSize'>Group Size: </div>
+      <select ng-init="groupSizeSelect = 2" ng-model="groupSizeSelect">
+        <option ng-repeat="idx in getIndexArray(8)">{{idx+2}}</option>
+      </select>
+      <br>
+      <button ng-click="randomize(groupSizeSelect)" class="partnerBtn">Partner Up!</button>
+      <input type="checkbox" id="chbx" checked > No repeats
+    </div>
     <button ng-click="seeHistory()" class="histBtn">See History</button>
   </div>
 
@@ -36,10 +37,10 @@
     </div>
       <h2>Students: </h2> 
     <div class="studentList">
-      <div class="student" ng-repeat="student in students"><button class="addOrRemove" ng-click="removeFromStudent(student);">x</button>{{student.user.name}}</div>
+      <div class="student" ng-repeat="student in students"><button class="addOrRemove" ng-click="removeFromStudent(student);" ng-hide="stuView">x</button>{{student.user.name}}</div>
     </div>
       <h2>Removed Students:</h2>
-    <div class="removedStudents" ng-show="noPair.length">
+    <div class="removedStudents" ng-show="noPair.length" ng-hide="stuView">
       <div ng-repeat="nopair in noPair"><button class="addOrRemove" ng-click="addStudentBackIn(nopair);">o</button>{{nopair.user.name}}
       </div>
     </div>
@@ -49,7 +50,7 @@
   <div ng-show="loadingGroups" loading class="studentGroups"></div>
   <div ng-show="partnerUp && !loadingGroups" class="studentGroups slide">
     <input class='groupSearch' ng-model="groupSearch" placeholder="Search groups"><br>
-    <div class='genTitle' ng-show="partnerUp && !finalized">
+    <div class='genTitle' ng-show="partnerUp && !finalized" ng-hide="stuView">
       <input ng-model="genTitle" placeholder="Title..." maxlength="17">
       <button class='final' ng-click="finalize()">Finalize this pairing</button>
     </div>
@@ -65,7 +66,7 @@
         <img src='{{stu.user.avatar_url}}' width='40px' height='50px'>
           {{stu.user.name}}
         </td>
-          <td>
+          <td ng-hide="stuView">
           <img src= "http://simpleicon.com/wp-content/uploads/lock-3.png" width='15px' height='15px' ng-show='!searchLockedGroups(group)' class="lockBtn" ng-click="toggleLockGroup(group)">
           <img src= "http://image.flaticon.com/icons/svg/26/26053.svg" width='15px' height='15px' ng-show='searchLockedGroups(group)' class="lockBtn" ng-click="toggleLockGroup(group)">
         </td>
