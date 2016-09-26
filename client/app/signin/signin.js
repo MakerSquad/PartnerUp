@@ -5,20 +5,24 @@ angular.module('PU.signin', [
 
   ])
 
-.controller('AuthController', function ($scope, $window, $location, $http) {
+.controller('AuthController', function ($scope, $window, $location, $http, CurrentUser) {
   $scope.user = {};
 
-  $http({ //Check the current user
-    method: "GET",
-    url: "/currentUser"
-  })
-  .then(function(resp){
-    console.log("data", resp.data)
-    if(resp.data !== ""){
-      console.log("data fron resp:", resp.data)
-      $location.path('/');
-    }
-  })
+  // $http({ //Check the current user
+  //   method: "GET",
+  //   url: "/currentUser"
+  // })
+  // .then(function(resp){
+  //   console.log("data", resp.data)
+  //   if(resp.data !== ""){
+  //     console.log("data fron resp:", resp.data)
+  //     $location.path('/');
+  //   }
+  // })
+
+  if(CurrentUser.get()){
+    $location.path('/');
+  }
 
   $scope.loginMakerPass = function(){
     // $window.location.href = '/auth/makerpass';
@@ -44,7 +48,12 @@ angular.module('PU.signin', [
     };
 
     $.oauthpopup({windowName: 'login', path:'/auth/makerpass', callback: function (data){
-      console.log("data in callback", data)
+      console.log("data in callback", data);
+      var signInInfo = JSON.parse(data.slice(data.indexOf('{'), data.lastIndexOf('}') + 1));
+      console.log("Parsed: ", signInInfo);
+      document.cookie = `token=${signInInfo.token}`;
+      CurrentUser.set(signInInfo.data.user);
+      $window.location.href = ('/#/');
     }})
 
 
@@ -52,3 +61,4 @@ angular.module('PU.signin', [
 
   }
 });
+

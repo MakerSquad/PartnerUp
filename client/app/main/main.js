@@ -1,7 +1,7 @@
 
 angular.module('PU.main', ['PU.factories', angularDragula(angular)])
 
-.controller('MainController', function ($scope, $location, Makerpass, $http, StateSaver, DB, dragulaService) {
+.controller('MainController', function ($scope, $location, Makerpass, $http, StateSaver, DB, dragulaService, CurrentUser) {
 
   $scope.currentUser = {} //Information for the current user
   $scope.classes = []; //all classes the user is a part of
@@ -64,6 +64,7 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
   */
 
   $scope.signOut = function(){
+    CurrentUser.destroy();
     return $http({
       method: 'GET',
       url: '/signout'
@@ -577,17 +578,25 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
   var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
     $scope.loading = true;
     new Clipboard('.clipyclip');
-    $http({ //Check the current user; redirect if we aren't logged in
-      method: "GET",
-      url: "/currentUser"
-    })
-    .then(function(resp){
-      console.log("resp", resp)
-      if(resp.data === ""){
+    // var cookies = document.cookie;
+    // console.log("Cookies: ", cookies);
+    // cookies = cookies.slice(cookies.indexOf('session') + 8)
+    // var session = cookies;
+    // console.log("session: ", session);
+    // $http({ //Check the current user; redirect if we aren't logged in
+    //   method: "GET",
+    //   url: "/currentUser",
+    //   headers: {
+    //     'token': session
+    //   }
+    // })
+    // .then(function(resp){
+     // console.log("resp", resp)
+      if(!CurrentUser.get()){
         $location.path('/signin');
       } 
       else{
-        $scope.currentUser = resp.data;
+        $scope.currentUser = CurrentUser.get();
         var savedState = StateSaver.restoreState(); //if we previously saved state, grab it back
         if(savedState){
           $scope = Object.assign($scope, savedState); //copy the saved state back into scope
@@ -597,7 +606,7 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
           $scope.initialized = true;
         })
       }
-    })
+    //})
   }())
 
 })

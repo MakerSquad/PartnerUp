@@ -23,6 +23,28 @@ angular.module('PU.factories', [])
 
 })
 
+.factory('CurrentUser', function(){
+  var currentUser;
+
+  var set = function(userInfo){
+    currentUser = userInfo;
+  }
+
+  var get = function(){
+    return currentUser;
+  }
+
+  var destroy = function(){
+    currentUser = undefined;
+  }
+
+  return {
+    set: set,
+    get: get,
+    destroy: destroy
+  }
+})
+
 .factory('StateSaver', function(){
   var state = null; //set to null if nothing is saved
 
