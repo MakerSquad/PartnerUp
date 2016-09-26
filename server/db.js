@@ -27,7 +27,7 @@ knex.addToken = (userToken, userUid) => {
   return knex('auth').where('user_uid', userUid).returning('user_uid')
     .then((uid) => {
       if(uid.length) {
-        return
+        return uid[0]
       } else {
         return knex('auth').insert({user_uid: userUid, token: userToken}).returning('*')
           .then((authData) => authData)
@@ -88,6 +88,23 @@ knex.addPairs = (pairData, groupUid) => {
 }
 
 /**
+  @params: groupId = {
+            groupId: (integer)id,
+            genTitle: (string)genTitle,
+            groupSize: (integer)groupSize
+          }
+
+  return: return id 
+*/
+knex.deleteGenaration = (groupId, genTableId) => {
+  return knex('generations').where({id: genTableId}).del()
+  .then((e) => knex('pairs').where({gen_table_id: genTableId, group_id: groupId}).del()
+    .then((e) => "deleted genaration and pairs related to genId " +genTableId
+    ).catch((err) => {throw new Error("Unable to delete pairs for gen from DataBase, "+ err)}) // throw error if something went horribly wrong
+  ).catch((err) => {throw new Error("Unable to delete genaration and pairs from DataBase, "+ err)}) // throw error if something went horribly wrong
+}
+
+/**
   @params: genData = {
             groupId: (integer)id,
             genTitle: (string)genTitle,
@@ -129,7 +146,7 @@ function addGeneration(genData) {
 */
 knex.getGroup = (group) => {
   if(typeof group.name == "string") // checks if givin a name
-    return knex('groups').where('name', group.names).returning('*')
+    return knex('groups').where('name', group.name).returning('*')
       .then((groupData) => groupData[0] || {id: -1})
       .catch((err) => {throw new Error("incorrect format, "+ err)}) // throw error if something went horribly wrong
   if(typeof group.id == 'integer') // checks if givin a non mks id
@@ -143,7 +160,7 @@ knex.getGroup = (group) => {
 }
 
 knex.getTables = () => {
-  return knex('auth').returning('*')
+  return knex('generations').returning('*')
 }
 
 /**

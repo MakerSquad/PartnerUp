@@ -24,7 +24,8 @@ AuthPort.on('auth', function(req, res, data) {
   // req.session.user = data.data.user;
   db.addToken(data.token, data.data.user.uid)
     .then((dbData) => {
-      res.send(data.token)
+      console.log("data in auth", data)
+      res.send(data)
     })
 })
  
@@ -75,14 +76,26 @@ app.get("/myGroups", function(req, res){
 app.get('/:groupUid/generations', (req,res) => {
   db.authenticate(req.headers.token)
   .then(() => db.getGroup({mks_id: req.params.groupUid})
-    .then((data) => 
-      db.getGenerationsByGroup(data.id)
+    .then((group) => 
+      db.getGenerationsByGroup(group.id)
       .then((generations) => {
           res.send(generations);
       }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
     ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
   ).catch((err) => {res.status(401).send(err)})
 })
+
+app.delete("/:groupUid/generation/:genId", function(req, res){    
+  db.authenticate(req.headers.token)
+  .then(() => db.getGroup({mks_id: req.params.groupUid})
+    .then((group) => 
+      db.deleteGenaration(group.id, req.params.genId)
+      .then((e) => {
+          res.send(e);
+      }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+    ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  ).catch((err) => {res.status(401).send(err)})
+})    
 
 app.get("/:groupUid/members", function(req, res){    
   db.authenticate(req.headers.token)
