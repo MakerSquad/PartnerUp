@@ -1,28 +1,5 @@
 angular.module('PU.factories', [])
 
-.factory('Makerpass',function($http){
-  
-  var getGroups = function(){
-    return $http({
-      method: 'GET',
-      url: '/myGroups'
-    })
-  }
-
-  var getMemberships = function(cls){
-    return $http({
-      method: 'GET',
-      url: `/groups/${cls}/memberships`,
-    })
-  }
-
-  return {
-    getGroups: getGroups,
-    getMemberships: getMemberships
-  }  
-
-})
-
 .factory('CurrentUser', function(){
   var currentUser;
 
@@ -72,15 +49,6 @@ angular.module('PU.factories', [])
 })
 
 .factory('DB', function($http){
-
-  var updateGroups = function(){
-    return $http({
-      method: 'GET',
-      url: '/updateGroups'
-    })
-    .then(resp => resp.data)
-    .catch(err => err)
-  }
 
   var getClasses = function(){
     return $http({
@@ -137,7 +105,6 @@ angular.module('PU.factories', [])
     getMemberships: getMemberships,
     getPairs: getPairs,
     addPairs: addPairs,
-    updateGroups: updateGroups,
     getGenerations: getGenerations
   }
   

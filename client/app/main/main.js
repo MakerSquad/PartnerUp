@@ -1,7 +1,7 @@
 
 angular.module('PU.main', ['PU.factories', angularDragula(angular)])
 
-.controller('MainController', function ($scope, $location, Makerpass, $http, StateSaver, DB, dragulaService, CurrentUser) {
+.controller('MainController', function ($scope, $location, $http, StateSaver, DB, dragulaService, CurrentUser) {
 
   $scope.currentUser = {} //Information for the current user
   $scope.classes = []; //all classes the user is a part of
@@ -353,24 +353,6 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
   $scope.addStudentBackIn = function(nopair){
     var index = $scope.noPair.indexOf(nopair);
     $scope.students.push($scope.noPair.splice(index,1)[0]);
-  }
-
-  $scope.importFromMakerpass = function(){
-    Makerpass.getGroups()
-    .then(function(classes){
-      var already = {};
-      classes = classes.data;
-      for(var i = 0; i < $scope.classes.length; i++){
-        already[$scope.classes[i]] = true;
-      }
-      for(var j = 0; j < classes.length; j++){
-        console.log("Classes: ", classes[j]);
-        if(!already[classes[j]]){
-          $scope.classes.push(classes[j]);
-        }
-      }
-      $scope.loading = false;
-    })
   }
 
   $scope.getClasses = function(){
