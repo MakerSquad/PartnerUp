@@ -22,6 +22,12 @@ exports.up = (knex, Promise) => Promise.all([
     table.string('title');
     table.integer('group_id');
     table.integer('group_size');
+  }),
+  knex.schema.createTableIfNotExists('bad_pairs', table => {
+    table.increments('id');
+    table.string('user1_uid');
+    table.string('user2_uid');
+    table.integer('group_id');
   })
 ])
 

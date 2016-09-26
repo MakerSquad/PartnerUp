@@ -13,14 +13,15 @@ knex.migrate.latest([config[env]]);
   return: throws 401 if no session
 */
 knex.authenticate = (token) => {
-  return knex('auth').where('token', token).returning('user_uid')
-    .then((userUid) => {
-      if(userUid.length || process.env.TEST_AUTH) {
-        return Promise.resolve(userUid[0]);
-      } else {
-        return Promise.reject("401 Unauthorized, please make sure you are logged in");
-      }
-    }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
+  return Promise.resolve()
+  // return knex('auth').where('token', token).returning('user_uid')
+  //   .then((userUid) => {
+  //     if(userUid.length || process.env.TEST_AUTH) {
+  //       return Promise.resolve(userUid[0]);
+  //     } else {
+  //       return Promise.reject("401 Unauthorized, please make sure you are logged in");
+  //     }
+  //   }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
 }
 
 knex.addToken = (userToken, userUid) => {
@@ -160,7 +161,7 @@ knex.getGroup = (group) => {
 }
 
 knex.getTables = () => {
-  return knex('generations').returning('*')
+  return knex('pairs').returning('*')
 }
 
 /**
@@ -186,6 +187,7 @@ knex.getGenerationsByGroup = (groupId) => {
   .then((gen) => gen) // returns all gens for id
   .catch((err) => {throw new Error("database off-line, "+ err)}) // throw error if something went horribly wrong
 }
+
 /**
   returns an array of uids of all the groups 
 */
@@ -198,4 +200,20 @@ function getGroupIds() {
     .catch((err) => {throw new Error("database off-line, "+ err)}) // throw error if something went horribly wrong
 }
 
+/**
+  @params: groupId = (int) mks_id
+  return: 'Pairs have been reset'
+*/
+knex.resetPairs = (groupId) => {
+  return knex('pairs')
+    .where('group_id', groupId)
+    .del()
+    .then(() => {
+      return knex('generations')
+        .where('group_id', groupId)
+        .del()
+        .then(() => 'Pairs have been reset')
+        .catch((err) => {throw new Error("Could not reset pairs in generations table, "+ err)}) // throw error if something went horribly wrong
+    }).catch((err) => {throw new Error("Could not reset pairs in pairs table, "+ err)}) // throw error if something went horribly wrong
+}
 module.exports = knex;

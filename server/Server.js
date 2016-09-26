@@ -131,6 +131,17 @@ app.post('/:groupUid/pairs', (req, res) => {
   }).catch((err) => res.status(401).send(err))
 })
 
+app.delete('/:groupUid/deletePairs', (req, res) => {
+  db.authenticate(req.headers.token)
+  .then(() => {
+    db.getGroup({mks_id: req.params.groupUid})
+      .then((groupData) => {
+        db.resetPairs(groupData.id)
+        .then((confirm) => res.status(202).send(confirm))
+        .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+      }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+})
 app.get('/test', (req, res) => {
   // console.log('session: ', req.session)
   db.getTables().then( (d) => res.send(d))
