@@ -1,6 +1,6 @@
 angular.module('PU.history', ['PU.factories'])
 
-.controller('HistoryController', function ($scope, $location, $http, $routeParams, DB, StateSaver, CurrentUser) {
+.controller('HistoryController', function ($scope, $location, $http, $routeParams, DB, StateSaver, CurrentUser,$route) {
   
   new Clipboard('.clipyclip');
   $scope.generationId = 0; //THE CURRENT GENERATION
@@ -219,10 +219,13 @@ angular.module('PU.history', ['PU.factories'])
 
   $scope.deleteGen = function(){
     //delete generation from databasee
+    if(confirm('Are you sure you want to delete this generation? Once clicked, its gone forever')){
     DB.deleteGeneration($scope.currClass, $scope.generationId)
       .then(function(resp){
+        $route.reload();
         console.log(resp)
       })
+    }
   }
 
   //*********************************************************************************
@@ -231,13 +234,16 @@ angular.module('PU.history', ['PU.factories'])
 
   $scope.deleteAllGen = function(){
     console.log($scope.currClass)
+    if(confirm('Are you sure you want to delete all generations? Once clicked, its gone forever')){
     DB.deleteAllGenerations($scope.currClass)
       .then(function(resp){
+        $route.reload();
         console.log(resp);
       })
       .catch(function(err){
         console.log(err)
       })
+    }
   }
 
   //*********************************************************************************
