@@ -18,10 +18,13 @@ angular.module('PU.history', ['PU.factories'])
   $scope.currClassName = '';
   $scope.pastGens = {};
 
-  var mainState;
+  $scope.mainState;
 
-  $scope.changeClass = function(clsUid){
-    $location.path(`/${clsUid}/history`);
+  $scope.changeClass = function(cls){
+    if(cls){      
+      cls = cls.mks_id;
+      $location.path(`/${cls}/history`);
+    }
   }
 
   //*********************************************************************************
@@ -29,6 +32,7 @@ angular.module('PU.history', ['PU.factories'])
   //*********************************************************************************
 
   $scope.getGen = function(cls){
+  console.log("Scope currClass: ", $scope.currClass);
   return DB.getGenerations($scope.currClass)
     .then(function(data){
       if(!data.length) {
@@ -83,9 +87,9 @@ angular.module('PU.history', ['PU.factories'])
       // var states = StateSaver.checkState();
       // $scope.currClassName = states.currentClass.name
       // console.log('STATES STATES', $scope.currClassName)
-      for(var i = 0; i < mainState.classes.length; i++){
-        if($routeParams.class === mainState.classes[i].mks_id){
-          $scope.currClassName = mainState.classes[i].name;
+      for(var i = 0; i < $scope.mainState.classes.length; i++){
+        if($routeParams.class === $scope.mainState.classes[i].mks_id){
+          $scope.currClassName = $scope.mainState.classes[i].name;
           break;
         }
       }
@@ -242,8 +246,9 @@ angular.module('PU.history', ['PU.factories'])
 
   var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
     $scope.loading = true;
-    mainState = StateSaver.checkState();
-     if(!mainState){
+    $scope.mainState = StateSaver.checkState();
+    console.log("Main State: ", $scope.mainState);
+     if(!$scope.mainState){
       $location.path('/');
      }
      if(!CurrentUser.get()){
