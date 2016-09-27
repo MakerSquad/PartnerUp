@@ -77,18 +77,19 @@ app.get("/myGroups", (req, res) => {
   }).catch((err) => {res.status(401).send(err)}) 
 })
 
+
 app.get("/:groupUid/recent", (req, res) => {  
   db.authenticate(req.cookies.token)
   .then(() => 
   db.getGroup({name: req.params.groupUid})
     .then((group) => 
       db.getNewGen(group.id)
-      .then((newGen) => {
-          res.send(newGen);
-      }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+      .then((newGen) => 
+        res.send(newGen)
+      ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
     ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => {res.status(401).send(err)}) 
-})
+  ).catch((err) => {res.status(401).send(err)}) 
+}
 
 app.get('/:groupUid/generations', (req,res) => {
   db.authenticate(req.cookies.token)
