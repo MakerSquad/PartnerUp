@@ -129,6 +129,16 @@ angular.module('PU.factories', [])
     .then(resp => resp.data)
     .catch(err => err)
   }
+
+  var getRecentPairs = function(groupId){
+    return $http({
+      method: 'GET',
+      url: `/${groupId}/recent`
+    })
+    .then(resp => resp.data)
+    .catch(err => err)
+  }
+
   return{
     getClasses: getClasses,
     getMemberships: getMemberships,
@@ -136,7 +146,8 @@ angular.module('PU.factories', [])
     addPairs: addPairs,
     getGenerations: getGenerations,
     deleteGeneration: deleteGeneration,
-    deleteAllGenerations: deleteAllGenerations
+    deleteAllGenerations: deleteAllGenerations,
+    getRecentPairs: getRecentPairs
   }
   
 })

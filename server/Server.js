@@ -81,7 +81,7 @@ app.get("/myGroups", (req, res) => {
 app.get("/:groupUid/recent", (req, res) => {
   db.authenticate(req.cookies.token)
   .then(() => 
-  db.getGroup({name: req.params.groupUid})
+  db.getGroup({mks_id: req.params.groupUid})
     .then((group) => 
       db.getNewGen(group.id)
       .then((newGen) => 

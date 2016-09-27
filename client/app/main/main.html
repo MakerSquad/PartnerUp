@@ -48,7 +48,9 @@
 
   <!--The table of current groupings-->
   <div ng-show="loadingGroups" loading class="studentGroups"></div>
-  <div ng-show="partnerUp && !loadingGroups" class="studentGroups slide">
+  <div ng-show="(partnerUp || stuView) && !loadingGroups" class="studentGroups slide">
+    <label ng-show="stuView">You're just a student in this class, so we can't let you make new pairs, sorry! Here's the most recent grouping made by your instructors:</label> <br>
+    <h3>{{genTitle}}</h3>
     <input class='groupSearch' ng-model="groupSearch" placeholder="Search groups"><br>
     <div class='genTitle' ng-show="partnerUp && !finalized" ng-hide="stuView">
       <input ng-model="genTitle" placeholder="Title..." maxlength="17">

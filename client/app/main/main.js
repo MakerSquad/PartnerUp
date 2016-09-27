@@ -16,7 +16,8 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
   $scope.initialized = false; //loading state, only changed on initial load
   $scope.partnerUp = false; //True if groups are assigned
   $scope.stuView = false;
-  $scope.roles = ["instructor", "fellow", "student"]; //The possible roles 
+  $scope.roles = ["instructor", "fellow", "student"]; //The possible roles
+  $scope.genTitle; 
 
   $scope.selectedForSwap = null; //The student object that has been selected to swap
   $scope.selectedForSwapIndex;  //The index of the student object to swap, as a tuple (2d Array Index)
@@ -98,6 +99,7 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
     $scope.partnerUp = false;
     $scope.noPair = [];
     $scope.loadingGroups = false;
+    $scope.stuView = false;
   }
 
   /**
@@ -124,7 +126,7 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
       for(var i = 0; i < members.length; i++){
         if(members[i].role === 'student'){
           $scope.students.push(members[i]);
-          if(members[i].user.name === CurrentUser.get().name){
+          if(members[i].user.name === $scope.currentUser.name){
             isStu = true;
           }
         }else if(members[i].role === 'fellow'){
@@ -134,22 +136,60 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
         }
       }
       $scope.stuView = isStu; //set to student view if current user is a student
-      return DB.getPairs($scope.currentClass.mks_id)
+      if(!$scope.stuView){
+        return DB.getPairs($scope.currentClass.mks_id)
+          .then(function(pairs){
+            console.log("Pairs: ", pairs);
+            for(var i = 0; i < pairs.length; i++){
+              if(!$scope.pastPairs[pairs[i].user1_uid]){
+                $scope.pastPairs[pairs[i].user1_uid] = {};
+              }
+              $scope.pastPairs[pairs[i].user1_uid][pairs[i].user2_uid] = true;
+              if(!$scope.pastPairs[pairs[i].user2_uid]){
+                $scope.pastPairs[pairs[i].user2_uid] = {};
+              }
+              $scope.pastPairs[pairs[i].user2_uid][pairs[i].user1_uid] = true;
+            }
+            console.log("Scope pastPairs: ", $scope.pastPairs);
+            $scope.loadingList = false;
+          })
+      }else{ //if he's a student, get recent pairs instead
+        return DB.getRecentPairs($scope.currentClass.mks_id)
         .then(function(pairs){
-          console.log("Pairs: ", pairs);
-          for(var i = 0; i < pairs.length; i++){
-            if(!$scope.pastPairs[pairs[i].user1_uid]){
-              $scope.pastPairs[pairs[i].user1_uid] = {};
-            }
-            $scope.pastPairs[pairs[i].user1_uid][pairs[i].user2_uid] = true;
-            if(!$scope.pastPairs[pairs[i].user2_uid]){
-              $scope.pastPairs[pairs[i].user2_uid] = {};
-            }
-            $scope.pastPairs[pairs[i].user2_uid][pairs[i].user1_uid] = true;
+          console.log("Recent pairs: ", pairs);
+          $scope.genTitle = pairs[1].title;
+          pairs = pairs[0];
+          var stuMap = {};
+          for(var stu = 0; stu < $scope.students.length; stu++){
+            stuMap[$scope.students[stu].user.uid] = $scope.students[stu]; //creates map of student uids to actual student objects
           }
-          console.log("Scope pastPairs: ", $scope.pastPairs);
+          var seen = {}; //users we've already seen as user2s; don't double show
+          var groupsByUser1 = {};
+          for(var i = 0; i < pairs.length; i++){
+            var user1 = pairs[i].user1_uid;
+            var user2 = pairs[i].user2_uid;
+            if(!seen[user1]){
+              if(!groupsByUser1[user1]){
+                groupsByUser1[user1] = [stuMap[user1]];
+              }
+              groupsByUser1[user1].push(stuMap[user2]);
+              seen[user2] = true;
+            }
+          }
+          console.log("GroupsByUser1: ", groupsByUser1);
+          for(var grp in groupsByUser1){
+            console.log("grp: ", grp);
+            $scope.groups.push(groupsByUser1[grp]);
+          }
+          console.log("$scope.groups: ", $scope.groups);
+          $scope.groupSize = $scope.groups[0].length;
           $scope.loadingList = false;
         })
+        .catch(function(err){
+          console.error("Error fetching recent pairs: " + err);
+          $scope.loadingList = false;
+        })
+      }
     })
   }
 
@@ -404,6 +444,9 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
   */
 
   $scope.selectForSwap = function(student){
+    if($scope.stuView){
+      return;
+    }
     if($scope.lockedStus[student.user.uid]){
       alert("This student has been locked into a group; please unlock them before moving them around");
       return;
