@@ -72,7 +72,7 @@ knex.addGroups = (groups) => {
   return: 201 or error
 */
 knex.addPairs = (pairData, groupUid) => {
-  return knex.getGroup({mks_id: groupUid}) // returns genId
+  return knex.getGroup({mks_id: groupUid}) // returns group_id
   .then((group) => group.id ) // sets the gId for generations and pairs tables in database
   .catch((err) => {throw new Error("Unable to to access groups, "+ err)})
   .then((gId) => {
@@ -82,7 +82,7 @@ knex.addPairs = (pairData, groupUid) => {
         rows.push({
           user1_uid: pairData.pairs[i][0], // user 1
           user2_uid: pairData.pairs[i][1], // user 2
-          group_id: gId, // groudn if in our database
+          group_id: gId, // group id in our database
           gen_table_id: genId // generation id on database
         });
       
@@ -101,8 +101,20 @@ knex.addPairs = (pairData, groupUid) => {
   }, (string)groupName)
   return: 201 or error
 */
-knex.addBadPairs = (pairData, GroupUid) => {
-  //return knex('bad_pairs').insert({})
+knex.addBadPairs = (pairData, groupUid) => {
+  return knex.getGroup({mks_id: groupUid}) // returns group_id
+  .then((gId) => {
+    console.log('gId: ', gId.id)
+    for(var i = 0, rows = []; i < pairData.pairs.length; i++) // creates an object for the database 
+          rows.push({
+            user1_uid: pairData.pairs[i][0], // user 1
+            user2_uid: pairData.pairs[i][1], // user 2
+            group_id: gId.id, // group id in our database
+          });
+    return knex.batchInsert('bad_pairs', rows, pairData.pairs.length)
+      .then((e) => ('bad pairs added')) // returns string for client that pair is added
+      .catch((err) => {throw new Error("Unable to add bad pairs, "+ err)}) // throw error if something went horribly wrong
+  })
 }
 
 /**
@@ -183,16 +195,26 @@ knex.getTables = () => {
   return knex('auth').returning('*')
 }
 knex.getTables2 = () => {
-  return knex('generations').returning('*')
+  return knex('bad_pairs').returning('*')
 }
 
 /**
-  @params: groupId = (string) group uid, groupName = (string) the name of the group
+  @params: groupId = (string) group uid
   return: array of pairs of the group
 */
-knex.getPairsForGroup = (groupId, groupName) => {
+knex.getPairsForGroup = (groupId) => {
   return knex('pairs').where({'group_id': groupId}).returning('*')
-    .then((pairsWithId) => pairsWithId)// returns all pairds for id
+    .then((pairsWithId) => pairsWithId)// returns all pairs for id
+    .catch((err) => {throw new Error("database off-line, "+ err)}) // throw error if something went horribly wrong
+}
+
+/**
+  @params: groupId = (string) group uid
+  return: array of bad pairs of the group
+*/
+knex.getBadPairsForGroup = (groupId) => {
+  return knex('bad_pairs').where({'group_id': groupId}).returning('*')
+    .then((pairsWithId) => pairsWithId)// returns all pairs for id
     .catch((err) => {throw new Error("database off-line, "+ err)}) // throw error if something went horribly wrong
 }
 
@@ -235,7 +257,7 @@ knex.getNewGen = (groupId) =>{
 }
 
 /**
-  @params: groupId = (int) mks_id
+  @params: groupId = (int) group_id
   return: 'Pairs have been reset'
 */
 knex.resetPairs = (groupId) => {
@@ -249,5 +271,17 @@ knex.resetPairs = (groupId) => {
         .then(() => 'Pairs have been reset')
         .catch((err) => {throw new Error("Could not reset pairs in generations table, "+ err)}) // throw error if something went horribly wrong
     }).catch((err) => {throw new Error("Could not reset pairs in pairs table, "+ err)}) // throw error if something went horribly wrong
+}
+
+/**
+  @params: groupId = (int) group_id
+  return: 'Bad pairs have been reset'
+*/
+knex.resetBadPairs = (groupId) => {
+  return knex('bad_pairs')
+    .where('group_id', groupId)
+    .del()
+    .then(() => 'Pairs have been reset')
+    .catch((err) => {throw new Error("Could not reset pairs in pairs table, "+ err)}) // throw error if something went horribly wrong
 }
 module.exports = knex;
