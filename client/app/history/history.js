@@ -222,6 +222,7 @@ angular.module('PU.history', ['PU.factories'])
     if(confirm('Are you sure you want to delete this generation? Once clicked, its gone forever')){
     DB.deleteGeneration($scope.currClass, $scope.generationId)
       .then(function(resp){
+        StateSaver.updateState({edited: true});
         $route.reload();
         console.log(resp)
       })
@@ -237,6 +238,7 @@ angular.module('PU.history', ['PU.factories'])
     if(confirm('Are you sure you want to delete all generations? Once clicked, its gone forever')){
     DB.deleteAllGenerations($scope.currClass)
       .then(function(resp){
+        StateSaver.updateState({edited: true})
         $route.reload();
         console.log(resp);
       })

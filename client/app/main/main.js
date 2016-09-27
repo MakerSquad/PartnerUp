@@ -1,7 +1,7 @@
 
 angular.module('PU.main', ['PU.factories', angularDragula(angular)])
 
-.controller('MainController', function ($scope, $location, $http, StateSaver, DB, dragulaService, CurrentUser) {
+.controller('MainController', function ($scope, $location, $route, $http, StateSaver, DB, dragulaService, CurrentUser) {
 
   $scope.currentUser = {} //Information for the current user
   $scope.classes = []; //all classes the user is a part of
@@ -57,6 +57,7 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
         finalized: $scope.finalized,
         noPair: $scope.noPair,
         stuView: $scope.stuView,
+        genTitle: $scope.genTitle
       })
       $location.path(`/${$scope.currentClass.mks_id}/history`);
     }
@@ -176,12 +177,9 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
               seen[user2] = true;
             }
           }
-          console.log("GroupsByUser1: ", groupsByUser1);
           for(var grp in groupsByUser1){
-            console.log("grp: ", grp);
             $scope.groups.push(groupsByUser1[grp]);
           }
-          console.log("$scope.groups: ", $scope.groups);
           $scope.groupSize = $scope.groups[0].length;
           $scope.loadingList = false;
         })
@@ -256,6 +254,7 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
   */
 
   $scope.randomize = function(groupSize){
+    $scope.genTitle = "";
     $scope.loadingGroups = true;
     if(!groupSize){
       groupSize = 2; //default group size to 2
@@ -388,7 +387,7 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
       }
       DB.addPairs($scope.currentClass.mks_id, newPairs, $scope.genTitle, $scope.groupSizeSelect);
       $scope.finalized = true;
-      $scope.genTitle = "";
+      //$scope.genTitle = "";
     }else{
       alert("Please enter a title for this class list");
     }
@@ -649,6 +648,9 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
           var savedState = StateSaver.restoreState(); //if we previously saved state, grab it back
           if(savedState){
             $scope = Object.assign($scope, savedState); //copy the saved state back into scope
+            if(savedState.edited){
+              $route.reload()
+            }
           }
           $scope.getClasses()
           .then(function(){
@@ -657,7 +659,6 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
         }
      })
      .catch(function(err){
-      console.log("In main js, no signin");
       $location.path('/signin');
       $scope.$apply();
      })

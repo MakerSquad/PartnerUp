@@ -52,10 +52,15 @@ angular.module('PU.factories', [])
     return tmp;
   }
 
+  var updateState = function(newState){
+    state = Object.assign(state, newState);
+  }
+
   return {
     saveState: saveState,
     restoreState: restoreState,
-    checkState: checkState
+    checkState: checkState,
+    updateState: updateState
   }
 
 })
