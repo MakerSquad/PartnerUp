@@ -38,8 +38,8 @@ angular.module('PU.signin', [
       that._oauthInterval = window.setInterval(function(){
         try{
           var x = that._oauthWindow.document.body.innerHTML
-          window.clearInterval(that._oauthInterval);
           options.callback(that._oauthWindow.document.body.innerHTML);
+          window.clearInterval(that._oauthInterval);
           that._oauthWindow.close()
         }
         catch (e){

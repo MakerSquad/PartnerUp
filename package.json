@@ -24,7 +24,7 @@
     "supertest-as-promised": "^4.0.0"
   },
   "dependencies": {
-    "authport": "^1.0.0",
+    "authport": "^1.0.1",
     "authport-makerpass": "^1.0.0",
     "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.15.2",
@@ -40,5 +40,8 @@
     "pg": "^6.1.0",
     "request": "^2.36.0",
     "sqlite3": "^3.1.4"
+  },
+  "engines": {
+    "node": "6.6.0"
   }
 }

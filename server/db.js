@@ -180,7 +180,7 @@ knex.getGroup = (group) => {
 }
 
 knex.getTables = () => {
-  return knex('pairs').returning('*')
+  return knex('auth').returning('*')
 }
 knex.getTables2 = () => {
   return knex('generations').returning('*')

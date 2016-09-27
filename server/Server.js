@@ -78,7 +78,7 @@ app.get("/myGroups", (req, res) => {
 })
 
 
-app.get("/:groupUid/recent", (req, res) => {  
+app.get("/:groupUid/recent", (req, res) => {
   db.authenticate(req.cookies.token)
   .then(() => 
   db.getGroup({name: req.params.groupUid})
