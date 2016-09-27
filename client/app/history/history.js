@@ -248,59 +248,61 @@ angular.module('PU.history', ['PU.factories'])
     $scope.loading = true;
     $scope.mainState = StateSaver.checkState();
     console.log("Main State: ", $scope.mainState);
-     if(!$scope.mainState){
-      $location.path('/');
-     }
-     if(!CurrentUser.get()){
-        $location.path('/signin');
-      }
-      else{
-   
-      $scope.getGen()
-      .then(function(generations){
-        $scope.getHistory()
-        .then(function(pairs){$scope.makeMap()
-          .then(function(evenmorestuff){
-            if(generations.length){
-              var pastGens = {};
-              var seen = {}; //object of objects
-              for(var i = 0; i < pairs.length; i++){
-                var currPair = pairs[i];
-                var currGen = currPair.gen_table_id;
-                if(!seen[currGen]){
-                  seen[currGen] = {};
-                }
-                var currUser1 = $scope.library[currPair.user1_uid];
-                if(seen[currGen][currUser1]){
-                  continue;
-                }
-                var currUser2 = $scope.library[currPair.user2_uid];
-                if(!pastGens[currGen]){
-                  pastGens[currGen] = {};
-                }
-                if(!pastGens[currGen][currUser1]){
-                  pastGens[currGen][currUser1] = [currUser1];
-                }
-                pastGens[currGen][currUser1].push(currUser2);
-                seen[currGen][currUser2] = true;
-              }
-              for(var gen in pastGens){
-                for(var user in pastGens[gen]){
-                  if(!$scope.pastGens[gen]){
-                    $scope.pastGens[gen] = [];
+     CurrentUser.get()
+     .then(function(userData){
+       if(!$scope.mainState){
+        $location.path('/');
+        $scope.$apply();
+       }
+        $scope.getGen()
+        .then(function(generations){
+          $scope.getHistory()
+          .then(function(pairs){$scope.makeMap()
+            .then(function(evenmorestuff){
+              if(generations.length){
+                var pastGens = {};
+                var seen = {}; //object of objects
+                for(var i = 0; i < pairs.length; i++){
+                  var currPair = pairs[i];
+                  var currGen = currPair.gen_table_id;
+                  if(!seen[currGen]){
+                    seen[currGen] = {};
                   }
-                  $scope.pastGens[gen].push(pastGens[gen][user]); //pushes the group (as an array) to pastgens
+                  var currUser1 = $scope.library[currPair.user1_uid];
+                  if(seen[currGen][currUser1]){
+                    continue;
+                  }
+                  var currUser2 = $scope.library[currPair.user2_uid];
+                  if(!pastGens[currGen]){
+                    pastGens[currGen] = {};
+                  }
+                  if(!pastGens[currGen][currUser1]){
+                    pastGens[currGen][currUser1] = [currUser1];
+                  }
+                  pastGens[currGen][currUser1].push(currUser2);
+                  seen[currGen][currUser2] = true;
                 }
+                for(var gen in pastGens){
+                  for(var user in pastGens[gen]){
+                    if(!$scope.pastGens[gen]){
+                      $scope.pastGens[gen] = [];
+                    }
+                    $scope.pastGens[gen].push(pastGens[gen][user]); //pushes the group (as an array) to pastgens
+                  }
+                }
+                console.log("$scope pastGens: ", $scope.pastGens);   
               }
-              console.log("$scope pastGens: ", $scope.pastGens);   
-            }
-      
-            $scope.getName();
-            console.log('init complete')
-            $scope.loading = false;
+        
+              $scope.getName();
+              console.log('init complete')
+              $scope.loading = false;
+            })
           })
         })
-      })
-    }
+     })
+     .catch((err) => {
+      $location.path('/');
+      $scope.$apply();
+     })
   }())
 });

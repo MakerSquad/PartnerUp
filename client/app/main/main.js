@@ -595,20 +595,29 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
     // })
     // .then(function(resp){
      // console.log("resp", resp)
-      if(!CurrentUser.get()){
-        $location.path('/signin');
-      } 
-      else{
-        $scope.currentUser = CurrentUser.get();
-        var savedState = StateSaver.restoreState(); //if we previously saved state, grab it back
-        if(savedState){
-          $scope = Object.assign($scope, savedState); //copy the saved state back into scope
+     CurrentUser.get()
+     .then(function(userData){
+      console.log("Userdata: ", userData);
+        if(!userData){
+          $location.path('/signin');
+        } 
+        else{
+          $scope.currentUser = userData;
+          var savedState = StateSaver.restoreState(); //if we previously saved state, grab it back
+          if(savedState){
+            $scope = Object.assign($scope, savedState); //copy the saved state back into scope
+          }
+          $scope.getClasses()
+          .then(function(){
+            $scope.initialized = true;
+          })
         }
-        $scope.getClasses()
-        .then(function(){
-          $scope.initialized = true;
-        })
-      }
+     })
+     .catch(function(err){
+      console.log("In main js, no signin");
+      $location.path('/signin');
+      $scope.$apply();
+     })
     //})
   }())
 

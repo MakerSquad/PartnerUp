@@ -1,6 +1,6 @@
 angular.module('PU.factories', [])
 
-.factory('CurrentUser', function(){
+.factory('CurrentUser', function($http){
   var currentUser;
 
   var set = function(userInfo){
@@ -8,7 +8,19 @@ angular.module('PU.factories', [])
   }
 
   var get = function(){
-    return currentUser;
+    if(document.cookie.includes("token")){
+      return $http({
+        method: "GET",
+        url: "/currentUser"
+      })
+      .then((userData) => {
+        return userData.data.user;
+      })
+    }else{
+      console.log("No signin info");
+      return Promise.reject("No signin info");
+    }
+    //return currentUser;
   }
 
   var destroy = function(){

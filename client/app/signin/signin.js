@@ -20,9 +20,12 @@ angular.module('PU.signin', [
   //   }
   // })
 
-  if(CurrentUser.get()){
+  CurrentUser.get()
+  .then((userData) => {
     $location.path('/');
-  }
+    $scope.$apply();
+  })
+  .catch(() => {})
 
   $scope.loginMakerPass = function(){
     // $window.location.href = '/auth/makerpass';
@@ -52,7 +55,7 @@ angular.module('PU.signin', [
       var signInInfo = JSON.parse(data.slice(data.indexOf('{'), data.lastIndexOf('}') + 1));
       console.log("Parsed: ", signInInfo);
       document.cookie = `token=${signInInfo.token}`;
-      CurrentUser.set(signInInfo.data.user);
+      //CurrentUser.set(signInInfo.data.user);
       $window.location.href = ('/#/');
     }})
 
