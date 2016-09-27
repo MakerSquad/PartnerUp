@@ -1,0 +1,21 @@
+.welcome{
+  text-align: center;
+}
+.login{
+  font-family: 'Josefin Sans', sans-serif;
+}
+.loginBtn{
+  background-color: cornflowerblue;
+  color:white;
+  border-radius: 5px;
+  float: right;
+  height:35px;
+  width: 150px;
+  font-size:13px;
+}
+.info{
+  padding:30px;
+  background-color: #ebebeb;
+  border: solid;
+  border-color: #dbdbdb;
+}

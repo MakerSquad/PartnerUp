@@ -2,10 +2,11 @@
 <div class='history fade' ng-show="!loading">
 <button class='goHome' ng-click='goHome()'>Back to PartnerUp</button>
 <h1>{{currClassName}}'s History</h1>
+<button class='deleteAll' ng-click="deleteAllGen() ">Delete All History</button>
+<br>
 <select ng-model="classSelect" ng-options="class as class.name for class in mainState.classes" ng-change="changeClass(classSelect)">
   <option value="">Choose a class</option>
 </select>
-<button ng-click="deleteAllGen() ">DELETE THEM ALL!</button>
 <br>
 
 <div ng-show="generations.length">
@@ -22,7 +23,6 @@
       <button class='changers prev' ng-click='previous()'><</button>
       <h3 class="currGenTitle">{{currGen}}</h3>
       <button class= 'changers next' ng-click='next()'>></button>
-      <button class="oopsies" ng-click="deleteGen()" >delete this generation</button>
     </div>
     <table class="pair" id="pair">
       <tr>
@@ -34,6 +34,7 @@
       </tr>
     </table>
     <button class="clipyclip histclip" data-clipboard-target="#pair">copy me</button>
+    <button class="deleteOne" ng-click="deleteGen()" >delete generation</button>
   </div>
 </div>
 <h3 class='genTitle' ng-show="!generations.length">This class has no past groupings! Go partner up!</h3>
