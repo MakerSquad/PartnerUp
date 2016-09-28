@@ -3,6 +3,7 @@
 // 
 var AuthPort = require('authport')
 var MakerpassService = require('authport-makerpass')
+var LESS = require('node-less-endpoint')
 
 // if (! process.env.MAKERPASS_CLIENT_ID || ! process.env.MAKERPASS_CLIENT_SECRET) {
 //   throw new Error("Please set MAKERPASS_CLIENT_ID and MAKERPASS_CLIENT_SECRET")
@@ -50,6 +51,9 @@ app.use(express.static(path.join(__dirname, '../client')));
 app.use(express.static(path.join(__dirname, '../client/app')));
 app.use(express.static(path.join(__dirname, '../bower_components')));
 app.use(cookieParser());
+
+app.get('/vendor.css', LESS.serve('./client/style/reactorcore/index.less'))
+app.get('/style.css', LESS.serve('./client/style/index.less'))
 
 app.get("/auth/:service", AuthPort.app);
 

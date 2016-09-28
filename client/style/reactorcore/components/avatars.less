@@ -1,0 +1,19 @@
+
+figure.avatar {
+  border-radius: 1000px;
+  height: 6rem;
+  overflow: hidden;
+  position: relative;
+  width: 6rem;
+}
+figure.avatar::after {
+  border-radius: 1000px;
+  box-shadow: inset 0px 0px 3px black;
+  content: "";
+  position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+  opacity: 0.1;
+}
+
+figure.avatar > img {
+  max-width: 100%;
+}

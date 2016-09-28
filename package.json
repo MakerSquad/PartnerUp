@@ -34,6 +34,7 @@
     "express-session": "^1.14.1",
     "jwt-simple": "^0.2.0",
     "knex": "^0.12.0",
+    "node-less-endpoint": "^0.2.0",
     "node-makerpass": "^1.2.0",
     "nodemon": "^1.10.2",
     "path": "^0.12.7",

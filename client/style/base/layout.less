@@ -1,0 +1,15 @@
+
+#app {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+#app > main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  & > *:only-child {
+    padding-bottom: 8vh;
+  }
+}
