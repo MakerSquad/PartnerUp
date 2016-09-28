@@ -4,7 +4,7 @@ angular.module('PU.factories', [])
   var getCohorts = function(){
     return $http({
       method: "GET",
-      url: '/myGroups'
+      url: '/cohorts'
     })
     .then((classes) => classes.data)
     .catch((err) => err);
@@ -95,7 +95,7 @@ angular.module('PU.factories', [])
   var getClasses = function(){
     return $http({
       method: 'GET',
-      url: '/myGroups'
+      url: '/groups'
     })
     .then(resp => resp.data)
     .catch(err => err);
@@ -104,7 +104,7 @@ angular.module('PU.factories', [])
   var getMemberships = function(cls){
     return $http({
       method: 'GET',
-      url: `/${cls}/members`,
+      url: `/group/${cls.groupId}/members`,
     })
     .then(resp => resp.data)
     .catch(err => err)
@@ -113,7 +113,7 @@ angular.module('PU.factories', [])
   var getPairs = function(cls){
     return $http({
       method: 'GET',
-      url: `/${cls}/pairs`
+      url: `/group/${cls.groupId}/pairs`
     })
     .then(resp => resp.data)
     .catch(err => err)
@@ -122,7 +122,7 @@ angular.module('PU.factories', [])
   var addPairs = function(cls, pairs, genTitle, groupSize){
     return $http({
       method: 'POST',
-      url: `/${cls}/pairs`,
+      url: `/group/${cls.groupId}/pairs`,
       data: {
         pairs: pairs,
         genTitle: genTitle,
@@ -136,7 +136,7 @@ angular.module('PU.factories', [])
   var getGenerations = function(cls){
     return $http({
       method: 'GET',
-      url:`/${cls}/generations`
+      url:`/group/${cls.groupId}/generations`
     })
     .then(resp => resp.data)
     .catch(err => err)
@@ -160,10 +160,10 @@ angular.module('PU.factories', [])
     .catch(err => err)
   }
 
-  var getRecentPairs = function(groupId){
+  var getRecentPairs = function(cls){
     return $http({
       method: 'GET',
-      url: `/${groupId}/recent`
+      url: `/group/${cls.groupId}/recent`
     })
     .then(resp => resp.data)
     .catch(err => err)
