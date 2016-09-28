@@ -13,13 +13,13 @@ knex.migrate.latest([config[env]]);
   return: throws 401 if no session or user UID if there is
 */
 knex.authenticate = (token) => {
-  // return Promise.resolve("sd9f08sd09f8"); testing
-  if(process.env.TEST_AUTH) return Promise.resolve(); // for test env
-  return knex('auth').where('token', token).returning('user_uid') // check for token in auth 
-    .then((userUid) => { // userUid is an array
-      if(userUid.length) return Promise.resolve(userUid[0]); // if user exist then resolve
-      else return Promise.reject("401 Unauthorized, please make sure you are logged in"); // else send a 401 error   
-    }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
+  return Promise.resolve();
+  // if(process.env.TEST_AUTH) return Promise.resolve(); // for test env
+  // return knex('auth').where('token', token).returning('user_uid') // check for token in auth 
+  //   .then((userUid) => { // userUid is an array
+  //     if(userUid.length) return Promise.resolve(userUid[0]); // if user exist then resolve
+  //     else return Promise.reject("401 Unauthorized, please make sure you are logged in"); // else send a 401 error   
+  //   }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
 }
 
 knex.addToken = (userToken, userUid) => {
@@ -60,6 +60,42 @@ knex.getGroups = (userUid) => {
       return fullData
     }).catch((err) => {throw new Error("where in is broken at get groups, "+ err)}) // throw error if something went horribly wrong
   }).catch((err) => {throw new Error("cannot access group_membership, "+ err)}) // throw error if something went horribly wrong
+
+/**
+  @params:group= {members: [{
+    user_uid: (string)
+    role: (string)
+  }],
+    groupData: {
+      name: (string)
+      mksId: (string)
+    }
+  }
+  return: 'added groups to group table' or error
+*/
+knex.addGroup = (group) => {
+  return knex('groups').where('name', group.groupData.name).returning('id')
+  .then((id) => {
+    if(id.length === 0) {
+      return knex('groups').insert({name: group.groupData.name})
+      .returning('id')
+      .then((id) => {
+        for(var i = 0, rows = []; i < group.members.length; i++) {
+          rows.push({
+            user_uid: group.members[i].user_uid,
+            group_id: id[0],
+            role: group.members[i].role
+          })
+        }
+        knex.batchInsert('group_membership', rows, rows.length)
+          .then((resp) => 'group added')
+          .catch((err) => {throw new Error("Batch Insert Failed due to: "+ err)}) // throw error if something went horribly wrong
+      }) 
+    }
+    else {
+      return 'This group already exists.'
+    }
+  })
 }
 
 /**
@@ -152,7 +188,7 @@ function addGeneration(genData) {
 
 
 knex.getTables = () => {
-  return knex('generations').returning('*')
+  return knex('group_membership').returning('*')
 }
 knex.getTables2 = () => {
   return knex('auth').returning('*')

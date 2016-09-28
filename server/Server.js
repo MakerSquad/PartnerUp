@@ -71,11 +71,26 @@ app.get("/cohorts", (req, res) => { // done
   }).catch((err) => {res.status(401).send(err)}) 
 })
 
+app.get("/cohort/:groupUid", (req, res) => {
+  MP.memberships(req.params.groupUid, req.cookies.token)    
+  .then((students) => res.send(students))
+  .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+})
+
 app.get("/groups", (req, res) => { 
   db.authenticate(req.cookies.token).then((uid) => {
     db.getGroups(uid)
     .then((groups) => res.send(groups))
     .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  }).catch((err) => {res.status(401).send(err)}) 
+})
+
+app.post("/group", (req, res) => {
+  db.authenticate(req.cookies.token).then((uid) => {
+    db.addGroup(req.body)
+    .then((id) => {
+      res.send()
+    }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
   }).catch((err) => {res.status(401).send(err)}) 
 })
 
