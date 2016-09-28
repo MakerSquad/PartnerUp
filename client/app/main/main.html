@@ -1,16 +1,14 @@
-<div ng-class="{toBackground: creatingGroup}" ng-show="initialized" class='main fade'>
+<div ng-show="initialized && !creatingGroup" class='main fade'>
   <button class="signout" ng-click="signOut()">Log out</button>
-  <h1 class="welcomeMain">Welcome, {{currentUser.name.includes("Gilbert") ? "Gilby" : currentUser.name.includes("Jamie Sowder") ? "Jam Jam" : currentUser.name ||  "Gilby"}}!</h1>
+  <h1 class="welcomeMain">Welcome, {{currentUser.uid === "90b72025841d" ? "Gilby" : currentUser.uid === '2a97b80a545a' ? "Jam Jam" : currentUser.name ||  "Gilby"}}!</h1>
 
   <!--Control buttons-->
   <div class="controls">
-    <div class="createButtons" ng-show='neverlol'>
-      <button ng-click="openCreateModal()" class='createClass'>Create a class</button>
-    </div>
-    <div class='currClass'>Current class: {{currentClass.name}}</div>
+    <div class='currClass'>Current pool: {{currentClass.name}}</div>
     <select ng-model="currentClass" ng-options="class as class.name for class in classes" ng-change="changeClass()">
-    <option value="">Choose a class</option>
+    <option value="">Choose a pool</option>
     </select>
+    <button ng-click="openCreateModal()" ng-hide="stuView" class='createClassBtn'>Create a Pool</button>
     <br><br>
     <div class='groupControls' ng-hide='stuView'>
       <div class='groupSize'>Group Size: </div>
@@ -81,34 +79,27 @@
 </div>
 
 
-  <!--The modal for creating a group-->
-  <div class="modal" ng-show="creatingGroup">
-    <form>
-      <label>Group Name: </label>
-      <br>
-      <input type="text" class="groupName" placeholder="(e.g. Physics 101, MKS46)" ng-model="groupName">
-      <form class="addUsers">
-        <br>
-        <label>Name:</label>
-        <br>
-        <input type="text" class="userName" ng-model="inputName">
-        <select class="roles" ng-model="inputRole" ng-options="role for role in roles">
-        <input type="submit" value="Add User" class="submitUser" ng-click="addToUserList(inputName, inputRole)">
-      </form>
-      <table class="addedUsers">
-        <tr>
-          <th>Name:</th>
-          <th>Role:</th>
-        </tr>
-        <tr ng-repeat="user in modalUserList">
-          <td>{{user.user.name}}</td>
-          <td>{{user.role}}</td>
-        </tr>
-      </table>
-      <input type="submit" value="Create Group" class="submitGroup" ng-click="createClass(groupName, modalUserList)">
-      <input type="submit" value="Cancel" class="cancel" ng-click="closeCreateModal()">
-    </form>
+<!--The modal for creating a group-->
+<div class="modalPage fade" ng-show="creatingGroup">
+  <div class="modal modalPeople">
+    <div loading class="modalLoad" ng-show="loadingModalUsers"></div>
+    <div ng-show="!loadingModalUsers">
+      <select ng-model="selectedCohort" ng-options="cohort as cohort.name for cohort in modalCohorts" ng-change="changeModalCohort()"></select>
+      <div class="modalPeopleList" ng-hide="modalAddedUids.includes(admin.user.uid)" ng-click="addModalAdmin(admin)" ng-repeat="admin in modalAdmins">{{admin.user.name}}</div>
+      <div class="modalPeopleList" ng-hide="modalAddedUids.includes(student.user.uid)" ng-click="addModalStu(student)" ng-repeat="student in modalStudents">{{student.user.name}}</div>
+    </div>
   </div>
+  <div class="modal modalList">    
+    <h3>Admins:</h3><br>
+    <div class="modalPeopleList" ng-click="removeModalAdmin(ad)" ng-repeat="ad in modalAddedAdmins">{{ad.user.name}}</div>
+    <h3>Students:</h3><br>
+    <div class="modalPeopleList" ng-click="removeModalStu(stu)" ng-repeat="stu in modalAddedStus">{{stu.user.name}}</div>
+  </div>
+  <div class="modalControls">
+    <button class="modalBtn" ng-click="createClass()">Create Pool</button>
+    <button class="modalBtn" ng-click="closeCreateModal()">Cancel</button>
+  </div>
+</div>
 
 <div loading class="initialLoad" ng-show="!initialized">
 </div> 

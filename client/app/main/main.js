@@ -1,8 +1,7 @@
 
 angular.module('PU.main', ['PU.factories', angularDragula(angular)])
 
-
-.controller('MainController', function ($scope, $location, $http, StateSaver, DB, dragulaService, CurrentUser) {
+.controller('MainController', function ($scope, MakerPass, $location, $route, $http, StateSaver, DB, dragulaService, CurrentUser) {
   document.getElementById("bodyclass").className = "";
 
   $scope.currentUser = {} //Information for the current user
@@ -19,7 +18,7 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
   $scope.partnerUp = false; //True if groups are assigned
   $scope.stuView = false;
   $scope.roles = ["instructor", "fellow", "student"]; //The possible roles
-  $scope.genTitle; 
+  $scope.genTitle;
 
   $scope.selectedForSwap = null; //The student object that has been selected to swap
   $scope.selectedForSwapIndex;  //The index of the student object to swap, as a tuple (2d Array Index)
@@ -548,15 +547,22 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
 
   //Functions for the createGroup Modal below
 
+  $scope.modalAdmins = [];
+  $scope.modalStudents = [];
+  $scope.modalCohorts = [];
+  $scope.modalAddedAdmins = [];
+  $scope.modalAddedStus = [];
+  $scope.selectedCohort;
+  $scope.loadingModalUsers=false;
+  $scope.modalAddedUids = [];
+
   /**
   * openCreateModal resets the information in the create group modal and shows it on the page
   */
 
   $scope.openCreateModal = function(){
-    $scope.modalUserList = [];
-    $scope.inputRole = "";
-    $scope.inputName = "";
-    $scope.groupName = "";
+    $scope.modalAddedAdmins = [];
+    $scope.modalAddedStus = [];
     $scope.creatingGroup = true;
   }
 
@@ -568,31 +574,58 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
     $scope.creatingGroup = false;
   }
 
-  /**
-  * addToUserList adds a new user to the list of users being added to a newly created class
-  * @param name The user's name
-  * @param role The user's role
-  * @return the new User as an object
-  */
+  $scope.changeModalCohort = function(){
+    console.log("Changing cohort to: ", $scope.selectedCohort);
+    $scope.modalStudents = [];
+    $scope.modalAdmins = [];
+    $scope.loadingModalUsers = true;
+    return MakerPass.getMemberships($scope.selectedCohort)
+    .then(function(members){
+      for(var i = 0; i < members.length; i++){
+        if(members[i].role === "student"){
+          $scope.modalStudents.push(members[i]);
+        }else{
+          $scope.modalAdmins.push(members[i]);
+        }
+      }
+      $scope.loadingModalUsers = false;
+    })
+    .catch(function(err){
+      $scope.loadingModalUsers = false;
+      console.error("Error loading users: ", err);
+    })
+  }
 
-  $scope.addToUserList = function(name, role){
-    var newUser = {role: role, user: {name: name}} //matches MakerPass format
-    $scope.modalUserList.push(newUser);
-    $scope.inputName = "";
-    return newUser;
+  $scope.addModalStu = function(stu){
+    $scope.modalStudents.splice($scope.modalStudents.indexOf(stu), 1);
+    $scope.modalAddedStus.push(stu);
+    $scope.modalAddedUids.push(stu.user.uid);
+  }
+
+  $scope.addModalAdmin = function(ad){
+    $scope.modalAdmins.splice($scope.modalAdmins.indexOf(ad), 1);
+    $scope.modalAddedAdmins.push(ad);
+    $scope.modalAddedUids.push(ad.user.uid);
+  }
+
+  $scope.removeModalAdmin = function(ad){
+    $scope.modalAddedAdmins.splice($scope.modalAddedAdmins.indexOf(ad), 1);
+    $scope.modalAddedUids.splice($scope.modalAddedUids.indexOf(ad.user.uid), 1);
+    $scope.modalAdmins.push(ad);
+  }
+
+  $scope.removeModalStu = function(stu){
+    $scope.modalAddedStus.splice($scope.modalAddedStus.indexOf(stu), 1);
+    $scope.modalAddedUids.splice($scope.modalAddedUids.indexOf(stu.user.uid), 1);
+    $scope.modalStudents.push(stu);
   }
 
   /**
   * TODO: make this function make database calls to create new classes
   */
 
-  $scope.createClass = function(name, users){
-    $scope.loading = true;
-    $scope.classes.push({name: name});
-    $scope.students = users.filter(m => m.role === 'student');
-    $scope.fellows = users.filter(m => m.role === 'fellow');
-    $scope.instructors = users.filter(m => m.role === 'instructor');
-    $scope.loading = false;
+  $scope.createClass = function(){
+    return DB.createClass()//TODO: find out how we want to send shit)
     $scope.closeCreateModal();
   }
 //***********************dragula under here ***********************************************
@@ -654,9 +687,16 @@ angular.module('PU.main', ['PU.factories', angularDragula(angular)])
               $route.reload()
             }
           }
-          $scope.getClasses()
-          .then(function(){
+          Promise.all([
+            $scope.getClasses(),
+            MakerPass.getCohorts()
+          ])
+          .then(function(resolveData){
+            console.log("Promises resolved");
+            $scope.modalCohorts = resolveData[1];
             $scope.initialized = true;
+            console.log("Current scope: ", $scope);
+            $scope.$apply();
           })
         }
      })

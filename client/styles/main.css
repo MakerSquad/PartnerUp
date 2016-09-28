@@ -14,16 +14,47 @@
   width:40%;
 }
 
+.modalPage{
+  width: 90%;
+  height: 75%;
+  margin-left: 3%;
+  transition-delay: 0.5s;
+  max-height: 75%;
+}
+
+.modalPage.ng-hide{
+  transition: 0s;
+}
+
 .modal{
-  position: absolute;
-  width: 300px;
+  position: relative;
+  width: 40%;
+  display: inline-block;
+  border-radius: 10px;
+  min-height: 400px;
+  max-height: 400px;
+  height: 75%;
   border: 1px solid black;
-  top: 100px;
-  left: 500px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
   background-color: white;
+  margin-right: 3%;
+  overflow-y: scroll;
+}
+
+.modalClasses{
+  width: 30%;
+}
+
+.modalPeople{
+  /*left: 35%;
+  width: 30%;*/
+}
+
+.modalList{
+}
+
+.modalControls{
+  float: right;
+  margin-right: 10%;
 }
 
 .addedUsers{
