@@ -25,7 +25,7 @@ angular.module('PU.factories', [])
   }
 })
 
-.factory('CurrentUser', function($http){
+.factory('CurrentUser', function($http, $location){
   var currentUser;
 
   var set = function(userInfo){
@@ -48,14 +48,24 @@ angular.module('PU.factories', [])
     //return currentUser;
   }
 
-  var destroy = function(){
+  var signOut = function(){
     currentUser = undefined;
+    document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'; //delete the token cookie
+    return $http({
+      method: 'GET',
+      url: '/signout'
+    }).then(function(){
+      $location.path('/signin');
+    })
+    .catch(function(err){
+      console.error("Logout failed: ", err);
+    })
   }
 
   return {
     set: set,
     get: get,
-    destroy: destroy
+    signOut: signOut
   }
 })
 

@@ -3,7 +3,7 @@
 // in our signup/signin forms using the injected Auth service
 angular.module('PU.signin', [
 
-  ])
+])
 
 .controller('AuthController', function ($scope, $window, $location, $http, CurrentUser) {
   document.getElementById("bodyclass").className = "bodyclass";

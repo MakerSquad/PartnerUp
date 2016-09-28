@@ -24,7 +24,47 @@ angular.module('PU', [
 
 .directive('loading', function(){
   return{
-    templateUrl: 'loading.html'
+    templateUrl: 'directives/loading.html'
+  }
+})
+
+.directive('header', function(){
+  var controller = function($scope, $location, $http, CurrentUser){
+    var path = $location.path();
+    $scope.nicknames = {
+      //TODO
+    }
+    $scope.hideMyPools = path === '/'; //NB: these routes might change
+    $scope.hideCreatePool = path === '/createPool';
+    $scope.currentUser;
+
+    var init = (function(){
+      CurrentUser.get()
+      .then(function(user){
+        if(!user){
+          $location.path('/signin');
+        }else{
+          $scope.currentUser = user;
+        }
+      })
+    }())
+
+    $scope.seeMyPools = function(){
+      $location.path('/');
+    }
+
+    $scope.createPool = function(){
+      $location.path('/createPool');
+    }
+
+    $scope.signOut = function(){
+      CurrentUser.signOut();
+    }
+  }
+
+  return {
+    controller: controller,
+    templateUrl: 'directives/header.html'
   }
 })
 
