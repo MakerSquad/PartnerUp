@@ -12,6 +12,8 @@
   height:30px;
   width: 10%;
   font-size:12px;
+     box-shadow:none;
+   border: none;
 }
 .goHome{
   background-color: cornflowerblue;
@@ -23,6 +25,8 @@
   width: 150px;
   font-size:12px;
   margin-right: 100px;
+     box-shadow:none;
+   border: none;
 }
 .generations{
   float: left;
@@ -118,6 +122,8 @@ background-color: cornflowerblue;
   width: 125px;
   font-size:12px;
   margin-right: 100px;
+     box-shadow:none;
+   border: none;
 }
 .deleteAll:hover{
 background-color: red;
@@ -129,6 +135,8 @@ background-color: red;
   height:30px;
   width: 125px;
   font-size:12px;
+     box-shadow:none;
+   border: none;
   
 }
 .deleteOne{
@@ -140,6 +148,8 @@ background-color: red;
   height:30px;
   width: 125px;
   font-size:12px;
+     box-shadow:none;
+   border: none;
 
 }
 .deleteOne:hover{
@@ -151,6 +161,8 @@ background-color: red;
   height:30px;
   width: 125px;
   font-size:12px;
+     box-shadow:none;
+   border: none;
 
 }
 .histclip{
@@ -162,4 +174,17 @@ background-color: red;
   height:30px;
   width: 125px;
   font-size:13px;
+     box-shadow:none;
+   border: none;
+}
+.signouthist{
+  float: right;
+  background-color: cornflowerblue;
+  color:white;
+  border-radius: 5px;
+  height:30px;
+  width: 125px;
+  font-size:13px;
+   box-shadow:none;
+   border: none;
 }

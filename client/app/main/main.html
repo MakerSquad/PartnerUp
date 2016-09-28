@@ -1,6 +1,6 @@
 <div ng-class="{toBackground: creatingGroup}" ng-show="initialized" class='main fade'>
   <button class="signout" ng-click="signOut()">Log out</button>
-  <h1 class="welcomeMain">Welcome, {{currentUser.name.includes("Gilbert") ? "Gilby" : currentUser.name || "Gilby"}}!</h1>
+  <h1 class="welcomeMain">Welcome, {{currentUser.name.includes("Gilbert") ? "Gilby" : currentUser.name.includes("Jamie Sowder") ? "Jam Jam" : currentUser.name ||  "Gilby"}}!</h1>
 
   <!--Control buttons-->
   <div class="controls">
@@ -58,7 +58,7 @@
       <button class='reroll' ng-click="randomize(groupSizeSelect)">Re-roll</button>
     </div>
 
-    <table id="partners"> 
+    <table id="partners" unselectable="on" class="unselectable"> 
       <tr>
       <th ng-repeat="index in getIndexArray(groupSizeSelect)">Partner {{index + 1}}</th>
       </tr>

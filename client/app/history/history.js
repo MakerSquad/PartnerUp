@@ -232,6 +232,24 @@ angular.module('PU.history', ['PU.factories'])
       })
     }
   }
+  //*********************************************************************************
+  //this signs you out. duh.
+  //*********************************************************************************
+
+
+    $scope.signOut = function(){
+    CurrentUser.destroy();
+    document.cookie = 'token=;expires=Thu, 01 Jan 1970 00:00:01 GMT;'; //delete the token cookie
+    return $http({
+      method: 'GET',
+      url: '/signout'
+    }).then(function(){
+      $location.path('/signin');
+    })
+    .catch(function(err){
+      console.error("Logout failed: ", err);
+    })
+  }
 
   //*********************************************************************************
   //deletes a generation from the table

@@ -80,6 +80,10 @@
   height:30px;
   width: 125px;
   font-size:13px;
+   box-shadow:none;
+   border: none;
+
+ 
 }
 .partnerBtn{
   background-color: cornflowerblue;
@@ -89,6 +93,8 @@
   height:30px;
   width: 125px;
   font-size:13px;
+   box-shadow:none;
+   border: none;
 }
 .createClass{
   background-color: cornflowerblue;
@@ -109,6 +115,8 @@
   height:30px;
   width: 125px;
   font-size:13px;
+   box-shadow:none;
+   border: none;
 }
 .currClass{
   font-size:20px;
@@ -126,6 +134,8 @@
   height:30px;
   width: 125px;
   font-size:12px;
+   box-shadow:none;
+   border: none;
 }
 
 .instructorTitle{
@@ -195,4 +205,18 @@
   height:30px;
   width: 125px;
   font-size:13px;
+   box-shadow:none;
+   border: none;
+}
+.reroll{
+    background-color: cornflowerblue;
+  color:white;
+  border-radius: 5px;
+  margin-top: 10px;
+  margin-bottom:10px;
+  height:30px;
+  width: 125px;
+  font-size:13px;
+   box-shadow:none;
+   border: none;
 }
