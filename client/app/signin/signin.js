@@ -6,7 +6,9 @@ angular.module('PU.signin', [
   ])
 
 .controller('AuthController', function ($scope, $window, $location, $http, CurrentUser) {
+  document.getElementById("bodyclass").className = "bodyclass";
   $scope.user = {};
+
 
   // $http({ //Check the current user
   //   method: "GET",

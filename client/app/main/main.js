@@ -1,7 +1,9 @@
 
 angular.module('PU.main', ['PU.factories', angularDragula(angular)])
 
-.controller('MainController', function ($scope, $location, $route, $http, StateSaver, DB, dragulaService, CurrentUser) {
+
+.controller('MainController', function ($scope, $location, $http, StateSaver, DB, dragulaService, CurrentUser) {
+  document.getElementById("bodyclass").className = "";
 
   $scope.currentUser = {} //Information for the current user
   $scope.classes = []; //all classes the user is a part of

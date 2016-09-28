@@ -69,7 +69,7 @@
         <img src='{{stu.user.avatar_url}}' width='40px' height='50px'>
           {{stu.user.name}}
         </td>
-          <td ng-hide="stuView">
+          <td ng-hide="stuView || finalized" >
           <img src= "http://simpleicon.com/wp-content/uploads/lock-3.png" width='15px' height='15px' ng-show='!searchLockedGroups(group)' class="lockBtn" ng-click="toggleLockGroup(group)">
           <img src= "http://image.flaticon.com/icons/svg/26/26053.svg" width='15px' height='15px' ng-show='searchLockedGroups(group)' class="lockBtn" ng-click="toggleLockGroup(group)">
         </td>

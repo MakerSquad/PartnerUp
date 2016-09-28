@@ -1,24 +1,28 @@
 angular.module('PU.history', ['PU.factories'])
 
 .controller('HistoryController', function ($scope, $location, $http, $routeParams, DB, StateSaver, CurrentUser,$route) {
-  
+  document.getElementById("bodyclass").className = "";
   new Clipboard('.clipyclip');
   $scope.generationId = 0; //THE CURRENT GENERATION
   $scope.pastPairs = []; //all of past pairs for the group
   $scope.displayPairs = []; //all of the filtered pair
-  $scope.generations = [];
-  $scope.prev='prev';
-  $scope.nex= 'next';
+  $scope.generations = []; //a list of the generations and their titles (no pairs!)
+  $scope.prev='prev'; //sets the previous title
+  $scope.nex= 'next'; //sets the next title
   $scope.currGen = 0; //THE CURRENT GENERATION NAME
-  $scope.maxGen = 0;
+  $scope.maxGen = 0; //the maxium generation of the pairings. the most recent generation 
   $scope.currClass = $routeParams.class; //CURRENT CLASS ID!
-  $scope.badPartners = [];
-  $scope.index = 0;
-  $scope.library = {};
-  $scope.currClassName = '';
-  $scope.pastGens = {};
+  $scope.badPartners = []; //people who can never be pair together again on random
+  $scope.index = 0; //the index of current generation in the generations table
+  $scope.library = {}; //the library of studenet uuids and names
+  $scope.currClassName = ''; //the current class name
+  $scope.pastGens = {}; // past generations, not the current one. 
 
   $scope.mainState;
+
+  //*********************************************************************************
+  //Changes the url to the correct class's history
+  //*********************************************************************************
 
   $scope.changeClass = function(cls){
     if(cls){      
