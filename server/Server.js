@@ -21,7 +21,7 @@ AuthPort.createServer({
 AuthPort.on('auth', (req, res, data) => {
   db.addToken(data.token, data.data.user.uid) // adds token to db
     .then((e) => {
-      console.log("OAuth success! user logged:", data.user); // tell server when someone logs in
+      console.log("OAuth success! user logged:", data.data.user); // tell server when someone logs in
       res.send(data)
     }).catch((err) => {console.log("auth error:", err); res.status(500).send(err)})
 })
@@ -83,6 +83,14 @@ app.get("/groups", (req, res) => {
     .then((groups) => res.send(groups))
     .catch((err) => {console.log("error:", err); res.status(500).send(err)})
   }).catch((err) => {res.status(401).send(err)}) 
+})
+
+app.get("/group/:groupId", (req, res) => { 
+  // db.authenticate(req.cookies.token).then((uid) => {
+    db.getGroup(req.params.groupId)
+    .then((group) => res.send(group))
+    .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  // }).catch((err) => {res.status(401).send(err)}) 
 })
 
 app.post("/group", (req, res) => {
@@ -162,6 +170,12 @@ app.post('/group/:groupId/pairs', (req, res) => { // done
 
 app.get('/generation/:uid', (req, res) => { // done
   db.getGenerationByUid(req.params.uid)
+  .then((resp) => res.send(resp))
+  .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+})
+
+app.get('/user/:uid', (req, res) => { // done
+  db.getUserData(req.params.uid)
   .then((resp) => res.send(resp))
   .catch((err) => {console.log("error:", err); res.status(500).send(err)})
 })

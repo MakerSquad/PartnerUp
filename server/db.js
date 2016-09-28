@@ -60,6 +60,12 @@ knex.getGroups = (userUid) => {
     }).catch((err) => {throw new Error("where in is broken at get groups, "+ err)}) // throw error if something went horribly wrong
   }).catch((err) => {throw new Error("cannot access group_membership, "+ err)}) // throw error if something went horribly wrong
 }
+
+knex.getGroup = (groupId) =>{
+  return knex('groups').where("id", groupId).returning("*")
+  .then((group) => group[0])
+  .catch((err) => {throw new Error("cannot access groups, "+ err)}) // throw error if something went horribly wrong
+}
 /**
   @params:group= {members: [{
     user_uid: (string)
@@ -233,6 +239,7 @@ knex.getMemberships = (groupId) => {
   .then((students) => students)
   .catch((err) => {throw new Error("cannot get membeships for that group, "+ err)}) // throw error if something went horribly wrong
 }
+
 /**
   @params: groupId = (int) group id
   return: return { object for most current generation
@@ -260,5 +267,17 @@ knex.getNewGen = (groupId) => {
   }).catch((err) => {throw new Error("cannot find gen_id, "+ err)}) // throw error if something went horribly wrong
 }
 
+/**
+  @params: groupId = (int) group id
+  return: return { an array of these students for group
+    Role: (string) role (admin or member)
+    UserUid: (string) user uid from makerpass 
+  }
+*/
+knex.getUserData = (userUid) => {
+  return knex('pairs').where('user1_uid', userUid).orWhere('user2_uid', userUid).returning("*")
+  .then((students) => students)
+  .catch((err) => {throw new Error("cannot get membeships for that group, "+ err)}) // throw error if something went horribly wrong
+}
 module.exports = knex;
 
