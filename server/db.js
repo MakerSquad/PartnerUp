@@ -1,6 +1,6 @@
 var pg = require('pg');
 var config = require('../knexfile.js')
-var env = process.env.NODE_ENV || 'production';
+var env = process.env.NODE_ENV || 'development';
 var knex = require('knex')(config[env]);
 
 

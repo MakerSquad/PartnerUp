@@ -1,6 +1,15 @@
 var path = require('path');
 
 module.exports = { 
+    development :{
+      client: 'pg',
+      connection: {
+        database: 'partner_up_dev'
+      },
+      migrations: {
+        tableName: 'knex_migrations'
+      }
+    },
     production : {
       client: 'pg',
       connection: {
