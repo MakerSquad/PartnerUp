@@ -1,8 +1,11 @@
 <div loading ng-show="loading"></div>
 <div class='history fade' ng-show="!loading">
+<div class ="histBlack">
 <button class="signouthist" ng-click='signOut()'>Logout</button>
 <button class='goHome' ng-click='goHome()'>Back to PartnerUp</button>
-<h1>{{currClassName}}'s History</h1>
+<h1 class="genTit">{{currClassName}}'s History</h1>
+</div>
+<div class="histMargin">
 <button class='deleteAll' ng-click="deleteAllGen() ">Delete All History</button>
 <br>
 <select ng-model="classSelect" ng-options="class as class.name for class in mainState.classes" ng-change="changeClass(classSelect)">
@@ -17,6 +20,7 @@
 
     <div ng-repeat='generation in generations| filter: {title: search}' ng-click='setGen(generation)' ng-class='{selectedGen: generation.title === currGen}' class="generations">{{generation.title}}
     </div>
+  </div>
   </div>
 
   <div class="content">

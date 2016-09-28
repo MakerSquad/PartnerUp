@@ -1,7 +1,30 @@
 
 .history{
-  margin-left:20px;
+/*  margin-left:20px;*/
   font-family: 'Josefin Sans', sans-serif;
+}
+.histBlack{
+  background-color:black;
+  position:absolute;
+   top:0;
+  height: 70px;
+  width: 100%;
+  margin-bottom:20px;
+}
+.histMargin{
+  /*margin: 20px;*/
+  margin-top: 20px;
+  padding-top:10px;
+  padding-left:10px;
+  border-right: solid;
+  width: 250px;
+  height: 100%;
+  position: absolute;
+  top:50px;
+  background-color: #c2c3c4;
+  border-bottom: solid;
+
+ 
 }
 .changers{
   background-color: cornflowerblue;
@@ -16,15 +39,19 @@
    border: none;
 }
 .goHome{
+  margin-top:20px;
+  margin-bottom:20px;
+  margin-left:5px;
+  margin-right:5px;
   background-color: cornflowerblue;
   color:white;
   border-radius: 5px;
   float: right;
-  margin-bottom:10px;
-  height:35px;
-  width: 150px;
+  /*margin-bottom:10px;*/
+ height:30px;
+  width: 125px;
   font-size:12px;
-  margin-right: 100px;
+  /*margin-right: 100px;*/
      box-shadow:none;
    border: none;
 }
@@ -149,6 +176,7 @@ background-color: red;
   width: 125px;
   font-size:12px;
      box-shadow:none;
+
    border: none;
 
 }
@@ -178,6 +206,8 @@ background-color: red;
    border: none;
 }
 .signouthist{
+  margin-top:20px;
+  margin-bottom:20px;
   float: right;
   background-color: cornflowerblue;
   color:white;
@@ -188,3 +218,7 @@ background-color: red;
    box-shadow:none;
    border: none;
 }
+.genTit{
+  color:white;
+  text-align: center;
+}*/*/

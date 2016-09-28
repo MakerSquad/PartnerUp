@@ -1,8 +1,36 @@
+.mainBlack{
+  background-color: black;
+
+  position:absolute;
+   top:0;
+  height: 70px;
+  width: 100%;
+  margin-bottom:20px;
+}
+.mainMargin{
+  /*margin: 20px;*/
+  margin-top: 20px;
+  padding-top:10px;
+  padding-left:10px;
+  border-right: solid;
+  width: 250px;
+  height: 2500px;
+  position: absolute;
+  top:50px;
+  background-color: #c2c3c4;
+  border-bottom: solid;
+
+ 
+}
 .welcomeMain{
   text-align: center;
+  color: white;
+  width: 100%;
 }
 .signout{
-  margin-bottom: 20px
+  margin-top: 20px;
+  margin-bottom: 20px;
+
 }
 .studentGroups{
   display: inline;
@@ -99,7 +127,8 @@
 
 .main{
   font-family: 'Josefin Sans', sans-serif;
-  margin:20px;
+  height: 100%;
+
 }
 
 
@@ -205,7 +234,7 @@
   border: 1px solid cornflowerblue;
   border-radius: 25px;
   padding: 10px;
-  width: 12%;
+  width: 80%;
   background-color: rgba(64, 95, 237, .1); 
 }
 
@@ -213,7 +242,7 @@
   border: 1px solid cornflowerblue;
   border-radius: 25px;
   padding: 10px;
-  width: 10%; 
+  width: 80%; 
   margin-top: 15px;
   background-color: rgba(64, 95, 237, .1); 
 }

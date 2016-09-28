@@ -1,8 +1,13 @@
-<div ng-show="initialized && !creatingGroup" class='main fade'>
-  <button class="signout" ng-click="signOut()">Log out</button>
-  <h1 class="welcomeMain">Welcome, {{currentUser.uid === "90b72025841d" ? "Gilby" : currentUser.uid === '2a97b80a545a' ? "Jam Jam" : currentUser.name ||  "Gilby"}}!</h1>
 
+<div ng-class="{toBackground: creatingGroup}" ng-show="initialized" class='main fade'>
+<div class="mainBlack">
+  <button class="signout" ng-click="signOut()">Log out</button>
+  <h1 class="welcomeMain">Welcome, {{currentUser.name.includes("Gilbert") ? "Gilby" : currentUser.name.includes("Jamie Sowder") ? "Jam Jam" : currentUser.name.includes("Patrick Daly") ? "P-dale" : currentUser.name ||  "Gilby"}}!</h1>
+  </div>
+  
+  <div class="mainMargin">
   <!--Control buttons-->
+  
   <div class="controls">
     <div class='currClass'>Current pool: {{currentClass.name}}</div>
     <select ng-model="currentClass" ng-options="class as class.name for class in classes" ng-change="changeClass()">
@@ -23,7 +28,7 @@
   </div>
 
   <!--Lists of people in the current class-->
-  <div loading ng-show="loadingList" class="listLoad"></div>
+ <!--  <div loading ng-show="loadingList" class="listLoad"></div>
   <div class="peopleList" ng-show="!loadingList && currentClass">
       <h2 class="instructorTitle">Instructors: </h2>
     <div class="instructorList">
@@ -32,7 +37,8 @@
       <h2 class="fellowTitle">Fellows: </h2>
     <div class="fellowList">
         <div class="fellow" ng-repeat="fellow in fellows">{{fellow.user.name}}</div>
-    </div>
+    </div> -->
+    <div class="studiv">
       <h2>Students: </h2> 
     <div class="studentList">
       <div class="student" ng-repeat="student in students"><button class="addOrRemove" ng-click="removeFromStudent(student);" ng-hide="stuView">x</button>{{student.user.name}}</div>
@@ -42,6 +48,7 @@
       <div ng-repeat="nopair in noPair"><button class="addOrRemove" ng-click="addStudentBackIn(nopair);">o</button>{{nopair.user.name}}
       </div>
     </div>
+  </div>
   </div>
 
   <!--The table of current groupings-->
@@ -76,6 +83,7 @@
     
     <button class="clipyclip mainCopy" data-clipboard-target="#partners">copy me</button>
   </div>
+</div>
 </div>
 
 
