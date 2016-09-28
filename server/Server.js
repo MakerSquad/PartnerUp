@@ -19,15 +19,11 @@ AuthPort.createServer({
 })
  
 AuthPort.on('auth', (req, res, data) => {
-  // console.log("OAuth success! user logged:", data.user);
-  // req.session.accessToken = data.token;
-  // req.session.uid = data.data.user.uid;
-  // req.session.user = data.data.user;
-  db.addToken(data.token, data.data.user.uid)
+  db.addToken(data.token, data.data.user.uid) // adds token to db
     .then((e) => {
-      // console.log("data in auth", data)
+      console.log("OAuth success! user logged:", data.user); // tell server when someone logs in
       res.send(data)
-    })
+    }).catch((err) => {console.log("auth error:", err); res.status(500).send(err)})
 })
  
 AuthPort.on('error', (req, res, data) => {
@@ -58,155 +54,109 @@ app.get('/style.css', LESS.serve('./client/style/index.less'))
 app.get("/auth/:service", AuthPort.app);
 
 app.get("/signout", (req, res) =>{
-  req.session.destroy();
-  res.redirect("/")
+  req.session.destroy(); // clears session on logout
+  res.redirect("/");
 })
 
 app.get("/currentUser", (req, res) =>{
-  MP.me(req.cookies.token)
-    .then((user) => {
-      console.log('user: ', user);
-      res.send(user)
-    })
+  MP.me(req.cookies.token) // MakerPass call to get personal data based on token
+    .then((user) => res.send(user)) // sends user object
 })
 
-app.get("/myGroups", (req, res) => {  
+app.get("/cohorts", (req, res) => { // done
   db.authenticate(req.cookies.token).then( (uid) => {
     MP.user.groups(uid.user_uid, req.cookies.token)    
-    .then((data)=> { 
-      db.addGroups(data)
-        .then((groups) => res.send(groups))
-        .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-    }).catch((err) => {res.status(401).send(err)})   
+    .then((data) => res.send(data))
+    .catch((err) => {res.status(401).send(err)})   
   }).catch((err) => {res.status(401).send(err)}) 
 })
 
+app.get("/groups", (req, res) => { 
+  db.authenticate(req.cookies.token).then((uid) => {
+    db.getGroups(uid)
+    .then((groups) => res.send(groups))
+    .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  }).catch((err) => {res.status(401).send(err)}) 
+})
 
-app.get("/:groupUid/recent", (req, res) => {
-  db.authenticate(req.cookies.token)
-  .then(() => 
-  db.getGroup({mks_id: req.params.groupUid})
-    .then((group) => 
-      db.getNewGen(group.id)
-      .then((newGen) => 
-        res.send(newGen)
-      ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-    ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+app.get("/group/:groupId/recent", (req, res) => { // done
+  db.authenticate(req.cookies.token).then((uid) => 
+      db.getNewGen(req.params.groupId)
+      .then((newGen) => res.send(newGen))
+      .catch((err) => {console.log("error:", err); res.status(500).send(err)})
   ).catch((err) => {res.status(401).send(err)}) 
 })
 
-app.get('/:groupUid/generations', (req,res) => {
-  db.authenticate(req.cookies.token)
-  .then(() => db.getGroup({mks_id: req.params.groupUid})
-    .then((group) => 
+app.get('/group/:groupId/generations', (req,res) => { // done
+  db.authenticate(req.cookies.token).then(() => 
       db.getGenerationsByGroup(group.id)
-      .then((generations) => {
-          res.send(generations);
-      }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-    ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+      .then((generations) => res.send(generations))
+      .catch((err) => {console.log("error:", err); res.status(500).send(err)})
   ).catch((err) => {res.status(401).send(err)})
 })
 
-app.delete("/:groupUid/generation/:genId", (req, res) => {    
+// app.delete("/:groupUid/generation/:genId", (req, res) => {    
+//   db.authenticate(req.cookies.token)
+//   .then((userUid) => db.getGroup({mks_id: req.params.groupUid})
+//     .then((group) => 
+//       db.deleteGeneration(group.id, req.params.genId)
+//       .then((e) => {
+//           res.status(202).send(e);
+//       }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+//     ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+//   ).catch((err) => {res.status(401).send(err)})
+// })    
+
+app.get("/group/:groupId/members", (req, res) => {  // done  
   db.authenticate(req.cookies.token)
-  .then((userUid) => db.getGroup({mks_id: req.params.groupUid})
-    .then((group) => 
-      db.deleteGeneration(group.id, req.params.genId)
-      .then((e) => {
-          res.status(202).send(e);
-      }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-    ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  .then((uid) => db.getMemberships(req.params.groupId)
+    .then((students) => res.send(students))   
+    .catch((err) => {console.log("error:", err); res.status(500).send(err)})
   ).catch((err) => {res.status(401).send(err)})
 })    
 
-app.get("/:groupUid/members", (req, res) => {    
+app.get('/group/:groupId/pairs', (req,res) => { // done
   db.authenticate(req.cookies.token)
-  .then(() => {db.getGroup({mks_id: req.params.groupUid})
-    .then((group) => {
-      MP.memberships(group.mks_id, req.cookies.token)    
-      .then((students) => {   
-        res.send(students);   
-      }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-    }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => {res.status(401).send(err)})
-})    
-
-app.get('/:groupUid/pairs', (req,res) => {
-  db.authenticate(req.cookies.token)
-  .then(() => {
-    console.log(req.params.groupUid)
-    db.getGroup({mks_id: req.params.groupUid})
-    .then(data => {
-      db.getPairsForGroup(data.id, req.params.groupName)
+  .then((uid) => db.getPairsForGroup(req.params.groupId)
       .then((pairs) => res.send(pairs))
       .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-    }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => res.status(401).send(err))
+  ).catch((err) => res.status(401).send(err))
 })
 
-app.post('/:groupUid/pairs', (req, res) => {
+app.post('/group/:groupId/pairs', (req, res) => { // done
   db.authenticate(req.cookies.token)
-  .then(() => {
-    db.addPairs(req.body, req.params.groupUid).then(data => 
+  .then((uid) => 
+    db.addPairs(req.body, req.params.groupId).then(data =>
       res.status(201).send(data)
     ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => res.status(401).send(err))
+  ).catch((err) => res.status(401).send(err))
 })
 
-app.delete('/:groupUid/deletePairs', (req, res) => {
-  db.authenticate(req.cookies.token)
-  .then(() => {
-    db.getGroup({mks_id: req.params.groupUid})
-      .then((groupData) => {
-        console.log('hey looky looky ', groupData.id)
-        db.resetPairs(groupData.id)
-        .then((confirm) => res.status(202).send(confirm))
-        .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-      }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => {console.log("error:", err); res.status(401).send(err)})
-})
+// app.delete('/:groupUid/pairs', (req, res) => {
+//   db.authenticate(req.cookies.token)
+//   .then(() => {
+//     db.getGroup({mks_id: req.params.groupUid})
+//       .then((groupData) => {
+//         console.log('hey looky looky ', groupData.id)
+//         db.resetPairs(groupData.id)
+//         .then((confirm) => res.status(202).send(confirm))
+//         .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+//       }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+//   }).catch((err) => {console.log("error:", err); res.status(401).send(err)})
+// })
 
-app.get('/:groupUid/badPairs', (req,res) => {
-  db.authenticate(req.cookies.token)
-  .then(() => {
-    console.log(req.params.groupUid)
-    db.getGroup({mks_id: req.params.groupUid})
-    .then(data => {
-      db.getBadPairsForGroup(data.id)
-      .then((pairs) => res.send(pairs))
-      .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-    }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => res.status(401).send(err))
-})
-
-app.post('/:groupUid/badPairs', (req, res) => {
-  db.authenticate(req.cookies.token)
-  .then(() => {
-    db.addBadPairs(req.body, req.params.groupUid).then(data => 
-      res.status(201).send(data)
-    ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => res.status(401).send(err))
-})
-
-app.delete('/:groupUid/deleteBadPairs', (req, res) => {
-  db.authenticate(req.cookies.token)
-  .then(() => {
-    db.getGroup({mks_id: req.params.groupUid})
-      .then((groupData) => {
-        console.log('hey looky looky ', groupData.id)
-        db.resetBadPairs(groupData.id)
-        .then((confirm) => res.status(202).send(confirm))
-        .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-      }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => {console.log("error:", err); res.status(401).send(err)})
+app.get('/generation/:uid', (req, res) => { // done
+  db.getGenerationByUid(req.params.uid)
+  .then((resp) => res.send(resp))
+  .catch((err) => {console.log("error:", err); res.status(500).send(err)})
 })
 
 app.get('/test', (req, res) => {
   // console.log('session: ', req.session)
- db.addPairs(req.body.name)
+  db.getPairsForGroup('1')
   .then((d) => {
      res.send(d)
-  }).catch((err) => res.status(401).send(err))
+  }).catch((err) => res.status(500).send(err))
 })
 
 app.get('/test2', (req, res) => {
@@ -215,8 +165,7 @@ app.get('/test2', (req, res) => {
 })
 
 app.post('/test1', (req, res) => {
-  // console.log('session: ', req.session)
-  db.addToken(req.body.user, req.body.token).then( (d) => res.send(d))
+  db.getTables().then((d) => res.send(d))
   .catch((err) => res.send(err));
 })
 
