@@ -65,7 +65,7 @@ app.get("/currentUser", (req, res) =>{
 
 app.get("/cohorts", (req, res) => { // done
   db.authenticate(req.cookies.token).then( (uid) => {
-    MP.user.groups(uid.user_uid, req.cookies.token)    
+    MP.user.groups(uid, req.cookies.token)    
     .then((data) => res.send(data))
     .catch((err) => {res.status(401).send(err)})   
   }).catch((err) => {res.status(401).send(err)}) 
