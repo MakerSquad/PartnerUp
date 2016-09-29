@@ -101,6 +101,21 @@ knex.addGroup = (group) => {
   })
 }
 
+knex.deleteGroup = (groupId) => {
+  // return knex('groups').where('id', groupId).del()
+  // .then(() => {
+  //   return knex('group_membership').where('group_id', groupId).del()
+  //   .then(() => {
+  //     return knex('generations').where('group_id', groupId).returning('gen_id')
+  //     .then((genIds) => {
+  //       for(var i = 0, )
+  //       return 
+  //     })
+  //   })
+  // })
+}
+
+
 /**
   @params: pairData = ({
     'pairs': (array)       [(user1_uid, user2_uid), (user1_uid, user2_uid), ...] array of 2 user ids in order,
@@ -124,6 +139,18 @@ knex.addPairs = (pairData, groupId) => {
         .then((e) => ('pairs added')) // returns string for client that pair is added
         .catch((err) => {throw new Error("Batch Inrest Failed due to: "+ err)}) // throw error if something went horribly wrong
     }).catch((err) => {throw new Error("Unable to create generation, "+ err)}) // throw error if something went horribly wrong
+}
+
+/**
+  @params: pairData = ({
+    'pairs': (array)[(user1_uid, user2_uid), (user1_uid, user2_uid), ...],
+    'genTitle': (string)title,
+    'groupSize': (integer)groupSize
+  }, (string)groupName)
+  return: 201 or error
+*/
+knex.addBadPairs = (pairData, GroupUid) => {
+  //return knex('bad_pairs').insert({})
 }
 
 /**

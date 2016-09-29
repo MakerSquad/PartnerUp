@@ -102,6 +102,15 @@ app.post("/group", (req, res) => {
   }).catch((err) => {res.status(401).send(err)}) 
 })
 
+app.delete("/group/:groupId", (req, res) => {
+   db.authenticate(req.cookies.token).then((uid) => {
+    db.deleteGroup(req.params.groupId)
+    .then((resp) => {
+      res.send(resp)
+    }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  }).catch((err) => {res.status(401).send(err)}) 
+})
+
 app.get("/group/:groupId/recent", (req, res) => { // done
   db.authenticate(req.cookies.token).then((uid) => 
       db.getNewGen(req.params.groupId)
