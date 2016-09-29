@@ -83,7 +83,7 @@ knex.addGroup = (group) => {
   return knex('groups').where('name', group.groupData.name).returning('id')
   .then((id) => {
     if(id.length === 0) {
-      return knex('groups').insert({name: group.groupData.name, group_size: group.groupData.size}).returning('id')
+      return knex('groups').insert({name: group.groupData.name, group_size: group.groupData.group_size}).returning('id')
       .then((id) => {
         for(var i = 0, rows = []; i < group.members.length; i++) {
           rows.push({
