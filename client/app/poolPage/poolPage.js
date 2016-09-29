@@ -15,6 +15,8 @@ angular.module('PU.poolPage', ['PU.factories'])
   $scope.stuView = false;
   $scope.currentUser;
   $scope.creatingGrouping = false;
+  $scope.selectedForSwap = null;
+  $scope.selectedForSwapIndex = null;
   $scope.noRepeats = true;
   $scope.idMap = {};
   var groupSize = 2;
@@ -36,7 +38,7 @@ angular.module('PU.poolPage', ['PU.factories'])
           var partOfGroup = false;
           for(var i = 0; i < members.length; i++){
             if(members[i].role === 'student'){
-              if(members[i].uid === $scope.currentUser.uid){
+              if(members[i].user.uid === $scope.currentUser.uid){
                 $scope.stuView = true;
                 partOfGroup = true;
               }
@@ -44,7 +46,7 @@ angular.module('PU.poolPage', ['PU.factories'])
               console.log("Students: ", $scope.students);
             }else if(members[i].role === 'fellow' || members[i].role === 'instructor'){
               $scope.admins.push(members[i]);
-              if(members[i].uid === $scope.currentUser.uid){
+              if(members[i].user.uid === $scope.currentUser.uid){
                 partOfGroup = true;
               }
             }
@@ -389,6 +391,72 @@ angular.module('PU.poolPage', ['PU.factories'])
     if(!$scope.searchHist) return true;
     var search = $scope.searchHist.toLowerCase();
     return grouping.generationData.title.toLowerCase().includes(search)
+  }
+
+  //Functions for rearranging students
+
+  /**
+  * selectForSwap takes in a student object from groups. If another student is currently selected, they will be swapped
+  * If no other student is currently selected, the passed in student will be selected
+  * If the student passed in is the same as the currently selected student, they will be unselected
+  * Students that have been locked in place cannot be selected
+  * @param student The student object that has been selected
+  */
+
+  $scope.selectForSwap = function(student){
+    if($scope.stuView){
+      return;
+    }
+    if($scope.lockedStus[student.user.uid]){
+      alert("This student has been locked into a group; please unlock them before moving them around");
+      return;
+    }
+    var selectedIndex = searchForSelected(student);
+    if($scope.selectedForSwap === student){
+      $scope.selectedForSwap = null;
+      $scope.selectedForSwapIndex = null;
+    }else if($scope.selectedForSwap === null){
+      $scope.selectedForSwap = student;
+      $scope.selectedForSwapIndex = selectedIndex;
+    }else{
+      swapStus(selectedIndex, $scope.selectedForSwapIndex);
+      $scope.selectedForSwap = null;
+      $scope.selectedForSwapIndex = null;
+      if($scope.finalized){
+        alert("Note: the groups have already been finalized; any manual edits will not be recorded")
+      }
+    }
+    checkClashes();
+  }
+
+  /**
+  * searchForSelected is a helper function for selectForSwap
+  * searchForSelected takes in a student object and searches the groups for its index
+  * @param student The student object to search for
+  * @return The index tuple for the student's location in groups; if the student is not found, returns undefined
+  */
+
+  var searchForSelected = function(student){
+    for(var i = 0; i < $scope.groups.length; i++){
+      for(var j = 0; j < $scope.groups[i].length; j++){
+        if($scope.groups[i][j] === student){
+          return [i, j];
+        }
+      }
+    }
+  }
+
+  /**
+  * swapStus is a helper function for selectForSwap
+  * swapStus takes in 2 index tuples from $scope.groups and swaps the students in those locations
+  * @param indexTuple1 The index of the first student selected to swap
+  * @param indexTuple2 The index of the second student selected to swap
+  */
+
+  var swapStus = function(indexTuple1, indexTuple2){
+    var tmp = $scope.groups[indexTuple1[0]][indexTuple1[1]];
+    $scope.groups[indexTuple1[0]][indexTuple1[1]] = $scope.groups[indexTuple2[0]][indexTuple2[1]]
+    $scope.groups[indexTuple2[0]][indexTuple2[1]] = tmp;
   }
 
 })
