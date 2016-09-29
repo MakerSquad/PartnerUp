@@ -147,7 +147,11 @@ app.get("/group/:groupId/members", (req, res) => {  // done
       for(var i=0, people =''; i<students.length; i++) people += (students[i].user_uid + "+");
       MP.Memberships.get('/users/'+people.substring(0,people.length-1), req.cookies.token)
         .then((users)=> {
-          for(let i=0; i<students.length; i++) students[i].user = users[i];
+          var usersSeen = {};
+          for(let i=0; i < users.length; i++){
+            usersSeen[users[i].uid] = users[i];
+          }
+          for(let i=0; i<students.length; i++) students[i].user = usersSeen[students[i].user_uid];
           res.send(students)
         }).catch((err) => res.status(500).send(err))
     }).catch((err) => {console.log("error:", err); res.status(500).send(err)})

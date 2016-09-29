@@ -53,7 +53,10 @@ angular.module('PU.poolPage', ['PU.factories'])
           if(!partOfGroup){
             $scope.stuView = true;
           }
-          refreshGroupings();
+          refreshGroupings()
+          .then(function(){
+            $scope.loading = false;
+          });
         })
     })
     })
@@ -317,6 +320,7 @@ angular.module('PU.poolPage', ['PU.factories'])
 
   $scope.finalize = function(){
     $scope.loading = true;
+    $scope.creatingGrouping = false;
     if($scope.groupingName && $scope.groupingName.length){      
       var newPairs = [];
       for(var i = 0; i < $scope.groups.length; i++){
@@ -334,10 +338,12 @@ angular.module('PU.poolPage', ['PU.factories'])
           }
         }
       }
-      refreshGroupings()
+      DB.addPairs($scope.currPool, newPairs, $scope.groupingName, groupSize)
       .then(function(){
-        $scope.loading = false;
-        $scope.creatingGrouping = false;
+        refreshGroupings()
+        .then(function(){
+          $scope.loading = false;
+        })
       })
       //$scope.groupingName = "";
     }else{
@@ -379,5 +385,10 @@ angular.module('PU.poolPage', ['PU.factories'])
     return -1;
   }
 
+  $scope.filterGroupingsByName = function(grouping){
+    if(!$scope.searchHist) return true;
+    var search = $scope.searchHist.toLowerCase();
+    return grouping.generationData.title.toLowerCase().includes(search)
+  }
 
 })

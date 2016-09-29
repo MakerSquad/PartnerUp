@@ -17,10 +17,11 @@
   </table>
   <button class="finalize" ng-click="finalize()">Finalize Grouping</button>
 </div>
-<div class="history">
+<div loading ng-show="loading"></div>
+<div class="history" ng-show="!loading">
   <input ng-model="searchHist" placeholder="Search groupings">
-  <div class="pastGrouping" ng-repeat="grouping in pastGroupings | filter : grouping.generationData.title.includes(searchHist)">
-    <div class="groupingTitle">{{grouping.generationData.title}}</div>
+  <div class="pastGrouping" ng-repeat="grouping in pastGroupings | filter : filterGroupingsByName">
+    <h3 class="groupingTitle">{{grouping.generationData.title}}</h3>
     <table unselectable="on" class="pair unselectable" id="pair">
       <tr ng-repeat='grp in grouping.groups'>
         <td class="indPair" ng-repeat='partner in grp'>

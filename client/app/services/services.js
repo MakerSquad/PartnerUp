@@ -151,8 +151,14 @@ angular.module('PU.factories', [])
         groupSize: groupSize
       }
     })
-    .then(resp => resp.data)
-    .catch(err => err)
+    .then(resp => {
+      console.log("Success posting pairs!")
+      return resp.data
+    })
+    .catch(err => {
+      console.error("Error: ", err);
+      throw err;
+    })
   }
 
   var getGroupings = function(cls){
