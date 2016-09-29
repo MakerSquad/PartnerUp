@@ -163,18 +163,6 @@ knex.addBadPairs = (pairData, GroupUid) => {
 }
 
 /**
-  @params: pairData = ({
-    'pairs': (array)[(user1_uid, user2_uid), (user1_uid, user2_uid), ...],
-    'genTitle': (string)title,
-    'groupSize': (integer)groupSize
-  }, (string)groupName)
-  return: 201 or error
-*/
-knex.addBadPairs = (pairData, GroupUid) => {
-  //return knex('bad_pairs').insert({})
-}
-
-/**
   @params: pairData = uid (string) generation uid
    
   return: {
@@ -221,11 +209,12 @@ function addGeneration(genData) {
 }
 
 
-knex.getTables2 = () => {
-  return knex('group_membership').returning('*')
-}
+
 knex.getTables = () => {
-  return knex('auth').returning('*')
+  return knex('generations').returning('*')
+}
+knex.getTables2 = () => {
+  return knex('pairs').returning('*')
 }
 
 /**
@@ -253,9 +242,8 @@ knex.getPairsForGroup = (groupId) => {
         .then((pairs) => {
           for(var i=0, data = []; i<gens.length; i++){
               data.push({generationData: gens[i], pairs: [] })
-              for(var j=0; j<pairs.length; j++){
-                if(pairs[j].gen_table_id) data[i].pairs.push(pairs[j]);
-              }
+              for(var j=0; j<pairs.length; j++)
+                if(pairs[j].gen_table_id == gens[i].id) data[i].pairs.push(pairs[j]);
           }
           return data
         }).catch((err) => {throw new Error("cannot find pairs for those gens, "+ err)})  // throw error if something went horribly wrong 
@@ -326,8 +314,49 @@ knex.getNewGen = (groupId) => {
 */
 knex.getUserData = (userUid) => {
   return knex('pairs').where('user1_uid', userUid).orWhere('user2_uid', userUid).returning("*")
-  .then((students) => students)
-  .catch((err) => {throw new Error("cannot get membeships for that group, "+ err)}) // throw error if something went horribly wrong
+  .then((students) => {
+    for(var i=0, genIds =[]; i<students.length ;i++) genIds.push(students[i].gen_table_id);
+    return knex('generations').whereIn('id', genIds).returning("*")
+    .then((generations) =>{
+      for(var i=0, groupIds =[]; i<students.length ;i++) groupIds.push(students[i].gen_table_id); 
+      return knex('groups').whereIn('id', groupIds).returning("*")
+      .then((groups) => {
+        for(var i=0, data =[]; i<students.length; i++) {
+          var generation = generations[findItemById(generations, students[i].gen_table_id)]
+          var group = groups[findItemById(groups, generation.group_id)]
+          data.push({
+            user1_uid : students[i].user1_uid,
+            user2_uid : students[i].user2_uid,
+            generations : generation,
+            group : group,
+          })
+        }
+        return data
+      })
+    })
+  }).catch((err) => {throw new Error("cannot get membeships for that group, "+ err)}) // throw error if something went horribly wrong
+}
+
+function findItemById(array, id){
+  var low = 0;
+  var high = array.length - 1;
+  var found = false;
+  while(!found){
+    var mid = Math.floor((high + low) /2)  
+    if(array[high].id === id) return high;
+    if(array[low].id === id) return low;  
+    if(array[mid].id === id) return mid;  
+    else if(array[mid].id > id){
+      if(high === mid) break;
+      high = mid;
+    }   
+    else if(array[mid].id < id){
+      if(low === mid) break;
+      low = mid;
+    }
+  }
+  return -1;
+
 }
 module.exports = knex;
 

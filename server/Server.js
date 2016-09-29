@@ -208,7 +208,7 @@ app.get('/test2', (req, res) => {
     .catch((err) => res.send(err));
 })
 
-app.post('/test1', (req, res) => {
+app.get('/test1', (req, res) => {
   db.getTables().then((d) => res.send(d))
   .catch((err) => res.send(err));
 })
