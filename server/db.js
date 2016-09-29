@@ -16,7 +16,8 @@ knex.authenticate = (token) => {
   if(process.env.TEST_AUTH) return Promise.resolve(); // for test env
   return knex('auth').where('token', token).returning('user_uid') // check for token in auth 
     .then((userUid) => { // userUid is an array
-      if(userUid.length) return Promise.resolve(userUid[0]); // if user exist then resolve
+      console.log('userUid: ', userUid[0].user_uid)
+      if(userUid.length) return Promise.resolve(userUid[0].user_uid); // if user exist then resolve
       else return Promise.reject("401 Unauthorized, please make sure you are logged in"); // else send a 401 error   
     }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
 }
@@ -139,6 +140,18 @@ knex.addPairs = (pairData, groupId) => {
         .then((e) => ('pairs added')) // returns string for client that pair is added
         .catch((err) => {throw new Error("Batch Inrest Failed due to: "+ err)}) // throw error if something went horribly wrong
     }).catch((err) => {throw new Error("Unable to create generation, "+ err)}) // throw error if something went horribly wrong
+}
+
+/**
+  @params: pairData = ({
+    'pairs': (array)[(user1_uid, user2_uid), (user1_uid, user2_uid), ...],
+    'genTitle': (string)title,
+    'groupSize': (integer)groupSize
+  }, (string)groupName)
+  return: 201 or error
+*/
+knex.addBadPairs = (pairData, GroupUid) => {
+  //return knex('bad_pairs').insert({})
 }
 
 /**
