@@ -204,7 +204,7 @@ knex.getTables = () => {
   return knex('group_membership').returning('*')
 }
 knex.getTables2 = () => {
-  return knex('group_membership').returning('*')
+  return knex('auth').returning('*')
 }
 
 /**

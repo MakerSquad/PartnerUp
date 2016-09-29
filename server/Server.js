@@ -141,9 +141,16 @@ app.get('/group/:groupId/generations', (req,res) => { // done
 
 app.get("/group/:groupId/members", (req, res) => {  // done  
   db.authenticate(req.cookies.token)
-  .then((uid) => db.getMemberships(req.params.groupId)
-    .then((students) => res.send(students))   
-    .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  .then((uid) => 
+    db.getMemberships(req.params.groupId)
+    .then((students) => {
+      for(var i=0, people =''; i<students.length; i++) people += (students[i].user_uid + "+");
+      MP.Memberships.get('/users/'+people.substring(0,people.length-1), req.cookies.token)
+        .then((users)=> {
+          for(let i=0; i<students.length; i++) students[i].user = users[i];
+          res.send(students)
+        }).catch((err) => res.status(500).send(err))
+    }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
   ).catch((err) => {res.status(401).send(err)})
 })    
 
@@ -189,12 +196,11 @@ app.get('/user/:uid', (req, res) => { // done
   .catch((err) => {console.log("error:", err); res.status(500).send(err)})
 })
 
-app.get('/test', (req, res) => {
-  // console.log('session: ', req.session)
-  db.getPairsForGroup('1')
-  .then((d) => {
-     res.send(d)
-  }).catch((err) => res.status(500).send(err))
+app.post('/test', (req, res) => {
+  console.log('body: ', req.body)
+  MP.Memberships.get('/users/ab2bc0473a48+bfc5a48d77ae', req.body.token)
+  .then((e)=> res.send(e))
+  .catch((err) => res.status(500).send(err))
 })
 
 app.get('/test2', (req, res) => {
