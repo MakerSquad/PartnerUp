@@ -1,5 +1,5 @@
 <div class="headerBar">
-  <h2>{{"Welcome, " + nicknames[currentUser.uid] || currentUser.name}}</h2>
+  <h2>{{"Welcome, " + (nicknames[currentUser.uid] ? nicknames[currentUser.uid] : currentUser.name) + '!'}}</h2>
   <button class="navBtn" ng-hide="hideMyPools" ng-click="seeMyPools()">My Pools</button>
   <button class="navBtn" ng-hide="hideCreatePool" ng-click="goToCreatePool()">Create New Pool</button>
   <button class="navBtn" ng-click="signOut()">Sign Out</button>

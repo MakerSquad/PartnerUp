@@ -1,0 +1,34 @@
+<div header></div>
+<h3 ng-class="poolTitle">{{currPool.name}}</h3>
+<br>
+<button class="partnerUpBtn" ng-click="startNewGrouping()">Organize New Grouping</button>
+<div class="newGrouping slide" ng-show="creatingGrouping">
+  <input class="groupingName" ng-model="groupingName" placeholder="Enter title">
+  <button class="reroll" ng-click="randomize()">Re-roll</button>
+  <table id="partners" unselectable="on" class="unselectable"> 
+    <tr ng-repeat="group in groups" ng-class="{clash: clashes.includes(group)}" >
+      <td  ng-repeat="stu in group" ng-click="selectForSwap(stu)" ng-class="{selectedStu: selectedForSwap === stu, locked: lockedStus[stu.user.uid]}" class="stu"> 
+      <img src='{{stu.user.avatar_url}}' width='40px' height='50px'>
+        {{stu.user.name}}
+        <img src= "http://simpleicon.com/wp-content/uploads/lock-3.png" width='15px' height='15px' ng-show='lockedStus[stu.user.uid] === undefined' class="lockBtn" ng-click="toggleLockStu(stu)">
+        <img src= "http://image.flaticon.com/icons/svg/26/26053.svg" width='15px' height='15px' ng-show='lockedStus[stu.user.uid] !== undefined' class="lockBtn" ng-click="toggleLockStu(stu)">
+      </td>
+    </tr>
+  </table>
+  <button class="finalize" ng-click="finalize()">Finalize Grouping</button>
+</div>
+<div class="history">
+  <input ng-model="searchHist" placeholder="Search groupings">
+  <div class="pastGrouping" ng-repeat="grouping in pastGroupings | filter : grouping.generationData.title.includes(searchHist)">
+    <div class="groupingTitle">{{grouping.generationData.title}}</div>
+    <table unselectable="on" class="pair unselectable" id="pair">
+      <tr ng-repeat='grp in grouping.groups'>
+        <td class="indPair" ng-repeat='partner in grp'>
+          <img src='{{idMap[partner].user.avatar_url}}' width='40px' height='50px'>
+          {{idMap[partner].user.name}}
+        </td>
+      </tr>
+    </table>
+    <button class="clipyclip histclip" data-clipboard-target="#pair">copy me</button>
+  </div>
+</div>

@@ -102,6 +102,15 @@ angular.module('PU.factories', [])
 
 .factory('DB', function($http){
 
+  var getPool = function(poolId){
+    return $http({
+      method: 'GET',
+      url: `/group/${poolId}`
+    })
+    .then(resp => resp.data)
+    .catch(err => err)
+  }
+
   var getClasses = function(){
     return $http({
       method: 'GET',
@@ -114,16 +123,19 @@ angular.module('PU.factories', [])
   var getMemberships = function(cls){
     return $http({
       method: 'GET',
-      url: `/group/${cls.groupId}/members`,
+      url: `/group/${cls.id}/members`,
     })
-    .then(resp => resp.data)
+    .then(resp => {
+      console.log("Memberships response: ", resp);
+      return resp.data;
+    })
     .catch(err => err)
   }
 
   var getPairs = function(cls){
     return $http({
       method: 'GET',
-      url: `/group/${cls.groupId}/pairs`
+      url: `/group/${cls.id}/pairs`
     })
     .then(resp => resp.data)
     .catch(err => err)
@@ -132,7 +144,7 @@ angular.module('PU.factories', [])
   var addPairs = function(cls, pairs, genTitle, groupSize){
     return $http({
       method: 'POST',
-      url: `/group/${cls.groupId}/pairs`,
+      url: `/group/${cls.id}/pairs`,
       data: {
         pairs: pairs,
         genTitle: genTitle,
@@ -143,10 +155,10 @@ angular.module('PU.factories', [])
     .catch(err => err)
   }
 
-  var getGenerations = function(cls){
+  var getGroupings = function(cls){
     return $http({
       method: 'GET',
-      url:`/group/${cls.groupId}/generations`
+      url:`/group/${cls.id}/generations`
     })
     .then(resp => resp.data)
     .catch(err => err)
@@ -173,7 +185,7 @@ angular.module('PU.factories', [])
   var getRecentPairs = function(cls){
     return $http({
       method: 'GET',
-      url: `/group/${cls.groupId}/recent`
+      url: `/group/${cls.id}/recent`
     })
     .then(resp => resp.data)
     .catch(err => err)
@@ -196,11 +208,12 @@ angular.module('PU.factories', [])
     getMemberships: getMemberships,
     getPairs: getPairs,
     addPairs: addPairs,
-    getGenerations: getGenerations,
+    getGroupings: getGroupings,
     deleteGeneration: deleteGeneration,
     deleteAllGenerations: deleteAllGenerations,
     getRecentPairs: getRecentPairs,
-    createClass: createClass
+    createClass: createClass,
+    getPool: getPool
   }
   
 })

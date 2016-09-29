@@ -5,6 +5,7 @@ angular.module('PU', [
   'PU.home',
   'PU.createPool',
   'ngAnimate',
+  'PU.poolPage'
   ])
 .config(function($routeProvider, $httpProvider) {
   $routeProvider
@@ -19,6 +20,10 @@ angular.module('PU', [
   .when('/createPool', {
     templateUrl: 'createPool/createPool.html',
     controller: 'CreatePoolController'
+  })
+  .when('/pools/:poolId', {
+    templateUrl: 'poolPage/poolPage.html',
+    controller: 'PoolPageController'
   })
 })
 
@@ -45,6 +50,7 @@ angular.module('PU', [
           $location.path('/signin');
         }else{
           $scope.currentUser = user;
+          console.log("In header, currentUser: ", $scope.currentUser);
         }
       })
     }())
