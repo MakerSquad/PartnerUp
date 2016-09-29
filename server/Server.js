@@ -86,11 +86,11 @@ app.get("/groups", (req, res) => {
 })
 
 app.get("/group/:groupId", (req, res) => { 
-  // db.authenticate(req.cookies.token).then((uid) => {
+  db.authenticate(req.cookies.token).then((uid) => {
     db.getGroup(req.params.groupId)
     .then((group) => res.send(group))
     .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  // }).catch((err) => {res.status(401).send(err)}) 
+  }).catch((err) => {res.status(401).send(err)}) 
 })
 
 app.post("/group", (req, res) => {

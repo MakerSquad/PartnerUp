@@ -62,6 +62,14 @@ knex.getGroups = (userUid) => {
     }).catch((err) => {throw new Error("where in is broken at get groups, "+ err)}) // throw error if something went horribly wrong
   }).catch((err) => {throw new Error("cannot access group_membership, "+ err)}) // throw error if something went horribly wrong
 }
+/**
+  @params: groupId = (string) group id
+  return: return { 
+    groupId: (int) id,
+    groupName: (string) name
+    group_size: (int) the size
+    }
+*/
 
 knex.getGroup = (groupId) =>{
   return knex('groups').where("id", groupId).returning("*")
