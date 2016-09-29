@@ -120,8 +120,8 @@ app.get("/group/:groupId/recent", (req, res) => { // done
 })
 
 app.get('/group/:groupId/generations', (req,res) => { // done
-  db.authenticate(req.cookies.token).then(() => 
-      db.getGenerationsByGroup(group.id)
+  db.authenticate(req.cookies.token).then((uid) => 
+      db.getGenerationsByGroup(req.params.groupId)
       .then((generations) => res.send(generations))
       .catch((err) => {console.log("error:", err); res.status(500).send(err)})
   ).catch((err) => {res.status(401).send(err)})
