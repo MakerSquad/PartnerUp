@@ -3,6 +3,7 @@ angular.module('PU', [
   'ngRoute',
   'PU.signin',
   'PU.home',
+  'PU.createPool',
   'ngAnimate',
   ])
 .config(function($routeProvider, $httpProvider) {
@@ -52,7 +53,7 @@ angular.module('PU', [
       $location.path('/');
     }
 
-    $scope.createPool = function(){
+    $scope.goToCreatePool = function(){
       $location.path('/createPool');
     }
 

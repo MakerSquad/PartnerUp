@@ -1,6 +1,7 @@
 angular.module('PU.home', ['PU.factories'])
 
 .controller('HomeController', function ($scope, MakerPass, $location, $route, $http, StateSaver, DB, CurrentUser) {
+
 $scope.currentUser = {} //where we store the current user's information 
 $scope.pools = []; //where  we store the total amout of pools from the owner
 
@@ -8,6 +9,10 @@ $scope.showPools = function(){
  return DB.getClasses()
   .then(function(resp){console.log('showPools',resp);})
   .catch(function(err){console.log('showPools err',err);})
+}
+
+$scope.goToCreatePool = function(){
+  $location.path('/createPool')
 }
 
  var init = (function(){ //function that runs on load; it'll call all the fns to set up the page

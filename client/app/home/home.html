@@ -2,5 +2,5 @@
 <div class="home">
 <div ng-repeat="pool in pools" ng-show="pools.length">{{pool}}</div>
 <h3 class='noPools' ng-show="!pools.length">You have no open pools. Go create one now!</h3>
-<button>Create New Pool</button>
+<button ng-click="goToCreatePool()">Create New Pool</button>
 </div>

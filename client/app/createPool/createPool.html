@@ -1,0 +1,16 @@
+<div header></div> 
+<div>
+<h3>PoolName: <input ng-model="poolName"></h3>
+<h4>Pool Members</h4>
+<div ng-repeat="student in importedStudents">{{student.user.name}}<button ng-click='removeStudent(student)'>x</button></div>
+<select ng-model="currentCohort" ng-options="cohort as cohort.name for cohort in allCohorts" >
+<option value="">Choose a pool</option>
+</select>
+<button ng-click="importStudents()">Import Students</button>
+<h4>Group Size</h4>
+<select ng-init="groupSizeSelect = 2" ng-model="groupSizeSelect">
+<option ng-repeat="idx in getIndexArray(8)">{{idx+2}}</option>
+</select>
+<button ng-click='createPool()'>Create Pool</button>
+<button ng-click='getRequest()'>do it</button>
+</div>

@@ -13,7 +13,7 @@ angular.module('PU.factories', [])
   var getMemberships = function(cls){
     return $http({
       method: "GET",
-      url: `/${cls.mks_id}/members`,
+      url: `/cohort/${cls.uid}`,
     })
     .then((members) => members.data)
     .catch((err) => err)
@@ -179,8 +179,16 @@ angular.module('PU.factories', [])
     .catch(err => err)
   }
 
-  var createClass = function(){
+  var createClass = function(members, groupData){
     //TODO: make this do something
+    return $http({
+      method: 'POST', 
+      url: '/group',
+      data: {members: members,
+      groupData: groupData}
+    })
+    .then(resp => resp.data)
+    .catch(err => console.log('you fucked up',err))
   }
 
   return{
