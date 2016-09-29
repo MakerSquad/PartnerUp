@@ -14,7 +14,7 @@ knex.migrate.latest([config[env]]);
 */
 knex.authenticate = (token) => {
   if(process.env.TEST_AUTH) return Promise.resolve(); // for test env
-  return knex('auth').where('token', token).returning('user_uid') // check for token in auth 
+  return knex('auth').where('token', token) // check for token in auth 
     .then((userUid) => { // userUid is an array
       console.log('userUid: ', userUid[0].user_uid)
       if(userUid.length) return Promise.resolve(userUid[0].user_uid); // if user exist then resolve
@@ -111,17 +111,22 @@ knex.addGroup = (group) => {
 }
 
 knex.deleteGroup = (groupId) => {
-  // return knex('groups').where('id', groupId).del()
-  // .then(() => {
-  //   return knex('group_membership').where('group_id', groupId).del()
-  //   .then(() => {
-  //     return knex('generations').where('group_id', groupId).returning('gen_id')
-  //     .then((genIds) => {
-  //       for(var i = 0, )
-  //       return 
-  //     })
-  //   })
-  // })
+  return knex('groups').where('id', groupId).del()
+  .then(() => {
+    return knex('group_membership').where('group_id', groupId).del()
+    .then(() => {
+      return knex('generations').where('group_id', groupId).del().returning('*')
+      .then((genData) => {
+        console.log('genData: ', genData)
+        for(var i = 0, genIds = []; i < genData.length; i++) {
+          genIds.push(genData.id)
+        } 
+        return knex('pairs').whereIn('gen_table_id', genIds).del()
+        .then(() => 'group deleted')
+        .catch((err) => {throw new Error("cannot delete pairs from pairs table,"+ err)})  // throw error if something went horribly wrong 
+      }).catch((err) => {throw new Error("cannot delete generations from generations table, "+ err)})  // throw error if something went horribly wrong 
+    }).catch((err) => {throw new Error("cannot delete users from group membership table, "+ err)})  // throw error if something went horribly wrong 
+  }).catch((err) => {throw new Error("cannot delete group from groups table, "+ err)})  // throw error if something went horribly wrong 
 }
 
 
@@ -148,18 +153,6 @@ knex.addPairs = (pairData, groupId) => {
         .then((e) => ('pairs added')) // returns string for client that pair is added
         .catch((err) => {throw new Error("Batch Inrest Failed due to: "+ err)}) // throw error if something went horribly wrong
     }).catch((err) => {throw new Error("Unable to create generation, "+ err)}) // throw error if something went horribly wrong
-}
-
-/**
-  @params: pairData = ({
-    'pairs': (array)[(user1_uid, user2_uid), (user1_uid, user2_uid), ...],
-    'genTitle': (string)title,
-    'groupSize': (integer)groupSize
-  }, (string)groupName)
-  return: 201 or error
-*/
-knex.addBadPairs = (pairData, GroupUid) => {
-  //return knex('bad_pairs').insert({})
 }
 
 /**
