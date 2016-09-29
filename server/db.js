@@ -53,7 +53,8 @@ knex.getGroups = (userUid) => {
         fullData.push({
           id : resp[i].id,
           name : resp[i].name,
-          role : memData[i].role
+          role : memData[i].role,
+          size : resp[i].group_size
         })
       }
       return fullData
@@ -73,6 +74,7 @@ knex.getGroup = (groupId) =>{
   }],
     groupData: {
       name: (string)
+      group_size: (int)
     }
   }
   return: 'added groups to group table' or error
@@ -81,7 +83,7 @@ knex.addGroup = (group) => {
   return knex('groups').where('name', group.groupData.name).returning('id')
   .then((id) => {
     if(id.length === 0) {
-      return knex('groups').insert({name: group.groupData.name}).returning('id')
+      return knex('groups').insert({name: group.groupData.name, group_size: group.groupData.size}).returning('id')
       .then((id) => {
         for(var i = 0, rows = []; i < group.members.length; i++) {
           rows.push({
@@ -175,7 +177,7 @@ knex.getTables = () => {
   return knex('group_membership').returning('*')
 }
 knex.getTables2 = () => {
-  return knex('auth').returning('*')
+  return knex('group_membership').returning('*')
 }
 
 /**
