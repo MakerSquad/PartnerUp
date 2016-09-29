@@ -221,10 +221,10 @@ function addGeneration(genData) {
 }
 
 
-knex.getTables = () => {
+knex.getTables2 = () => {
   return knex('group_membership').returning('*')
 }
-knex.getTables2 = () => {
+knex.getTables = () => {
   return knex('auth').returning('*')
 }
 

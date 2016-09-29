@@ -7,7 +7,11 @@ $scope.pools = []; //where  we store the total amout of pools from the owner
 
 $scope.showPools = function(){
  return DB.getClasses()
-  .then(function(resp){console.log('showPools',resp);})
+  .then(function(data){
+    console.log('i make its here', data)
+    $scope.pools = data;
+    console.log($scope.pools)
+  })
   .catch(function(err){console.log('showPools err',err);})
 }
 
@@ -35,11 +39,11 @@ $scope.goToCreatePool = function(){
             }
           }
           Promise.all([
-            $scope.showPools(),
-            MakerPass.getCohorts()
+            $scope.showPools()
           ])
           .then(function(resolveData){
             console.log("Promises resolved");
+            console.log('resolveData', resolveData)
             // $scope.modalCohorts = resolveData[1];
             // $scope.initialized = true;
             console.log("Current scope: ", $scope);

@@ -2,7 +2,7 @@
 <div>
 <h3>PoolName: <input ng-model="poolName"></h3>
 <h4>Pool Members</h4>
-<div ng-repeat="student in importedStudents">{{student.user.name}}<button ng-click='removeStudent(student)'>x</button></div>
+<div ng-repeat="student in importedStudents" ng-if="student.role === 'student'">{{student.user.name}}<button ng-click='removeStudent(student)'>x</button></div>
 <select ng-model="currentCohort" ng-options="cohort as cohort.name for cohort in allCohorts" >
 <option value="">Choose a pool</option>
 </select>
