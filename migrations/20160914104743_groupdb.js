@@ -17,7 +17,6 @@ exports.up = (knex, Promise) => Promise.all([
   }),
   knex.schema.createTableIfNotExists('generations', table => {
     table.increments('id');
-    table.string('uid');
     table.integer('gen_id');
     table.string('title');
     table.integer('group_id');

@@ -19,11 +19,12 @@ AuthPort.createServer({
 })
  
 AuthPort.on('auth', (req, res, data) => {
-  db.addToken(data.token, data.data.user.uid) // adds token to db
-    .then((e) => {
-      console.log("OAuth success! user logged:", data.data.user); // tell server when someone logs in
-      res.send(data)
-    }).catch((err) => {console.log("auth error:", err); res.status(500).send(err)})
+  var token = hash(data.token)
+    db.addToken(token, data.data.user.uid) // adds token to db
+      .then((e) => {
+        console.log("OAuth success! user logged:", data.data.user); // tell server when someone logs in
+        res.send(data)
+      }).catch((err) => {console.log("auth error:", err); res.status(500).send(err)})
 })
  
 AuthPort.on('error', (req, res, data) => {
@@ -40,6 +41,7 @@ var MP = require('node-makerpass');
 var path = require('path');
 var db = require('./db');
 var bodyParser = require('body-parser');
+var hash = require('string-hash')
 
 app.use(bodyParser.json());
 app.use(session({secret: "funnyGilby"}));
@@ -193,12 +195,13 @@ app.get('/user/:uid', (req, res) => { // done
   .catch((err) => {console.log("error:", err); res.status(500).send(err)})
 })
 
-app.post('/test', (req, res) => {
-  console.log('body: ', req.body)
-  MP.Memberships.get('/users/ab2bc0473a48+bfc5a48d77ae', req.body.token)
-  .then((e)=> res.send(e))
-  .catch((err) => res.status(500).send(err))
-})
+// app.get('/test', (req, res) => {
+//   var id = hash('abcd')
+//   console.log('id: ', id)
+//   res.send(id)
+//   .then((e)=> res.send(e))
+//   .catch((err) => res.status(500).send(err))
+// })
 
 app.get('/test2', (req, res) => {
     db.getTables2().then((d) => res.send(d))

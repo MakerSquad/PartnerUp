@@ -3,6 +3,7 @@ var config = require('../knexfile.js')
 var env = process.env.NODE_ENV || 'production';
 var knex = require('knex')(config[env]);
 var uuid = require('uuid');
+var hash = require('string-hash')
 
 "use strict";
 knex.migrate.latest([config[env]]);
@@ -14,7 +15,8 @@ knex.migrate.latest([config[env]]);
 */
 knex.authenticate = (token) => {
   if(process.env.TEST_AUTH) return Promise.resolve(); // for test env
-  return knex('auth').where('token', token) // check for token in auth 
+  var encToken = hash(token)
+  return knex('auth').where('token', encToken) // check for token in auth 
     .then((userUid) => { // userUid is an array
       console.log('userUid: ', userUid[0].user_uid)
       if(userUid.length) return Promise.resolve(userUid[0].user_uid); // if user exist then resolve
