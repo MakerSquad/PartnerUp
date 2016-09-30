@@ -1,0 +1,40 @@
+/*.parent{
+display: flex;
+  
+  width: 300px;
+  height: 40px;
+  border-style: solid;
+  border-width:  2px;
+  border-color:  #b4b7c0;
+  padding: 5px;
+  margin: 5px;
+     -webkit-flex-wrap: wrap;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    list-style: none;
+}
+
+
+.name{
+margin-right: 1em;
+}
+.admin{
+flex: 1;
+    width: 100%;
+    padding: .8em 1em 0;
+    background: hsla(31,15%,50%,.1);
+    border-radius: 3px;
+}
+.member{
+flex: 1;
+    width: 100%;
+    padding: .8em 1em 0;
+    background: hsla(31,15%,50%,.1);
+    border-radius: 3px;
+}
+.gridcell{
+      -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+}*/

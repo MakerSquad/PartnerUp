@@ -1,0 +1,20 @@
+.studentParent{
+ display: flex;
+  align-items: flex-start;
+  width: 300px;
+  height: 40px;
+  border-style: solid;
+  border-width:  2px;
+  border-color:  #b4b7c0;
+  padding: 5px;
+  margin: 5px;
+}
+.stuImg{
+margin-right: 1em;
+}
+.stuName{
+  flex:1;
+}
+.deleteStu{
+/*  flex: 1;*/
+}

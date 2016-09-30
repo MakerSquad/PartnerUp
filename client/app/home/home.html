@@ -1,6 +1,6 @@
 <div header></div>
 <div class="home">
-<div ng-repeat="pool in pools" ng-show="pools.length" ><a  ng-href="/pool/{{pool.id}}">{{pool.name}}</a><h4 ng-if="pool.role === 'fellow' || pool.role === 'instructor'">admin</h4><h4 ng-if="pool.role==='student'">member</h4></div>
+<div class="parent" ng-repeat="pool in pools" ng-show="pools.length" ><a class="name" ng-href="/#/pools/{{pool.id}}">{{pool.name}}</a><div class="gridcell"><h4 class="admin" ng-if="pool.role === 'fellow' || pool.role === 'instructor' || pool.role === 'memberAdmin'">admin<h4 class="member" ng-if="pool.role==='student' || pool.role === 'memberAdmin'">member</h4></h4></div></div>
 <h3 class='noPools' ng-show="!pools.length">You have no open pools. Go create one now!</h3>
 <button ng-click="goToCreatePool()">Create New Pool</button>
 </div>

@@ -97,7 +97,8 @@ app.post("/group", (req, res) => {
   db.authenticate(req.cookies.token).then((uid) => {
     db.addGroup(req.body)
     .then((id) => {
-      res.send(id)
+      console.log('got here sucka', id)
+      res.send(""+id)
     }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
   }).catch((err) => {res.status(401).send(err)}) 
 })

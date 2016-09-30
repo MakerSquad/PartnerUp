@@ -1,16 +1,23 @@
 <div header></div> 
-<div>
+<br>
+<div class='form'>
 <h3>PoolName: <input ng-model="poolName"></h3>
+<h4> admins</h4>
+<div class="studentParent" ng-repeat="admin in importedAdmins" >{{admin.user.name}}</div>
 <h4>Pool Members</h4>
-<div ng-repeat="student in importedStudents" ng-if="student.role === 'student'">{{student.user.name}}<button ng-click='removeStudent(student)'>x</button></div>
+<div class="studentParent" ng-repeat="student in importedStudents" >
+  <img class="stuImg" src='{{student.user.avatar_url}}' width='40px' height='50px'>
+    <p class="stuName">{{student.user.name}}</p>
+      <button class="deleteStu" ng-click='removeStudent(student)' width='40px' height='50px'>x</button>
+</div>
 <select ng-model="currentCohort" ng-options="cohort as cohort.name for cohort in allCohorts" >
-<option value="">Choose a pool</option>
+<option value="">Choose a Cohort</option>
 </select>
 <button ng-click="importStudents()">Import Students</button>
 <h4>Group Size</h4>
 <select ng-init="groupSizeSelect = 2" ng-model="groupSizeSelect">
 <option ng-repeat="idx in getIndexArray(8)">{{idx+2}}</option>
 </select>
-<button ng-click='createPool()'>Create Pool</button>
+<button ng-click='createPool()' ng-href="`pool/{{pool.id}}`">Create Pool</button>
 <button ng-click='getRequest()'>do it</button>
 </div>

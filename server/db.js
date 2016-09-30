@@ -102,7 +102,7 @@ knex.addGroup = (group) => {
           })
         }
         return knex.batchInsert('group_membership', rows, rows.length)
-          .then((resp) => id[0])
+          .then((resp) => groupsId[0])
           .catch((err) => {throw new Error("Batch Insert Failed due to: "+ err)}) // throw error if something went horribly wrong
       })
     }

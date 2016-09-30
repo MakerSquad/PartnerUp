@@ -10,7 +10,7 @@ $scope.showPools = function(){
   .then(function(data){
     console.log('i make its here', data)
     $scope.pools = data;
-    console.log($scope.pools)
+    console.log('lALALALALA',$scope.pools)
   })
   .catch(function(err){console.log('showPools err',err);})
 }
