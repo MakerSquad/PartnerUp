@@ -103,11 +103,10 @@ angular.module('PU.createPool', ['PU.factories'])
     var groupData = {'name': $scope.poolName, 'group_size': $scope.groupSizeSelect}
     console.log('goupData', groupData)
     DB.createClass(members, groupData)
-    .then(function(resp){console.log('done') })
+    .then(function(resp){$location.path('/pools/'+resp)})
     .catch(function(err){console.log('pool not created', err)})
 
   }
-  // $location.path('/pools/'+resp)
   $scope.getRequest = function(){
     DB.getClasses().then(function(data){console.log('FUCK YEAH', data)})
     .catch(function(err){console.log('you fucked up', err)})
