@@ -96,13 +96,12 @@ app.get("/group/:groupId", (req, res) => {
 })
 
 app.post("/group", (req, res) => {
-  // db.authenticate(req.cookies.token).then((uid) => {
+  db.authenticate(req.cookies.token).then((uid) => {
     db.addGroup(req.body)
     .then((id) => {
-      console.log('got here sucka', id)
       res.send(""+id)
     }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  // }).catch((err) => {res.status(401).send(err)}) 
+  }).catch((err) => {res.status(401).send(err)}) 
 })
 
 app.delete("/group/:groupId", (req, res) => {
@@ -128,19 +127,7 @@ app.get('/group/:groupId/generations', (req,res) => { // done
       .then((generations) => res.send(generations))
       .catch((err) => {console.log("error:", err); res.status(500).send(err)})
   ).catch((err) => {res.status(401).send(err)})
-})
-
-// app.delete("/:groupUid/generation/:genId", (req, res) => {    
-//   db.authenticate(req.cookies.token)
-//   .then((userUid) => db.getGroup({mks_id: req.params.groupUid})
-//     .then((group) => 
-//       db.deleteGeneration(group.id, req.params.genId)
-//       .then((e) => {
-//           res.status(202).send(e);
-//       }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-//     ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-//   ).catch((err) => {res.status(401).send(err)})
-// })    
+})    
 
 app.get("/group/:groupId/members", (req, res) => {  // done  
   db.authenticate(req.cookies.token)
@@ -176,23 +163,24 @@ app.post('/group/:groupId/pairs', (req, res) => { // done
   ).catch((err) => res.status(401).send(err))
 })
 
-// app.delete('/:groupUid/pairs', (req, res) => {
-//   db.authenticate(req.cookies.token)
-//   .then(() => {
-//     db.getGroup({mks_id: req.params.groupUid})
-//       .then((groupData) => {
-//         console.log('hey looky looky ', groupData.id)
-//         db.resetPairs(groupData.id)
-//         .then((confirm) => res.status(202).send(confirm))
-//         .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-//       }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-//   }).catch((err) => {console.log("error:", err); res.status(401).send(err)})
-// })
-
 app.get('/user/:uid', (req, res) => { // done
   db.getUserData(req.params.uid)
-  .then((resp) => res.send(resp))
-  .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  .then((dataArray) => {
+    for(var i=0, studentsUid = []; i<dataArray.length; i++){
+      if(!studentsUid.includes(dataArray[i].user1_uid)) studentsUid.push(dataArray[i].user1_uid);
+      if(!studentsUid.includes(dataArray[i].user2_uid)) studentsUid.push(dataArray[i].user2_uid);
+    }
+    MP.Memberships.get('/users/'+studentsUid.join("+"), req.cookies.token)
+      .then((users)=> {
+        for(var i=0; i<dataArray.length; i++){
+          for(var j=0; j<users.length; j++){
+            if(dataArray[i].user1_uid == users[j].uid) dataArray[i].user1 = users[j];
+            if(dataArray[i].user2_uid == users[j].uid) dataArray[i].user2 = users[j];
+          }
+        }
+        res.send(dataArray)
+      }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+    }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
 })
 
 // app.get('/test', (req, res) => {

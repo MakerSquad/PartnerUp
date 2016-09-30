@@ -2,12 +2,11 @@ var pg = require('pg');
 var config = require('../knexfile.js')
 var env = process.env.NODE_ENV || 'production';
 var knex = require('knex')(config[env]);
-var uuid = require('uuid');
 var hash = require('string-hash')
+
 
 "use strict";
 knex.migrate.latest([config[env]]);
-
 
 /**
   @params: token = (string) Session we get from MakerPass
@@ -53,7 +52,7 @@ knex.getGroups = (userUid) => {
     return knex('groups').whereIn("id", data).returning("*")
     .then((resp) => {
       for(var i=0, fullData =[]; i<resp.length; i++) {
-        let role = memData[findItemById(memData, resp[i].id)];
+        let role = memData[knex.findItemById(memData, resp[i].id)];
         fullData.push({
           id : resp[i].id,
           name : resp[i].name,
@@ -189,10 +188,10 @@ function addGeneration(genData) {
 
 
 knex.getTables = () => {
-  return knex('generations').returning('*')
+  return knex('pairs').returning('*')
 }
 knex.getTables2 = () => {
-  return knex('groups').returning('*')
+  return knex('auth').returning('*')
 }
 
 /**
@@ -234,7 +233,6 @@ knex.getPairsForGroup = (groupId) => {
     genId: (int) gen_id,
     groupSize: (int) group_size,
     groupTitle: (string) group_title 
-    uid: (string) generation uid
   }]
 */
 knex.getGenerationsByGroup = (groupId) => {
@@ -304,8 +302,8 @@ knex.getUserData = (userUid) => {
       .then((groups) => {
         for(var i=0, data =[]; i<students.length; i++) {
           try {
-            var generation = generations[findItemById(generations, students[i].gen_table_id)]
-            var group = groups[findItemById(groups, generation.group_id)]
+            var generation = generations[knex.findItemById(generations, students[i].gen_table_id)]
+            var group = groups[knex.findItemById(groups, generation.group_id)]
           }
           catch (e){
             if(e instanceof TypeError){
@@ -326,7 +324,7 @@ knex.getUserData = (userUid) => {
   }).catch((err) => {throw new Error("cannot get pair from user, "+ err)}) // throw error if something went horribly wrong
 }
 
-function findItemById(array, id){
+knex.findItemById = (array, id) => {
   if(!array || array.length == 0) return -1;
   var low = 0;
   var high = array.length - 1;
@@ -346,7 +344,6 @@ function findItemById(array, id){
     }
   }
   return -1;
-
 }
 module.exports = knex;
 
