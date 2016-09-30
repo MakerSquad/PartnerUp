@@ -39,7 +39,11 @@ angular.module('PU', [
     $scope.nicknames = {
       'a4fa408de847' : 'Patty Cakes',
       '90b72025841d': 'Gilby',
-      "ab2bc0473a48": 'Kitty'
+      "ab2bc0473a48": 'Kitty',
+      "8534c57b54f4": 'Waltisha',
+      "bfc5a48d77ae": 'Russian Man',
+      '2a97b80a545a': 'Jam Jam',
+      '3a9137d82c2b': 'Ez'
     }
 
     $scope.hideMyPools = path === '/'; //NB: these routes might change
