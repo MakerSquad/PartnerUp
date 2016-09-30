@@ -1,7 +1,7 @@
 angular.module('PU.home', ['PU.factories'])
 
 .controller('HomeController', function ($scope, MakerPass, $location, $route, $http, StateSaver, DB, CurrentUser) {
-
+document.getElementById("bodyclass").className = "";
 $scope.currentUser = {} //where we store the current user's information 
 $scope.pools = []; //where  we store the total amout of pools from the owner
 

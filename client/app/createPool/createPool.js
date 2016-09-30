@@ -1,6 +1,7 @@
 angular.module('PU.createPool', ['PU.factories'])
 
 .controller('CreatePoolController', function ($scope, MakerPass, $location, $route, $http, StateSaver, DB, CurrentUser) {
+  document.getElementById("bodyclass").className = "";
   $scope.allCohorts = [];
   $scope.importedStudents = [];
   $scope.importedAdmins = [];

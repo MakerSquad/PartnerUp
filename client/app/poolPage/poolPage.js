@@ -1,7 +1,7 @@
 angular.module('PU.poolPage', ['PU.factories'])
 
 .controller('PoolPageController', function ($scope, $routeParams, MakerPass, $location, $route, $http, StateSaver, DB, CurrentUser){
-
+  document.getElementById("bodyclass").className = "";
   $scope.pastGroupings = [];
   $scope.currPool;
   $scope.pastPairs = {};
