@@ -1,0 +1,59 @@
+.poolPageBody{
+  text-align: center;
+}
+
+.newGrouping{
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+}
+
+.history{
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+}
+.pair{
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+.partnerName{
+  flex: none !important;
+  width: 30% !important;
+  text-align: center;
+}
+.indPair{
+  text-align: center;
+}
+
+.grp{
+  /*display: block !important;
+  /*text-align: center !important;*/
+  border-top: 1px solid #CCC;
+}
+.portrait{
+  flex: none !important;
+  display: block !important;
+  max-height: 50px;
+  margin-left: 33%;
+  margin-right: 2%;
+  max-width: 20% !important;
+}
+.lockBtn{
+  /*flex: none !important;*/
+  /*display: block !important;*/
+  float: right;
+  max-height: 15px;
+  cursor: pointer;
+  max-width: 15px;
+  margin-left: 10%;
+}
+
+.selectedStu{
+  color: #999;
+}
+
+.clash{
+  color: red;
+}

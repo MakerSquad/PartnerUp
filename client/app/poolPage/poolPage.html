@@ -1,20 +1,21 @@
 <div header></div>
-<h3 ng-class="poolTitle">{{currPool.name}}</h3>
+<div class="poolPageBody">
+<h1 class="" ng-class="poolTitle">{{currPool.name}}</h1>
 <br>
 <button class="partnerUpBtn" ng-click="startNewGrouping()">Organize New Grouping</button>
 <div class="newGrouping slide" ng-show="creatingGrouping">
   <input class="groupingName" ng-model="groupingName" placeholder="Enter title">
   <button class="reroll" ng-click="randomize()">Re-roll</button>
-  <table id="partners" unselectable="on" class="unselectable"> 
-    <tr ng-repeat="group in groups" ng-class="{clash: clashes.includes(group)}" >
-      <td  ng-repeat="stu in group" ng-click="selectForSwap(stu)" ng-class="{selectedStu: selectedForSwap === stu, locked: lockedStus[stu.user.uid]}" class="stu"> 
-      <img src='{{stu.user.avatar_url}}' width='40px' height='50px'>
-        {{stu.user.name}}
-        <img src= "http://simpleicon.com/wp-content/uploads/lock-3.png" width='15px' height='15px' ng-show='lockedStus[stu.user.uid] === undefined' class="lockBtn" ng-click="toggleLockStu(stu)">
-        <img src= "http://image.flaticon.com/icons/svg/26/26053.svg" width='15px' height='15px' ng-show='lockedStus[stu.user.uid] !== undefined' class="lockBtn" ng-click="toggleLockStu(stu)">
-      </td>
-    </tr>
-  </table>
+  <div id="partners" unselectable="on" class="unselectable"> 
+    <div class="Grid Grid--cell grp" ng-repeat="group in groups" ng-class="{clash: clashes.includes(group)}" >
+      <div class="indPair Grid Grid--cell" ng-repeat="stu in group" ng-click="selectForSwap(stu)" class="stu"> 
+        <img class='portrait Grid Grid--cell' src='{{stu.user.avatar_url}}' width='40px' height='50px'>
+        <div class='Grid Grid--cell partnerName' ng-class="{selectedStu: selectedForSwap === stu, locked: lockedStus[stu.user.uid]}">{{stu.user.name}}</div>
+        <img class='Grid Grid--cell lockBtn' src= "http://simpleicon.com/wp-content/uploads/lock-3.png" width='15px' height='15px' ng-show='lockedStus[stu.user.uid] === undefined' ng-click="toggleLockStu(stu)">
+        <img class='Grid Grid--cell lockBtn' src= "http://image.flaticon.com/icons/svg/26/26053.svg" width='15px' height='15px' ng-show='lockedStus[stu.user.uid] !== undefined' ng-click="toggleLockStu(stu)">
+      </div>
+    </div>
+  </div>
   <button class="finalize" ng-click="finalize()">Finalize Grouping</button>
 </div>
 <div loading ng-show="loading"></div>
@@ -22,14 +23,15 @@
   <input ng-model="searchHist" placeholder="Search groupings">
   <div class="pastGrouping" ng-repeat="grouping in pastGroupings | filter : filterGroupingsByName">
     <h3 class="groupingTitle">{{grouping.generationData.title}}</h3>
-    <table unselectable="on" class="pair unselectable" id="pair">
-      <tr ng-repeat='grp in grouping.groups'>
-        <td class="indPair" ng-repeat='partner in grp'>
-          <img src='{{idMap[partner].user.avatar_url}}' width='40px' height='50px'>
+    <div unselectable="on" class="pair unselectable" id="pair">
+      <div class="Grid Grid--cell grp" ng-repeat='grp in grouping.groups'>
+        <div class="indPair Grid Grid--cell" ng-repeat='partner in grp'>
+          <img class="portrait" src='{{idMap[partner].user.avatar_url}}' width='40px' height='50px'>
           {{idMap[partner].user.name}}
-        </td>
-      </tr>
-    </table>
+        </div>
+      </div>
+    </div>
     <button class="clipyclip histclip" data-clipboard-target="#pair">copy me</button>
   </div>
+</div>
 </div>

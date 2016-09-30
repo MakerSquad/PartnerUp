@@ -1,0 +1,33 @@
+.Grid{
+  display: flex;
+}
+
+.Grid--cell{
+  flex: 1;
+}
+
+
+.welcome{
+  width: 33% !important;
+  flex: none !important;
+  padding-right: 1%;
+  vertical-align: bottom;
+  /*border-bottom: 1px solid #DDD;*/
+}
+
+.signout{
+  display: block !important;
+  flex: none !important;
+  width: 10% !important;
+  text-align: center;
+  margin-left: 10%;
+}
+
+.myPoolBtn{
+  margin-right: 5%;
+}
+
+.headerBar{
+  border-bottom: 1px solid #DDD;
+  margin-bottom: 20px;
+}

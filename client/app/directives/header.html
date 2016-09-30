@@ -1,6 +1,8 @@
-<div class="headerBar">
-  <h2>{{"Welcome, " + (nicknames[currentUser.uid] ? nicknames[currentUser.uid] : currentUser.name) + '!'}}</h2>
-  <button class="navBtn" ng-hide="hideMyPools" ng-click="seeMyPools()">My Pools</button>
-  <button class="navBtn" ng-hide="hideCreatePool" ng-click="goToCreatePool()">Create New Pool</button>
-  <button class="navBtn" ng-click="signOut()">Sign Out</button>
+<div class="headerBar Grid">
+  <h2 class="Grid Grid--cell welcome">{{"Welcome, " + (nicknames[currentUser.uid] ? nicknames[currentUser.uid] : currentUser.name) + '!'}}</h2>
+  <div class="Grid Grid--cell headerBtns">
+    <button class="navBtn myPoolBtn" ng-hide="hideMyPools" ng-click="seeMyPools()">My Pools</button>
+    <button class="navBtn" ng-hide="hideCreatePool" ng-click="goToCreatePool()">Create New Pool</button>
+  </div>
+  <button class="navBtn Grid Grid--cell signout" ng-click="signOut()">Sign Out</button>
 </div>  
