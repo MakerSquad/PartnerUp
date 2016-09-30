@@ -21,19 +21,19 @@
   /*background-image: url("http://www.marketingtango.com/wp-content/uploads/2014/01/partnerships-matter.jpg");*/
 }
 .loginBtn{
-  background-color: cornflowerblue;
-  color:white;
-  border-radius: 5px;
-  height:35px;
-  width: 150px;
-  font-size:13px;
+  /*background-color: cornflowerblue;*/
+  /*color:white;*/
+  /*border-radius: 5px;*/
+  /*height:35px;*/
+  /*width: 150px;*/
+  /*font-size:13px;*/
    margin: auto;
   display: block ;
   margin-top: 100px;
-  /*margin-bottom: 100px;*/
-  /*position: relative;*/
-   box-shadow:none;
-   border: none;
+  margin-bottom: 100px;
+  /*position: relative;
+   /*box-shadow:none;*/
+   /*border: none;*/
 
 }
 .info{
