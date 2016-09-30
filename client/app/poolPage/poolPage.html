@@ -2,9 +2,9 @@
 <div class="poolPageBody">
 <h1 class="poolTitle">{{currPool.name}}</h1>
 <br>
-<button class="partnerUpBtn" ng-hide="!stuView" ng-click="startNewGrouping()">Organize New Grouping</button>
+<button class="partnerUpBtn" ng-hide="stuView" ng-click="startNewGrouping()">Organize New Grouping</button>
 <div loading ng-show="loadingNewGrouping"></div>
-<div class="newGrouping slide" ng-show="creatingGrouping && !loadingNewGrouping && stuView">
+<div class="newGrouping slide" ng-show="creatingGrouping && !loadingNewGrouping && !stuView">
   <input class="groupingName" ng-model="groupingName" placeholder="Enter title">
   <button class="reroll" ng-click="randomize()">Re-roll</button>
   <div id="partners" class='pair' unselectable="on" class="unselectable"> 
