@@ -94,13 +94,13 @@ app.get("/group/:groupId", (req, res) => {
 })
 
 app.post("/group", (req, res) => {
-  db.authenticate(req.cookies.token).then((uid) => {
+  // db.authenticate(req.cookies.token).then((uid) => {
     db.addGroup(req.body)
     .then((id) => {
       console.log('got here sucka', id)
       res.send(""+id)
     }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => {res.status(401).send(err)}) 
+  // }).catch((err) => {res.status(401).send(err)}) 
 })
 
 app.delete("/group/:groupId", (req, res) => {
@@ -149,10 +149,8 @@ app.get("/group/:groupId/members", (req, res) => {  // done
       MP.Memberships.get('/users/'+people.substring(0,people.length-1), req.cookies.token)
         .then((users)=> {
           var usersSeen = {};
-          for(let i=0; i < users.length; i++){
-            usersSeen[users[i].uid] = users[i];
-          }
-          for(let i=0; i<students.length; i++) students[i].user = usersSeen[students[i].user_uid];
+          for(let i=0; i < users.length; i++)  usersSeen[users[i].uid] = users[i];
+          for(let i=0; i < students.length; i++) students[i].user = usersSeen[students[i].user_uid];
           res.send(students)
         }).catch((err) => res.status(500).send(err))
     }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
@@ -188,12 +186,6 @@ app.post('/group/:groupId/pairs', (req, res) => { // done
 //       }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
 //   }).catch((err) => {console.log("error:", err); res.status(401).send(err)})
 // })
-
-app.get('/generation/:uid', (req, res) => { // done
-  db.getGenerationByUid(req.params.uid)
-  .then((resp) => res.send(resp))
-  .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-})
 
 app.get('/user/:uid', (req, res) => { // done
   db.getUserData(req.params.uid)

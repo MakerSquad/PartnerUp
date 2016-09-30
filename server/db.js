@@ -50,11 +50,12 @@ knex.getGroups = (userUid) => {
     for(var i=0, data = []; i<memData.length;i++) data.push(memData[i].group_id);
     return knex('groups').whereIn("id", data).returning("*")
     .then((resp) => {
-      for(var i=0, fullData =[], newObj = {}; i<resp.length; i++) {
+      for(var i=0, fullData =[]; i<resp.length; i++) {
+        let role = memData[findItemById(memData, resp[i].id)];
         fullData.push({
           id : resp[i].id,
           name : resp[i].name,
-          role : memData[i].role,
+          role : role,
           size : resp[i].group_size
         })
       }
@@ -155,22 +156,6 @@ knex.addPairs = (pairData, groupId) => {
     }).catch((err) => {throw new Error("Unable to create generation, "+ err)}) // throw error if something went horribly wrong
 }
 
-/**
-  @params: pairData = uid (string) generation uid
-   
-  return: {
-    pairs: [pairs]
-    generationData: generation data
-  }
-*/
-knex.getGenerationByUid = (uid) => {
-  return knex('generations').where('uid', uid).returning("*")
-  .then((gens) => 
-    knex('pairs').where('gen_table_id', gens[0].id).returning("*")
-    .then((pairs) => {return {generationData: gens[0],pairs: pairs}})
-    .catch((err) => {throw new Error("Unable to get uid from gens, "+ err)}) // throw error if something went horribly wrong
-  ).catch((err) => {throw new Error("Unable to find pairs with gens id, "+ err)}) // throw error if something went horribly wrong
-} 
 
 /**
   @params: genData = {
@@ -187,10 +172,8 @@ function addGeneration(genData) {
     if(!exist.length){ // if array is empty  
       return knex('generations').where({group_id:genData.groupId}).returning("gen_id")
       .then((next) => {
-        var uid = uuid.v4()
         for(var i=0, max =0; i<next.length;i++) if(next[i].gen_id > max) max = next[i].gen_id;
-        return knex('generations').insert({
-          uid:        uid, // uuid genarated for links 
+        return knex('generations').insert({ 
           group_id:   genData.groupId, // adds the group
           title:      genData.genTitle,// adds the title
           gen_id:     max+1,     // adds the generation by finding how many generation were before
@@ -207,7 +190,7 @@ knex.getTables = () => {
   return knex('generations').returning('*')
 }
 knex.getTables2 = () => {
-  return knex('pairs').returning('*')
+  return knex('groups').returning('*')
 }
 
 /**
@@ -310,18 +293,24 @@ knex.getUserData = (userUid) => {
   .then((students) => {
     console.log("students,", students)
     for(var i=0, genIds =[]; i<students.length ;i++) if(!genIds.includes(students[i].gen_table_id)) genIds.push(students[i].gen_table_id);
-      console.log("genIds", genIds)
+    console.log("genIds", genIds)
     return knex('generations').whereIn('id', genIds).returning("*")
     .then((generations) =>{
           console.log("generations,", generations)
       for(var i=0, groupIds =[]; i<generations.length ;i++) if(!groupIds.includes(generations[i].group_id)) groupIds.push(generations[i].group_id); 
       return knex('groups').whereIn('id', groupIds).returning("*")
       .then((groups) => {
-            console.log("groups,", groups)
         for(var i=0, data =[]; i<students.length; i++) {
-          console.log("this is i before crash", i)
-          var generation = generations[findItemById(generations, students[i].gen_table_id)]
-          var group = groups[findItemById(groups, generation.group_id)]
+          try {
+            var generation = generations[findItemById(generations, students[i].gen_table_id)]
+            var group = groups[findItemById(groups, generation.group_id)]
+          }
+          catch (e){
+            if(e instanceof TypeError){
+              var generation = "doesnt exist"
+              var group = "doesnt exist"
+            } else throw new Error(e);
+          }
           data.push({
             user1_uid : students[i].user1_uid,
             user2_uid : students[i].user2_uid,
@@ -336,6 +325,7 @@ knex.getUserData = (userUid) => {
 }
 
 function findItemById(array, id){
+  if(!array || array.length == 0) return -1;
   var low = 0;
   var high = array.length - 1;
   var found = false;
