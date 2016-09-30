@@ -37,20 +37,25 @@ angular.module('PU.poolPage', ['PU.factories'])
         .then(function(members){
           var partOfGroup = false;
           for(var i = 0; i < members.length; i++){
-            if(members[i].role === 'student'){
+            if(members[i].role === 'student' || members[i].role === 'memberAdmin'){
               if(members[i].user.uid === $scope.currentUser.uid){
                 $scope.stuView = true;
                 partOfGroup = true;
               }
               $scope.students.push(members[i]);
               console.log("Students: ", $scope.students);
-            }else if(members[i].role === 'fellow' || members[i].role === 'instructor'){
+            }else if(members[i].role === 'fellow' || members[i].role === 'instructor' || members[i].role === 'memberAdmin'){
               $scope.admins.push(members[i]);
               if(members[i].user.uid === $scope.currentUser.uid){
                 partOfGroup = true;
               }
             }
           }
+
+          for(var j = 0; j < $scope.students.length % groupSize; j++){
+            $scope.students.push({user: {name: "Rubber Duck Debugger", uid: "-" + i, avatar_url:'../../assets/rubberducky.png'}}); //give them decrementing ids
+          }
+
           $scope.makeMap();
           if(!partOfGroup){
             $scope.stuView = true;
@@ -68,7 +73,7 @@ angular.module('PU.poolPage', ['PU.factories'])
     return DB.getPairs($scope.currPool)
     .then(function(groupings){
       console.log("Data from getPairs: ", groupings);
-      $scope.pastGroupings = groupings;
+      $scope.pastGroupings = groupings.reverse();
       for(var i = 0; i < $scope.pastGroupings.length; i++){
         $scope.pastGroupings[i].groups = createGroupings($scope.pastGroupings[i].pairs);
         $scope.pastGroupings[i].pairs.forEach(function(pair){
@@ -152,9 +157,6 @@ angular.module('PU.poolPage', ['PU.factories'])
     })
 
     var shuffled = [];
-    for(var i = 0; i < stus.length % groupSize; i++){
-      stus.push({user: {name: "Code Monkey", uid: "-" + i, avatar_url:'https://s-media-cache-ak0.pinimg.com/564x/7e/e7/fe/7ee7fe7d2753c6c47715a95c8508533d.jpg'}}); //give them decrementing ids
-    }
 
     while(stus.length){
       var randInd = Math.floor(Math.random() * stus.length);
@@ -215,9 +217,7 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
     console.log("Groups: ", $scope.groups);
     var stus = $scope.students.slice();
-    for(var i = 0; i < stus.length % groupSize; i++){
-      stus.push({user: {name: "Code Monkey", uid: "-" + i, avatar_url:'https://s-media-cache-ak0.pinimg.com/564x/7e/e7/fe/7ee7fe7d2753c6c47715a95c8508533d.jpg'}});
-    }
+
     stus = stus.filter(function(stu){
       console.log("Locked stus index: ", $scope.lockedStus[stu.user.uid]);
       return !Number.isInteger($scope.lockedStus[stu.user.uid]); //don't shuffle the locked students
@@ -408,7 +408,6 @@ angular.module('PU.poolPage', ['PU.factories'])
       return;
     }
     if($scope.lockedStus[student.user.uid]){
-      alert("This student has been locked into a group; please unlock them before moving them around");
       return;
     }
     var selectedIndex = searchForSelected(student);
