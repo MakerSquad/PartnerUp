@@ -52,7 +52,7 @@ knex.getGroups = (userUid) => {
     return knex('groups').whereIn("id", data).returning("*")
     .then((resp) => {
       for(var i=0, fullData =[]; i<resp.length; i++) {
-        let role = memData[knex.findItemById(memData, resp[i].id)];
+        for(var x = 0; x < memData.length; x++) if(resp[i].id == memData[x].group_id) var role = memData[x].role;
         fullData.push({
           id : resp[i].id,
           name : resp[i].name,
