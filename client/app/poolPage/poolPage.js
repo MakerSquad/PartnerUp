@@ -19,11 +19,13 @@ angular.module('PU.poolPage', ['PU.factories'])
   $scope.selectedForSwapIndex = null;
   $scope.noRepeats = true;
   $scope.idMap = {};
+  $scope.alreadyFailed = false;
   var groupSize = 2;
   var timeoutCounter = 0;
   var timeoutThreshold = 5000;
 
   var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
+    new Clipboard('.clipyclip');
     $scope.loading = true;
     CurrentUser.get()
     .then(function(user){
@@ -90,6 +92,14 @@ angular.module('PU.poolPage', ['PU.factories'])
     })
   }
 
+  $scope.filterGroupsByName = function(group){
+    console.log("calling filter by name for: ", $scope.stuSearch);
+    console.log("Group: ", group);
+    if(!$scope.stuSearch) return true;
+    var search = $scope.stuSearch.toLowerCase();
+    return group.filter(stu => stu.user.name.toLowerCase().includes(search)).length;
+  }
+
   var createGroupings = function(pairs){
     var pastGroupings = {};
     var seen = {}; //object of objects
@@ -114,8 +124,18 @@ angular.module('PU.poolPage', ['PU.factories'])
   }
 
   $scope.startNewGrouping = function(){
-    $scope.randomize();
+    if($scope.loadingNewGrouping){
+      return; //in case user double clicks the button
+    }
+    if($scope.creatingGrouping){
+      $scope.creatingGrouping = false;
+      return;
+    }
+    $scope.loadingNewGrouping = true;
     $scope.creatingGrouping = true;
+    console.log("Loading new Grouping? : ", $scope.loadingNewGrouping);
+    $scope.randomize();
+    $scope.loadingNewGrouping = false;
   }
 
   /**
@@ -189,7 +209,6 @@ angular.module('PU.poolPage', ['PU.factories'])
   */
 
   $scope.randomize = function(){
-    console.log("Calling randomize");
     $scope.groupingName = "";
     $scope.loadingGroups = true;
     if(!groupSize){
@@ -203,9 +222,12 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
 
     if(timeoutCounter > timeoutThreshold){
-      alert(`Uh oh! We were unable to generate a list without repeating pairs; this is likely because ` +
-      `most of the possible pairs, if not all of them, have already occurred. Here's a random list anyway. Sorry!`);
+      if(!$scope.alreadyFailed){
+        alert(`Uh oh! We were unable to generate a list without repeating pairs; this is likely because ` +
+        `most of the possible pairs, if not all of them, have already occurred. Here's a random list anyway. Sorry!`);
+      }
       timeoutCounter = 0;
+      $scope.alreadyFailed = true;
       return $scope.trueRandomize();
     }
     
@@ -215,14 +237,11 @@ angular.module('PU.poolPage', ['PU.factories'])
     for(var s in $scope.lockedStus){
       $scope.groups[$scope.lockedStus[s]].push($scope.idMap[s]);
     }
-    console.log("Groups: ", $scope.groups);
     var stus = $scope.students.slice();
 
     stus = stus.filter(function(stu){
-      console.log("Locked stus index: ", $scope.lockedStus[stu.user.uid]);
       return !Number.isInteger($scope.lockedStus[stu.user.uid]); //don't shuffle the locked students
     })
-    console.log("Stus: ", stus);
 
     var shuffled = [];
 
@@ -271,7 +290,6 @@ angular.module('PU.poolPage', ['PU.factories'])
         }
       }
       if(failed){
-        console.log("Failed");
         return $scope.randomize(groupSize);
       }
     }
@@ -284,9 +302,9 @@ angular.module('PU.poolPage', ['PU.factories'])
   }
 
   $scope.filterGroupsByName = function(group){
-    if(!$scope.groupSearch) return true;
-    var search = $scope.groupSearch.toLowerCase();
-    return group.filter(stu => stu.user.name.toLowerCase().includes(search)).length;
+    if(!$scope.stuSearch) return true;
+    var search = $scope.stuSearch.toLowerCase();
+    return group.filter(stu => $scope.idMap[stu].user.name.toLowerCase().includes(search)).length;
   }
 
   /**
@@ -322,8 +340,8 @@ angular.module('PU.poolPage', ['PU.factories'])
 
   $scope.finalize = function(){
     $scope.loading = true;
-    $scope.creatingGrouping = false;
     if($scope.groupingName && $scope.groupingName.length){      
+      $scope.creatingGrouping = false;
       var newPairs = [];
       for(var i = 0; i < $scope.groups.length; i++){
         for(var j = 0; j < $scope.groups[i].length; j++){
@@ -344,12 +362,14 @@ angular.module('PU.poolPage', ['PU.factories'])
       .then(function(){
         refreshGroupings()
         .then(function(){
+          $scope.alreadyFailed = false;
           $scope.loading = false;
         })
       })
       //$scope.groupingName = "";
     }else{
       alert("Please enter a title for this class list");
+      $scope.loading = false;
     }
   }
 

@@ -2,13 +2,40 @@
   text-align: center;
 }
 
+.poolTitle{
+  border: none !important;
+}
+
 .newGrouping{
   margin-left: auto;
   margin-right: auto;
   width: 80%;
 }
 
+.groupingTitle{
+  /*text-decoration-color: #CCC;
+  text-decoration: underline;*/
+  /*border-bottom: 1px solid #CCC;*/
+}
+.partnerUpBtn{
+  margin-bottom: 2rem;
+}
+
+.pastGrouping{
+  margin-top: 2rem;
+  border-radius: 10px;
+}
+
+.groupingName{
+  margin-bottom: 2rem;
+}
+
+#partners{
+  margin-bottom: 2rem;
+}
+
 .history{
+  margin-top: 2rem;
   margin-left: auto;
   margin-right: auto;
   width: 80%;
@@ -17,11 +44,16 @@
   margin-left: auto;
   margin-right: auto;
   text-align: center;
+  border: 1px solid #CCC;
 }
 .partnerName{
   flex: none !important;
   width: 30% !important;
   text-align: center;
+}
+
+.clickable{
+  cursor: pointer;
 }
 .indPair{
   text-align: center;
@@ -31,6 +63,7 @@
   /*display: block !important;
   /*text-align: center !important;*/
   border-top: 1px solid #CCC;
+  border-bottom: 1px solid #CCC;
 }
 .portrait{
   flex: none !important;
@@ -39,6 +72,7 @@
   margin-left: 33%;
   margin-right: 2%;
   max-width: 20% !important;
+  /*border-left: 1px solid #CCC;*/
 }
 .lockBtn{
   /*flex: none !important;*/
