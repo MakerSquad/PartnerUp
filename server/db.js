@@ -97,6 +97,8 @@ knex.addGroup = (group) => {
       return knex('groups').insert({name: group.groupData.name, group_size: group.groupData.group_size}).returning('id')
       .then((groupsId) => {
         for(var i = 0, rows = []; i < group.members.length; i++) {
+          console.log("Inserting: ", {user_uid: group.members[i].user_uid,
+            group_id: groupsId[0], role: group.members[i].role});
           rows.push({
             user_uid: group.members[i].user_uid,
             group_id: groupsId[0],

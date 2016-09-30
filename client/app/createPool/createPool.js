@@ -67,24 +67,33 @@ angular.module('PU.createPool', ['PU.factories'])
         var admin = $scope.importedAdmins[b]
         if(stud.user_uid === admin.user_uid){
           var member = {};
+          if($scope.importedStudents[a].user.name.includes('Kath')){
+            console.log("Adding kath as studentAdmin");
+          }
           member.user_uid = stud.user_uid;
           member.role = "memberAdmin";
           members.push(member);
           var index = $scope.importedStudents.indexOf(stud)
           $scope.importedStudents.splice(index, 1)
           var index2 = $scope.importedAdmins.indexOf(admin)
-          $scope.importedAdmins.splice(index, 1)
+          $scope.importedAdmins.splice(index2, 1)
         }
       }
     }
     for(var i = 0; i<$scope.importedStudents.length; i++){
       var member = {};
+      if($scope.importedStudents[i].user.name.includes('Kath')){
+        console.log("Adding kath as student");
+      }
       member.user_uid = $scope.importedStudents[i].user_uid
       member.role = $scope.importedStudents[i].role
       members.push(member);
     }
     for(var j = 0; j<$scope.importedAdmins.length;j++){
       var member = {};
+      if($scope.importedAdmins[j].user.name.includes('Kath')){
+        console.log("Adding kath as admin");
+      }
       member.user_uid = $scope.importedAdmins[j].user_uid
       member.role = $scope.importedAdmins[j].role
       members.push(member);
@@ -93,10 +102,11 @@ angular.module('PU.createPool', ['PU.factories'])
     var groupData = {'name': $scope.poolName, 'group_size': $scope.groupSizeSelect}
     console.log('goupData', groupData)
     DB.createClass(members, groupData)
-    .then(function(resp){ $location.path('/pools/'+resp)})
+    .then(function(resp){console.log('done') })
     .catch(function(err){console.log('pool not created', err)})
 
   }
+  // $location.path('/pools/'+resp)
   $scope.getRequest = function(){
     DB.getClasses().then(function(data){console.log('FUCK YEAH', data)})
     .catch(function(err){console.log('you fucked up', err)})
@@ -146,7 +156,6 @@ angular.module('PU.createPool', ['PU.factories'])
                   console.log('$scope.allCohorts', $scope.allCohorts)
                 // }
               }
-              // if()
 
               console.log("Current scope: ", $scope);
               $scope.$apply();
