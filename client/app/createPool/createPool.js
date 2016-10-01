@@ -1,6 +1,6 @@
 angular.module('PU.createPool', ['PU.factories'])
 
-.controller('CreatePoolController', function ($scope, MakerPass, $location, $route, $http, StateSaver, DB, CurrentUser) {
+.controller('CreatePoolController', function ($scope, MakerPass, $location, $route, $http, $window, $anchorScroll, DB, CurrentUser) {
   document.getElementById("bodyclass").className = "";
   $scope.allCohorts = [];
   $scope.importedStudents = [];
@@ -27,6 +27,7 @@ angular.module('PU.createPool', ['PU.factories'])
             $scope.importedStudents.push(data[i])
           }
         }
+        $scope.noStusError = false;
     
         if(data[i].role === 'fellow' || data[i].role === 'instructor'){
           var isThere = false
@@ -70,14 +71,15 @@ angular.module('PU.createPool', ['PU.factories'])
     }
     if(removed[person.user_uid] === undefined){
       removed[person.user_uid] = true;
-      return;
+    }else{
+      delete removed[person.user_uid];
+      $scope.noStusError = false;
     }
-    removed[person.user_uid] = !removed[person.user_uid];
   }
 
   $scope.createPool = function(){
     var didError = false;
-    if(!$scope.importedStudents.length){
+    if(!$scope.importedStudents.length || $scope.importedStudents.length === Object.keys($scope.removedStus).length){
       $scope.noStusError = true;
       didError = true;
     }
@@ -86,6 +88,7 @@ angular.module('PU.createPool', ['PU.factories'])
       didError = true;
     }
     if(didError){
+      $anchorScroll('noNameError');
       return; //don't go through with the create
     }
 

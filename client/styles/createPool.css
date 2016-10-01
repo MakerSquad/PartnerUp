@@ -1,5 +1,5 @@
 .studentParent{
- display: flex;
+  display: flex;
   align-items: flex-start;
   width: 300px;
   height: 40px;
@@ -19,8 +19,45 @@ margin-right: 1em;
 /*  flex: 1;*/
 }
 
+.createListTitle{
+  text-align: center;
+}
+
+.createControls{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.createCtrl{
+  margin-right: 1%;
+  margin-bottom: 1%;
+}
+
+input.createCtrl{
+  font-size: 2em;
+  width: 300px;
+  height: 30px;
+}
+
 .removed{
   text-decoration: line-through;
   color: #AAA;
   opacity: 0.7;
+}
+
+.creatingUserList{
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  margin-bottom: 1%;
+  margin-left: 2%;
+  margin-right: 2%;
+  border: 2px solid #0298F5;
+  background-color: rgba(2, 98, 245, 0.1);
+  border-radius: 10px;
+}
+
+.extraBtn{
+  text-align: center;
 }

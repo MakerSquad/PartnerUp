@@ -21,6 +21,7 @@ body{
 
 
 .welcome{
+  flex: 2;
   /*width: 33% !important;
   flex: none !important;*/
   padding-right: 1%;
@@ -30,18 +31,15 @@ body{
 }
 
 .headerBtns{
-  flex: none !important;
-  width: 33% !important;
+  flex: 1;
 }
 
 .signout{
-  display: block !important;
-  /*flex: none !important;
-  width: 10% !important;*/
-  text-align: center;
+ text-align: center;
 }
 
 .navBtn{
+  flex: 1;
   margin-left: 1%;
 }
 
