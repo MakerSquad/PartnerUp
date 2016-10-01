@@ -168,9 +168,10 @@ angular.module('PU.createPool', ['PU.factories'])
             .then(function(resolveData){
               console.log("Promises resolved");
               console.log('resolveData', resolveData[0])
-              for(var i = 0; i<resolveData[0].length; i++){
+              var cohorts = resolveData[0].reverse(); //reverse for recency order
+              for(var i = 0; i<cohorts.length; i++){
                 // if(resolveData[0][i].user_role === 'instructor' || resolveData[0][i].user_role === 'fellow'){
-                  $scope.allCohorts.push(resolveData[0][i]);
+                  $scope.allCohorts.push(cohorts[i]);
                   console.log('$scope.allCohorts', $scope.allCohorts)
                 // }
               }

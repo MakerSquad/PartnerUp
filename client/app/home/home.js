@@ -10,7 +10,7 @@ $scope.showPools = function(){
  return DB.getClasses()
   .then(function(data){
     console.log('i make its here', data)
-    $scope.pools = data;
+    $scope.pools = data.reverse();
     console.log('lALALALALA',$scope.pools)
   })
   .catch(function(err){console.log('showPools err',err);})
