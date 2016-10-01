@@ -1,18 +1,18 @@
 <div header></div>
 <h2 class="errMsg" ng-show="error.length">{{error}}</h2>
 <div class="poolPageBody" ng-show="!error.length">
-<h1 class="poolTitle">{{currPool.name}}</h1>
+<h1 class="poolTitle" ng-hide="loading">{{currPool.name}}</h1>
 <br>
-<button class="partnerUpBtn" ng-hide="stuView" ng-click="startNewGrouping()">Organize New Grouping</button>
+<button class="partnerUpBtn" ng-hide="stuView || loading" ng-click="startNewGrouping()">Organize New Grouping</button>
 <div loading ng-show="loadingNewGrouping"></div>
 <div class="newGrouping slide" ng-show="creatingGrouping && !loadingNewGrouping && !stuView">
   <input class="groupingName" ng-model="groupingName" maxlength="20" placeholder="Enter title">
   <button class="reroll" ng-click="randomize()">Re-roll</button>
   <div id="partners" class='pair' unselectable="on" class="unselectable"> 
-    <div class="Grid Grid--cell grp" ng-repeat="group in groups" ng-class="{clash: clashes.includes(group)}" >
-      <div class="indPair Grid Grid--cell" ng-repeat="stu in group" class="stu"> 
-        <img class='portrait Grid Grid--cell' src='{{stu.user.avatar_url}}' width='40px' height='50px'>
-        <div class='Grid Grid--cell partnerName' ng-class="{selectedStu: selectedForSwap === stu, locked: lockedStus[stu.user.uid], clickable: !stuView}" ng-click="selectForSwap(stu)">{{stu.user.name}}</div>
+    <div class="grp" ng-repeat="group in groups" ng-class="{clash: clashes.includes(group)}" >
+      <div class="partner" ng-repeat="stu in group" class="stu"> 
+        <img class='portrait' src='{{stu.user.avatar_url}}'>
+        <div class='partnerName' ng-class="{selectedStu: selectedForSwap === stu, locked: lockedStus[stu.user.uid], clickable: !stuView}" ng-click="selectForSwap(stu)">{{stu.user.name}}</div>
         <img class='Grid Grid--cell lockBtn' src= "http://simpleicon.com/wp-content/uploads/lock-3.png" width='15px' height='15px' ng-show='lockedStus[stu.user.uid] === undefined' ng-click="toggleLockStu(stu)">
         <img class='Grid Grid--cell lockBtn' src= "http://image.flaticon.com/icons/svg/26/26053.svg" width='15px' height='15px' ng-show='lockedStus[stu.user.uid] !== undefined' ng-click="toggleLockStu(stu)">
       </div>
@@ -27,15 +27,16 @@
   <input ng-model="stuSearch" placeholder="Search for a student">
   <div class="pastGrouping" ng-repeat="grouping in pastGroupings | filter : filterGroupingsByName">
     <h3 class="groupingTitle">{{grouping.generationData.title}}</h3>
-    <div unselectable="on" class="pair unselectable" id="pair">
-      <div class="Grid Grid--cell grp" ng-repeat='grp in grouping.groups | filter : filterGroupsByName'>
-        <div class="indPair Grid Grid--cell" ng-repeat='partner in grp'>
-          <img class="portrait" src='{{idMap[partner].user.avatar_url}}' width='40px' height='50px'>
-          {{idMap[partner].user.name}}
+    <div unselectable="on" class="groupingUsers unselectable" id="groupingUsers">
+      <div class="grp" ng-repeat='grp in grouping.groups | filter : filterGroupsByName'>
+        <div class="partner" ng-repeat='partner in grp'>
+          <img class="portrait" src='{{idMap[partner].user.avatar_url}}'>
+          <!-- {{idMap[partner].user.name}} -->
+          <div class="partnerName">{{idMap[partner].user.name}}</div>
         </div>
       </div>
     </div>
-    <button class="clipyclip histclip" data-clipboard-target="#pair">copy me</button>
+    <button class="clipyclip histclip" data-clipboard-target="#groupingUsers">copy me</button>
   </div>
 </div>
 </div>

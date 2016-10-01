@@ -3,6 +3,10 @@ body{
   background-color: #F0F4F5;
 }
 
+.extraBtn{
+  text-align: center;
+}
+
 .error{
   color: red;
   border: 2px solid red;

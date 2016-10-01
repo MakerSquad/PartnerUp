@@ -1,6 +1,19 @@
 <div header></div>
 <div class="home">
-<div class="parent" ng-repeat="pool in pools" ng-show="pools.length" ><a class="name" ng-href="/#/pools/{{pool.id}}">{{pool.name}}</a><div class="gridcell"><h4 class="admin" ng-if="pool.role === 'fellow' || pool.role === 'instructor' || pool.role === 'memberAdmin'">admin<h4 class="member" ng-if="pool.role==='student' || pool.role === 'memberAdmin'">member</h4></h4></div></div>
-<h3 class='noPools' ng-show="!pools.length">You have no open pools. Go create one now!</h3>
-<button ng-click="goToCreatePool()">Create New Pool</button>
+  <h1 class="homeTitle">{{currentUser.name + "'s Pools"}}</h1>
+  <div class="homePool" ng-click="goToPool(pool)" ng-repeat="pool in pools" ng-show="pools.length" >
+    <h3 class="homePoolName">
+      {{pool.name}}
+    </h3>
+    <div class="homeRoles">
+      <div class="admin homeRole" ng-if="pool.role === 'fellow' || pool.role === 'instructor' || pool.role === 'memberAdmin'">
+        admin
+      </div>
+      <div class="member homeRole" ng-if="pool.role==='student' || pool.role === 'memberAdmin'">member</div>
+    </div>
+  </div>
+  <h3 class='noPools' ng-show="!pools.length">You have no open pools. Go create one now!</h3>
+  <div class="extraBtn">
+    <button ng-click="goToCreatePool()">Create New Pool</button>
+  </div>
 </div>

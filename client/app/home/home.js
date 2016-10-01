@@ -19,6 +19,10 @@ $scope.goToCreatePool = function(){
   $location.path('/createPool')
 }
 
+$scope.goToPool = function(pool){
+  $location.path(`/pools/${pool.id}`);
+}
+
  var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
     
     new Clipboard('.clipyclip');
