@@ -1,7 +1,7 @@
 <div header></div>
-<div class="home">
+<div loading class="extraBtn" ng-show="loading"></div>
+<div class="home fade" ng-hide="loading">
   <h1 class="homeTitle">{{currentUser.name + "'s Pools"}}</h1>
-  <div loading class="extraBtn" ng-show="loading"></div>
   <div class="homePool" ng-click="goToPool(pool)" ng-repeat="pool in pools" ng-show="pools.length && !loading">
     <h3 class="homePoolName">
       {{pool.name}}

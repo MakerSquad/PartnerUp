@@ -3,6 +3,14 @@ body{
   background-color: #F0F4F5;
 }
 
+.fade {
+  -webkit-transition:all linear 0.5s;
+  transition:all linear 0.5s;
+}
+.fade.ng-hide {
+  opacity:0;
+}
+
 .extraBtn{
   text-align: center;
 }

@@ -1,11 +1,12 @@
 <div header></div>
+<div loading class="extraBtn" ng-show="loading"></div>
 <h2 class="errMsg" ng-show="error.length">{{error}}</h2>
-<div class="poolPageBody" ng-show="!error.length">
+<div class="poolPageBody fade" ng-show="!error.length && !loading">
 <h1 class="poolTitle" ng-hide="loading">{{currPool.name}}</h1>
 <br>
 <button class="partnerUpBtn" ng-hide="stuView || loading" ng-click="startNewGrouping()">Organize New Grouping</button>
 <div loading ng-show="loadingNewGrouping"></div>
-<div class="newGrouping slide" ng-show="creatingGrouping && !loadingNewGrouping && !stuView">
+<div class="newGrouping fade" ng-show="creatingGrouping && !loadingNewGrouping && !stuView">
   <input class="groupingName" ng-model="groupingName" maxlength="20" placeholder="Enter title">
   <button class="reroll" ng-click="randomize()">Re-roll</button>
   <div id="partners" class='pair' unselectable="on" class="unselectable"> 
@@ -20,7 +21,6 @@
   </div>
   <button class="finalize" ng-click="finalize()">Finalize Grouping</button>
 </div>
-<div loading ng-show="loading"></div>
 <div class="history" ng-show="!loading">
   <h2>Past Groupings</h2>
   <input ng-model="searchHist" placeholder="Search groupings">
