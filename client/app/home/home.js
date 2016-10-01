@@ -4,6 +4,7 @@ angular.module('PU.home', ['PU.factories'])
 document.getElementById("bodyclass").className = "";
 $scope.currentUser = {} //where we store the current user's information 
 $scope.pools = []; //where  we store the total amout of pools from the owner
+$scope.loading = true;
 
 $scope.showPools = function(){
  return DB.getClasses()
@@ -26,7 +27,7 @@ $scope.goToPool = function(pool){
  var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
     
     new Clipboard('.clipyclip');
- 
+    $scope.loading = true;
      CurrentUser.get()
      .then(function(userData){
       console.log("Userdata: ", userData);
@@ -51,6 +52,7 @@ $scope.goToPool = function(pool){
             // $scope.modalCohorts = resolveData[1];
             // $scope.initialized = true;
             console.log("Current scope: ", $scope);
+            $scope.loading = false;
             $scope.$apply();
           })
         }

@@ -1,48 +1,51 @@
 <div header></div> 
 <br>
-<div class='form'>
-<div id="noNameError" class="error" ng-show="noNameError && poolName.length <= 0">
-  Oops! That pool needs a name <br> (Anonymous pools confuse us greatly)
-</div>
-<div class="createControls">
-  <h3 class="createCtrl">Pool Name: </h3>
-  <input class="createCtrl" ng-init="poolName = ''" ng-model="poolName" maxlength="20">
-</div>
-<div class="createControls">
-  <h4 class="createCtrl">Import from MakerPass: </h4>
-  <select class="createCtrl" ng-model="currentCohort" ng-options="cohort as cohort.name for cohort in allCohorts" >
-  <option value="">Choose a Cohort</option>
-  </select>
-  <button class="createCtrl" ng-click="importStudents()">Import</button>
-</div>
-<div class="createControls">
-  <h4 class="createCtrl">Group Size: </h4>
-  <select class="createCtrl" ng-init="groupSizeSelect = 2" ng-model="groupSizeSelect">
-  <option class="createCtrl" ng-repeat="idx in getIndexArray(8)">{{idx+2}}</option>
-  </select>
-  <button class="createCtrl" ng-click='createPool()' ng-href="`pool/{{pool.id}}`">Create Pool</button>
-</div>
-<h3 class="createListTitle">Pool Admins</h3>
-<div class="creatingUserList">
-  <div class="studentParent" ng-class="{removed: removedAdmins[admin.user_uid]}" ng-repeat="admin in importedAdmins">
-    <img class="stuImg" src='{{admin.user.avatar_url}}' width='40px' height='50px'>
-    <p class="stuName">{{admin.user.name}}</p>
-    <button ng-show="$index > 0" class="deleteStu" ng-click="toggleRemoved(admin, 'admin')" width="40px" height="50px">{{removedAdmins[admin.user_uid] ? 'O' : 'X'}}</button>
+<div loading class="extraBtn" ng-show="loadingPage"></div>
+<div class='form' ng-hide="loadingPage">
+  <div id="noNameError" class="error" ng-show="noNameError && poolName.length <= 0">
+    Oops! That pool needs a name <br> (Anonymous pools confuse us greatly)
   </div>
-</div>
+  <div class="createControls">
+    <h3 class="createCtrl">Pool Name: </h3>
+    <input class="createCtrl" ng-init="poolName = ''" ng-model="poolName" maxlength="20">
+  </div>
+  <div class="createControls">
+    <h4 class="createCtrl">Import from MakerPass: </h4>
+    <select class="createCtrl" ng-model="currentCohort" ng-options="cohort as cohort.name for cohort in allCohorts" >
+    <option value="">Choose a Cohort</option>
+    </select>
+    <button class="createCtrl" ng-click="importStudents()">Import</button>
+  </div>
+  <div class="createControls">
+    <h4 class="createCtrl">Group Size: </h4>
+    <select class="createCtrl" ng-init="groupSizeSelect = 2" ng-model="groupSizeSelect">
+    <option class="createCtrl" ng-repeat="idx in getIndexArray(8)">{{idx+2}}</option>
+    </select>
+    <button class="createCtrl" ng-click='createPool()' ng-href="`pool/{{pool.id}}`">Create Pool</button>
+  </div>
+  <h3 class="createListTitle">Pool Admins</h3>
+  <div class="creatingUserList">
+    <div loading class="extraBtn" ng-show="loadingUsers"></div>
+    <div class="studentParent" ng-class="{removed: removedAdmins[admin.user_uid]}" ng-repeat="admin in importedAdmins" ng-hide="loadingUsers">
+      <img class="stuImg" src='{{admin.user.avatar_url}}' width='40px' height='50px'>
+      <p class="stuName">{{admin.user.name}}</p>
+      <button ng-show="$index > 0" class="deleteStu" ng-click="toggleRemoved(admin, 'admin')" width="40px" height="50px">{{removedAdmins[admin.user_uid] ? 'O' : 'X'}}</button>
+    </div>
+  </div>
 
-<div id="noStusError" class="error" ng-show="noStusError && importedStudents.length">
-  Oops! We can't create a pool without any students. Get people involved!
-</div> 
-<h3 class="createListTitle">Pool Members</h3>
-<div class="creatingUserList" ng-show="importedStudents.length">
-  <div class="studentParent" ng-class="{removed: removedStus[student.user_uid]}" ng-repeat="student in importedStudents" >
-    <img class="stuImg" src='{{student.user.avatar_url}}' width='40px' height='50px'>
-      <p class="stuName">{{student.user.name}}</p>
-        <button class="deleteStu" ng-click='toggleRemoved(student, "student")' width='40px' height='50px'>{{removedStus[student.user_uid] ? 'O' : 'X'}}</button>
+  <div id="noStusError" class="error" ng-show="noStusError && importedStudents.length">
+    Oops! We can't create a pool without any students. Get people involved!
+  </div> 
+  <h3 class="createListTitle">Pool Members</h3>
+  <div class="creatingUserList" ng-show="importedStudents.length">
+  <div loading class="extraBtn" ng-show="loadingUsers"></div>
+    <div class="studentParent" ng-class="{removed: removedStus[student.user_uid]}" ng-repeat="student in importedStudents" ng-hide="loadingUsers">
+      <img class="stuImg" src='{{student.user.avatar_url}}' width='40px' height='50px'>
+        <p class="stuName">{{student.user.name}}</p>
+          <button class="deleteStu" ng-click='toggleRemoved(student, "student")' width='40px' height='50px'>{{removedStus[student.user_uid] ? 'O' : 'X'}}</button>
+    </div>
   </div>
-</div>
-<div class="extraBtn">
-  <button class="createCtrl" ng-click='createPool()' ng-href="`pool/{{pool.id}}`">Create Pool</button>
-</div>
+  <div class="extraBtn">
+    <button class="createCtrl" ng-click='createPool()' ng-href="`pool/{{pool.id}}`">Create Pool</button>
+  </div>
 </div>

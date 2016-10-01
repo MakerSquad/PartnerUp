@@ -1,7 +1,8 @@
 <div header></div>
 <div class="home">
   <h1 class="homeTitle">{{currentUser.name + "'s Pools"}}</h1>
-  <div class="homePool" ng-click="goToPool(pool)" ng-repeat="pool in pools" ng-show="pools.length" >
+  <div loading class="extraBtn" ng-show="loading"></div>
+  <div class="homePool" ng-click="goToPool(pool)" ng-repeat="pool in pools" ng-show="pools.length && !loading">
     <h3 class="homePoolName">
       {{pool.name}}
     </h3>
@@ -12,8 +13,8 @@
       <div class="member homeRole" ng-if="pool.role==='student' || pool.role === 'memberAdmin'">member</div>
     </div>
   </div>
-  <h3 class='noPools' ng-show="!pools.length">You have no open pools. Go create one now!</h3>
-  <div class="extraBtn">
+  <h3 class='noPools' ng-show="!pools.length && !loading">You have no open pools. Go create one now!</h3>
+  <div class="extraBtn" ng-show="!loading">
     <button ng-click="goToCreatePool()">Create New Pool</button>
   </div>
 </div>

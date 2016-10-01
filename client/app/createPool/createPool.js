@@ -7,11 +7,14 @@ angular.module('PU.createPool', ['PU.factories'])
   $scope.importedAdmins = [];
   $scope.removedStus = {};
   $scope.removedAdmins = {};
+  $scope.loadingPage = true;
+  $scope.loadingUsers = false;
 
   // $scope.currentCohort = '';
 
 
   $scope.importStudents = function(){
+    $scope.loadingUsers = true;
     MakerPass.getMemberships($scope.currentCohort)
     .then(function(data){
       console.log('data', data)
@@ -44,8 +47,12 @@ angular.module('PU.createPool', ['PU.factories'])
           console.log('admins!', $scope.importedAdmins)
         }
       }
+      $scope.loadingUsers = false;
     })
-    .catch(function(err){console.log(err)})
+    .catch(function(err){
+      console.error("Error fetching users: ", err);
+      $scope.loadingUsers = false;
+    })
   }
 
 
@@ -78,6 +85,7 @@ angular.module('PU.createPool', ['PU.factories'])
   }
 
   $scope.createPool = function(){
+    $scope.loadingPage = true;
     var didError = false;
     if(!$scope.importedStudents.length || $scope.importedStudents.length === Object.keys($scope.removedStus).length){
       $scope.noStusError = true;
@@ -168,6 +176,7 @@ angular.module('PU.createPool', ['PU.factories'])
               }
 
               console.log("Current scope: ", $scope);
+              $scope.loadingPage = false;
               $scope.$apply();
             })
           
