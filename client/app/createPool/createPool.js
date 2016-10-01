@@ -61,16 +61,25 @@ angular.module('PU.createPool', ['PU.factories'])
   }
 
   $scope.createPool = function(){
-      var members=[];
+    var didError = false;
+    if(!$scope.importedStudents.length){
+      $scope.noStusError = true;
+      didError = true;
+    }
+    if(!$scope.poolName.length){
+      $scope.noNameError = true
+      didError = true;
+    }
+    if(didError){
+      return; //don't go through with the create
+    }
+    var members=[];
     for (var a = 0; a<$scope.importedStudents.length; a++){
       var stud = $scope.importedStudents[a]
       for (var b=0; b<$scope.importedAdmins.length;b++){
         var admin = $scope.importedAdmins[b]
         if(stud.user_uid === admin.user_uid){
           var member = {};
-          if($scope.importedStudents[a].user.name.includes('Kath')){
-            console.log("Adding kath as studentAdmin");
-          }
           member.user_uid = stud.user_uid;
           member.role = "memberAdmin";
           members.push(member);
@@ -83,18 +92,12 @@ angular.module('PU.createPool', ['PU.factories'])
     }
     for(var i = 0; i<$scope.importedStudents.length; i++){
       var member = {};
-      if($scope.importedStudents[i].user.name.includes('Kath')){
-        console.log("Adding kath as student");
-      }
       member.user_uid = $scope.importedStudents[i].user_uid
       member.role = $scope.importedStudents[i].role
       members.push(member);
     }
     for(var j = 0; j<$scope.importedAdmins.length;j++){
       var member = {};
-      if($scope.importedAdmins[j].user.name.includes('Kath')){
-        console.log("Adding kath as admin");
-      }
       member.user_uid = $scope.importedAdmins[j].user_uid
       member.role = $scope.importedAdmins[j].role
       members.push(member);

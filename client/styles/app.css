@@ -1,9 +1,14 @@
 body{
-  height: 100vh;
+  height: 100%;
+  background-color: #F0F4F5;
 }
 
-.ng-scope{
-  /*background-color: #F0F4F5;*/
+.error{
+  color: red;
+  border: 2px solid red;
+  background-color: #ffe6e6;
+  border-radius: 10px;
+  text-align: center;
 }
 
 .Grid{

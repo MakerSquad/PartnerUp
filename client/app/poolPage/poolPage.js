@@ -34,25 +34,35 @@ angular.module('PU.poolPage', ['PU.factories'])
       DB.getPool($routeParams.poolId)
       .then(function(poolInfo){
         console.log("PoolInfo: ", poolInfo);
+        if(!poolInfo){
+          $scope.error = "Whoops, no pool here (neither swimming nor billiards)";
+          return;
+        }
         $scope.currPool = poolInfo;
         groupSize = poolInfo.group_size;
         DB.getMemberships(poolInfo)
         .then(function(members){
           var partOfGroup = false;
           for(var i = 0; i < members.length; i++){
-            if(members[i].role === 'student' || members[i].role === 'memberAdmin'){
+            if(members[i].role === 'student'){
               if(members[i].user.uid === $scope.currentUser.uid){
                 $scope.stuView = true;
                 partOfGroup = true;
               }
               $scope.students.push(members[i]);
               console.log("Students: ", $scope.students);
-            }else if(members[i].role === 'fellow' || members[i].role === 'instructor' || members[i].role === 'memberAdmin'){
+            }else if(members[i].role === 'fellow' || members[i].role === 'instructor'){
               $scope.admins.push(members[i]);
               if(members[i].user.uid === $scope.currentUser.uid){
                 partOfGroup = true;
               }
-            }
+            }else if(members[i].role === 'memberAdmin'){
+              $scope.students.push(members[i]);
+              $scope.admins.push(members[i]);
+              if(members[i].user.uid === $scope.currentUser.uid){
+                partOfGroup = true;
+              }
+           }
           }
 
           for(var j = 0; j < $scope.students.length % groupSize; j++){
@@ -74,13 +84,13 @@ angular.module('PU.poolPage', ['PU.factories'])
         })
         .catch(function(err){
           console.error("Error loading pool members: ", err);
-          $scope.error = "Error loading pool members: " + err;
+          $scope.error = "Something went wrong getting the members of this pool! (Don't blame me, I'm just the front-end developer)"
           $scope.loading = false;
         })
       })
       .catch(function(err){
         console.error("Error getting pool: ", err);
-        $scope.error = "Error getting pool: " + err;
+        $scope.error = "Um, that pool doesn't seem valid. Could be our fault (but it's probably yours) (pools are designated by numbers)";
         $scope.loading = false;
       })
     })
@@ -88,6 +98,8 @@ angular.module('PU.poolPage', ['PU.factories'])
       console.error("Error initializing page: ", err);
       $scope.error = "Error initializing page: " + err;
       $scope.loading = false;
+      $location.path('/signin');
+      $scope.$apply();
     })
   }())
 
@@ -212,7 +224,6 @@ angular.module('PU.poolPage', ['PU.factories'])
 
     checkClashes();
     $scope.partnerUp = true;
-    $scope.finalized = false;
     $scope.loadingGroups = false;
     console.log("Groups after randomize: ", $scope.groups);
     return $scope.groups;
@@ -312,7 +323,6 @@ angular.module('PU.poolPage', ['PU.factories'])
       }
     }
     $scope.partnerUp = true;
-    $scope.finalized = false;
     checkClashes();
     timeoutCounter = 0;
     $scope.loadingGroups = false;
@@ -459,9 +469,6 @@ angular.module('PU.poolPage', ['PU.factories'])
       swapStus(selectedIndex, $scope.selectedForSwapIndex);
       $scope.selectedForSwap = null;
       $scope.selectedForSwapIndex = null;
-      if($scope.finalized){
-        alert("Note: the groups have already been finalized; any manual edits will not be recorded")
-      }
     }
     checkClashes();
   }

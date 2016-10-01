@@ -55,7 +55,10 @@ angular.module('PU.signin', [
     $.oauthpopup({windowName: 'login', path:'/auth/makerpass', callback: function (data){
       console.log("data in callback", data);
       var signInInfo = JSON.parse(data.slice(data.indexOf('{'), data.lastIndexOf('}') + 1));
-      console.log("Parsed: ", signInInfo);
+      if(!signInInfo.token){
+        alert("Whoops! Something went wrong with your log in. Please try again, I promise we'll (try to) do better");
+        return;
+      }
       document.cookie = `token=${signInInfo.token}`;
       //CurrentUser.set(signInInfo.data.user);
       $window.location.href = ('/#/');

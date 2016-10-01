@@ -1,9 +1,15 @@
 <div header></div> 
 <br>
 <div class='form'>
-<h3>PoolName: <input ng-model="poolName"></h3>
+<div class="error" ng-show="noNameError && poolName.length <= 0">
+  Oops! That pool needs a name <br> (Anonymous pools confuse us greatly)
+</div> 
+<h3>Pool Name: <input ng-init="poolName = ''" ng-model="poolName" maxlength="20"></h3>
 <!-- <h4> admins</h4>
 <div class="studentParent" ng-repeat="admin in importedAdmins" >{{admin.user.name}}</div> -->
+<div class="error" ng-show="noStusError && importedStudents.length <= 0">
+  Oops! We can't create a pool without any students. Get people involved!
+</div> 
 <h4>Pool Members</h4>
 <div class="studentParent" ng-repeat="student in importedStudents" >
   <img class="stuImg" src='{{student.user.avatar_url}}' width='40px' height='50px'>

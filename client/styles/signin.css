@@ -1,8 +1,9 @@
 .bodyclass{
   background-image: url('../assets/giphy.gif') !important;
-  background-size: 23% 
-
+  background-size: 23%;
+  height: 100vh;
 }
+
 .partnerUpWelcome{
   text-align: center !important;
   color: white !important;
@@ -11,6 +12,7 @@
 
 
 }
+
 .login{
    font-family: 'Anton', sans-serif;
    font-size: 100px !important;
