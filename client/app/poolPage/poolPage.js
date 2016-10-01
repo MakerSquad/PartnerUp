@@ -163,6 +163,7 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
     $scope.loadingNewGrouping = true;
     $scope.creatingGrouping = true;
+    $scope.groupingName = "";
     console.log("Loading new Grouping? : ", $scope.loadingNewGrouping);
     $scope.randomize();
     $scope.loadingNewGrouping = false;
@@ -238,7 +239,6 @@ angular.module('PU.poolPage', ['PU.factories'])
   */
 
   $scope.randomize = function(){
-    $scope.groupingName = "";
     $scope.loadingGroups = true;
     if(!groupSize){
       groupSize = 2; //default group size to 2

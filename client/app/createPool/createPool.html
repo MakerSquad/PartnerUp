@@ -5,16 +5,21 @@
   Oops! That pool needs a name <br> (Anonymous pools confuse us greatly)
 </div> 
 <h3>Pool Name: <input ng-init="poolName = ''" ng-model="poolName" maxlength="20"></h3>
-<!-- <h4> admins</h4>
-<div class="studentParent" ng-repeat="admin in importedAdmins" >{{admin.user.name}}</div> -->
+<h4>Pool Admins</h4>
+<div class="studentParent" ng-class="{removed: removedAdmins[admin.user_uid]}" ng-repeat="admin in importedAdmins">
+  <img class="stuImg" src='{{admin.user.avatar_url}}' width='40px' height='50px'>
+  <p class="stuName">{{admin.user.name}}</p>
+  <button ng-show="$index > 0" class="deleteStu" ng-click="toggleRemoved(admin, 'admin')" width="40px" height="50px">{{removedAdmins[admin.user_uid] ? 'O' : 'X'}}</button>
+</div>
+
 <div class="error" ng-show="noStusError && importedStudents.length <= 0">
   Oops! We can't create a pool without any students. Get people involved!
 </div> 
 <h4>Pool Members</h4>
-<div class="studentParent" ng-repeat="student in importedStudents" >
+<div class="studentParent" ng-class="{removed: removedStus[student.user_uid]}" ng-repeat="student in importedStudents" >
   <img class="stuImg" src='{{student.user.avatar_url}}' width='40px' height='50px'>
     <p class="stuName">{{student.user.name}}</p>
-      <button class="deleteStu" ng-click='removeStudent(student)' width='40px' height='50px'>x</button>
+      <button class="deleteStu" ng-click='toggleRemoved(student, "student")' width='40px' height='50px'>{{removedStus[student.user_uid] ? 'O' : 'X'}}</button>
 </div>
 <select ng-model="currentCohort" ng-options="cohort as cohort.name for cohort in allCohorts" >
 <option value="">Choose a Cohort</option>

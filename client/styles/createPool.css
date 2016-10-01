@@ -18,3 +18,9 @@ margin-right: 1em;
 .deleteStu{
 /*  flex: 1;*/
 }
+
+.removed{
+  text-decoration: line-through;
+  color: #AAA;
+  opacity: 0.7;
+}
