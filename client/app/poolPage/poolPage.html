@@ -1,5 +1,6 @@
 <div header></div>
-<div class="poolPageBody">
+<h2 class="errMsg" ng-show="error.length">{{error}}</h2>
+<div class="poolPageBody" ng-show="!error.length">
 <h1 class="poolTitle">{{currPool.name}}</h1>
 <br>
 <button class="partnerUpBtn" ng-hide="stuView" ng-click="startNewGrouping()">Organize New Grouping</button>

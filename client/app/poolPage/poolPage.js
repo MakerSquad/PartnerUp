@@ -20,6 +20,7 @@ angular.module('PU.poolPage', ['PU.factories'])
   $scope.noRepeats = true;
   $scope.idMap = {};
   $scope.alreadyFailed = false;
+  $scope.error = "";
   var groupSize = 2;
   var timeoutCounter = 0;
   var timeoutThreshold = 5000;
@@ -65,9 +66,28 @@ angular.module('PU.poolPage', ['PU.factories'])
           refreshGroupings()
           .then(function(){
             $scope.loading = false;
+          })
+          .catch(function(err){
+            $scope.error = "Error: " + err;
+            $scope.loading = false;
           });
         })
+        .catch(function(err){
+          console.error("Error loading pool members: ", err);
+          $scope.error = "Error loading pool members: " + err;
+          $scope.loading = false;
+        })
+      })
+      .catch(function(err){
+        console.error("Error getting pool: ", err);
+        $scope.error = "Error getting pool: " + err;
+        $scope.loading = false;
+      })
     })
+    .catch(function(err){
+      console.error("Error initializing page: ", err);
+      $scope.error = "Error initializing page: " + err;
+      $scope.loading = false;
     })
   }())
 
@@ -93,8 +113,6 @@ angular.module('PU.poolPage', ['PU.factories'])
   }
 
   $scope.filterGroupsByName = function(group){
-    console.log("calling filter by name for: ", $scope.stuSearch);
-    console.log("Group: ", group);
     if(!$scope.stuSearch) return true;
     var search = $scope.stuSearch.toLowerCase();
     return group.filter(stu => stu.user.name.toLowerCase().includes(search)).length;

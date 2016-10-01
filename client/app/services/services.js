@@ -103,12 +103,16 @@ angular.module('PU.factories', [])
 .factory('DB', function($http){
 
   var getPool = function(poolId){
+    if(!Number.isInteger(Number(poolId))){
+      console.log("Error");
+      return Promise.reject("Invalid pool id");
+    }
     return $http({
       method: 'GET',
       url: `/group/${poolId}`
     })
     .then(resp => resp.data)
-    .catch(err => err)
+    .catch(err => Promise.reject(err.statusText))
   }
 
   var getClasses = function(){
@@ -117,7 +121,7 @@ angular.module('PU.factories', [])
       url: '/groups'
     })
     .then(resp => resp.data)
-    .catch(err => err);
+    .catch(err => Promise.reject(err.statusText));
   }
 
   var getMemberships = function(cls){
@@ -129,7 +133,7 @@ angular.module('PU.factories', [])
       console.log("Memberships response: ", resp);
       return resp.data;
     })
-    .catch(err => err)
+    .catch(err => Promise.reject(err.statusText))
   }
 
   var getPairs = function(cls){
@@ -138,7 +142,7 @@ angular.module('PU.factories', [])
       url: `/group/${cls.id}/pairs`
     })
     .then(resp => resp.data)
-    .catch(err => err)
+    .catch(err => Promise.reject(err.statusText))
   }
 
   var addPairs = function(cls, pairs, genTitle, groupSize){
@@ -155,10 +159,7 @@ angular.module('PU.factories', [])
       console.log("Success posting pairs!")
       return resp.data
     })
-    .catch(err => {
-      console.error("Error: ", err);
-      throw err;
-    })
+    .catch(err => Promise.reject(err.statusText))
   }
 
   var getGroupings = function(cls){
@@ -167,7 +168,7 @@ angular.module('PU.factories', [])
       url:`/group/${cls.id}/generations`
     })
     .then(resp => resp.data)
-    .catch(err => err)
+    .catch(err => Promise.reject(err.statusText))
   }
 
   var deleteGeneration = function(groupId, genId){
@@ -176,7 +177,7 @@ angular.module('PU.factories', [])
       url: `/${groupId}/generation/${genId}`
     })
     .then(resp => resp.data)
-    .catch(err => err)
+    .catch(err => Promise.reject(err.statusText))
   }
 
   var deleteAllGenerations = function(groupId){
@@ -185,7 +186,7 @@ angular.module('PU.factories', [])
       url: `/${groupId}/deletePairs`
     })
     .then(resp => resp.data)
-    .catch(err => err)
+    .catch(err => Promise.reject(err.statusText))
   }
 
   var getRecentPairs = function(cls){
@@ -194,7 +195,7 @@ angular.module('PU.factories', [])
       url: `/group/${cls.id}/recent`
     })
     .then(resp => resp.data)
-    .catch(err => err)
+    .catch(err => Promise.reject(err.statusText))
   }
 
   var createClass = function(members, groupData){
@@ -206,7 +207,7 @@ angular.module('PU.factories', [])
       groupData: groupData}
     })
     .then(resp => resp.data)
-    .catch(err => console.log('you fucked up',err))
+    .catch(err => Promise.reject(err.statusText))
   }
 
   return{
