@@ -11,9 +11,9 @@
   <button class="reroll" ng-click="randomize()">Re-roll</button>
   <div id="partners" class='pair' unselectable="on" class="unselectable"> 
     <div class="grp" ng-repeat="group in groups" ng-class="{clash: clashes.includes(group)}" >
-      <div class="partner" ng-repeat="stu in group" class="stu"> 
+      <div class="partner" ng-class="{locked: lockedStus[stu.user.uid]}" ng-repeat="stu in group" class="stu"> 
         <img class='portrait' src='{{stu.user.avatar_url}}'>
-        <div class='partnerName' ng-class="{selectedStu: selectedForSwap === stu, locked: lockedStus[stu.user.uid], clickable: !stuView}" ng-click="selectForSwap(stu)">{{stu.user.name}}</div>
+        <div class='partnerName' ng-class="{selectedStu: selectedForSwap === stu, clickable: !stuView}" ng-click="selectForSwap(stu)">{{stu.user.name}}</div>
         <img class='Grid Grid--cell lockBtn' src= "http://simpleicon.com/wp-content/uploads/lock-3.png" width='15px' height='15px' ng-show='lockedStus[stu.user.uid] === undefined' ng-click="toggleLockStu(stu)">
         <img class='Grid Grid--cell lockBtn' src= "http://image.flaticon.com/icons/svg/26/26053.svg" width='15px' height='15px' ng-show='lockedStus[stu.user.uid] !== undefined' ng-click="toggleLockStu(stu)">
       </div>

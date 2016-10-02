@@ -223,6 +223,7 @@ angular.module('PU.poolPage', ['PU.factories'])
       currGroupInd += 1;
     }
 
+    swapLockedStusBack();
     checkClashes();
     $scope.partnerUp = true;
     $scope.loadingGroups = false;
@@ -264,12 +265,12 @@ angular.module('PU.poolPage', ['PU.factories'])
       $scope.groups[i] = [];
     }
     for(var s in $scope.lockedStus){
-      $scope.groups[$scope.lockedStus[s]].push($scope.idMap[s]);
+      $scope.groups[$scope.lockedStus[s][0]].push($scope.idMap[s]);
     }
     var stus = $scope.students.slice();
 
     stus = stus.filter(function(stu){
-      return !Number.isInteger($scope.lockedStus[stu.user.uid]); //don't shuffle the locked students
+      return !$scope.lockedStus[stu.user.uid]; //don't shuffle the locked students
     })
 
     var shuffled = [];
@@ -323,10 +324,19 @@ angular.module('PU.poolPage', ['PU.factories'])
       }
     }
     $scope.partnerUp = true;
+    swapLockedStusBack();
     checkClashes();
     timeoutCounter = 0;
     $scope.loadingGroups = false;
     return $scope.groups;
+  }
+
+  var swapLockedStusBack = function(){
+    for(var s in $scope.lockedStus){
+      var currGroup = $scope.lockedStus[s][0];
+      var currIndex = [currGroup, $scope.groups[currGroup].indexOf($scope.idMap[s])];
+      swapStus(currIndex, $scope.lockedStus[s])
+    }
   }
 
   $scope.filterGroupsByName = function(group){
@@ -403,21 +413,19 @@ angular.module('PU.poolPage', ['PU.factories'])
 
   $scope.toggleLockStu = function(stu){
     var index = searchGroupsForStu(stu);
-    if(!Number.isInteger($scope.lockedStus[stu.user.uid])){
+    if(!$scope.lockedStus[stu.user.uid]){
       if(index !== -1){
         $scope.lockedStus[stu.user.uid] = index;
       }
       if(groupSize === 2){
-        for(var i = 0; i < $scope.groups[index].length; i++){
-          $scope.lockedStus[$scope.groups[index][i].user.uid] = index;
+        for(var i = 0; i < $scope.groups[index[0]].length; i++){
+          $scope.lockedStus[$scope.groups[index[0]][i].user.uid] = [index[0], i];
         }
-      }else{
-        console.error("Error locking student: student not found in groups")
       }
     }else{
       if(groupSize === 2){
-        for(var i = 0; i < $scope.groups[index].length; i++){
-          delete $scope.lockedStus[$scope.groups[index][i].user.uid];
+        for(var i = 0; i < $scope.groups[index[0]].length; i++){
+          delete $scope.lockedStus[$scope.groups[index[0]][i].user.uid];
         }
       }
       delete $scope.lockedStus[stu.user.uid];
@@ -428,7 +436,7 @@ angular.module('PU.poolPage', ['PU.factories'])
     for(var i = 0; i < $scope.groups.length; i++){
       for(var j = 0; j < $scope.groups[i].length; j++){
         if($scope.groups[i][j] === stu){
-          return i;
+          return [i, j];
         }
       }
     }

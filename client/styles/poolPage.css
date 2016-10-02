@@ -94,3 +94,7 @@
 .clash{
   color: red;
 }
+
+.locked{
+  background-color: #CCC;
+}
