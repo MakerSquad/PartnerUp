@@ -8,6 +8,10 @@
 .homeTitle{
   text-align: center;
 }
+/*.allHeight{
+  height: 100vh;
+  width:100vw;
+}*/
 
 .homePool{
   display: flex;
@@ -57,12 +61,12 @@
 }
 
 .admin{
-  background-color: rgba(2, 152, 245, 0.8);
+  background-color: rgba(2, 152, 245, 0.8) !important;
 }
 
 .member{
-  background-color: rgba(0,0,0,0.12);
-  color: rgba(0,0,0,0.38);
+  background-color: rgba(0,0,0,0.12) !important;
+  color: rgba(0,0,0,0.38) !important;
 }
 .noPools{
   text-align: center;

@@ -1,8 +1,13 @@
 body{
-  height: 100vh;
+  min-height: 100vh;
   
 }
-.full { height: 100%;}
+html{
+  background-color: #F0F4F5;
+}
+.ng-scope{
+  background-color: #F0F4F5;
+}
 
 
 .fade {
