@@ -97,6 +97,7 @@ angular.module('PU.createPool', ['PU.factories'])
     }
     if(didError){
       $anchorScroll('noNameError');
+      $scope.loadingPage = false;
       return; //don't go through with the create
     }
 

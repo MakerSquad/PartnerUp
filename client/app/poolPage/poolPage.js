@@ -36,6 +36,7 @@ angular.module('PU.poolPage', ['PU.factories'])
         console.log("PoolInfo: ", poolInfo);
         if(!poolInfo){
           $scope.error = "Whoops, no pool here (neither swimming nor billiards)";
+          $scope.loading = false;
           return;
         }
         $scope.currPool = poolInfo;
