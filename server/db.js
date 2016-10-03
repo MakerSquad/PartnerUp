@@ -222,10 +222,10 @@ knex.deleteGeneration = (id) => {
 
 
 knex.getTables = () => {
-  return knex('groups').returning('*')
+  return knex('generations').returning('*')
 }
 knex.getTables2 = () => {
-  return knex('pairs').returning('*')
+  return knex('auth').returning('*')
 }
 
 /**
@@ -325,24 +325,16 @@ knex.getNewGen = (groupId) => {
 knex.getUserData = (userUid) => {
   return knex('pairs').where('user1_uid', userUid).orWhere('user2_uid', userUid).returning("*")
   .then((students) => {
-    console.log("students,", students)
     for(var i=0, genIds =[]; i<students.length ;i++) if(!genIds.includes(students[i].gen_table_id)) genIds.push(students[i].gen_table_id);
     return knex('generations').whereIn('id', genIds).returning("*")
     .then((generations) =>{
       for(var i=0, groupIds =[]; i<generations.length ;i++) if(!groupIds.includes(generations[i].group_id)) groupIds.push(generations[i].group_id); 
       return knex('groups').whereIn('id', groupIds).returning("*")
       .then((groups) => {
-        for(var i=0, data =[]; i<students.length; i++) {
-          try {
-            var generation = generations[knex.findItemById(generations, students[i].gen_table_id)]
-            var group = groups[knex.findItemById(groups, generation.group_id)]
-          }
-          catch (e){
-            if(e instanceof TypeError){
-              var generation = "doesnt exist"
-              var group = "doesnt exist"
-            } else throw new Error(e);
-          }
+        for(var i=0, generation = null,group = null, data =[]; i<students.length; i++) {
+
+          generation  = knex.findItemById(generations, students[i].gen_table_id)
+          group  = knex.findItemById(groups, generation.group_id)
           data.push({
             user1_uid : students[i].user1_uid,
             user2_uid : students[i].user2_uid,
@@ -357,15 +349,15 @@ knex.getUserData = (userUid) => {
 }
 
 knex.findItemById = (array, id) => {
-  if(!array || array.length == 0) return -1;
+  if(!array || array.length == 0 || !id) return -1;
   var low = 0;
   var high = array.length - 1;
   var found = false;
   while(!found){
     var mid = Math.floor((high + low) /2)  
-    if(array[high].id === id) return high;
-    if(array[low].id === id) return low;  
-    if(array[mid].id === id) return mid;  
+    if(array[high].id === id) return array[high];
+    if(array[low].id === id) return array[low];  
+    if(array[mid].id === id) return array[mid];  
     else if(array[mid].id > id){
       if(high === mid) break;
       high = mid;
