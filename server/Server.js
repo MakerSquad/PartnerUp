@@ -20,11 +20,19 @@ AuthPort.createServer({
  
 AuthPort.on('auth', (req, res, data) => {
   var token = hash(data.token)
-    db.addToken(token, data.data.user.uid) // adds token to db
-      .then((e) => {
-        console.log("OAuth success! user logged:", data.data.user); // tell server when someone logs in
-        res.send(data)
-      }).catch((err) => {console.log("auth error:", err); res.status(500).send(err)})
+  MP.user.groups(data.data.user.uid, data.token)    
+  .then((groups) => {
+    for(var i=0, admin=false; i<groups.length; i++) 
+      if(groups[i].user_role !== 'student'){
+        admin = true;
+        break;
+      }
+    db.addToken(token, data.data.user.uid, admin) // adds token to db
+    .then((e) => {
+      console.log("OAuth success! user logged:", data.data.user); // tell server when someone logs in
+      res.send(data)
+    }).catch((err) => {console.log("auth error:", err); res.status(500).send(err)})
+  }) .catch((err) => {res.status(401).send(err)})
 })
  
 AuthPort.on('error', (req, res, data) => {
@@ -183,13 +191,6 @@ app.get('/user/:uid', (req, res) => { // done
     }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
 })
 
-// app.get('/test', (req, res) => {
-//   var id = hash('abcd')
-//   console.log('id: ', id)
-//   res.send(id)
-//   .then((e)=> res.send(e))
-//   .catch((err) => res.status(500).send(err))
-// })
 
 app.get('/test2', (req, res) => {
     db.getTables2().then((d) => res.send(d))

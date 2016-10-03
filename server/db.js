@@ -17,21 +17,20 @@ knex.authenticate = (token) => {
   var encToken = hash(token)
   return knex('auth').where('token', encToken) // check for token in auth 
     .then((userUid) => { // userUid is an array
-      console.log('userUid: ', userUid[0].user_uid)
       if(userUid.length) return Promise.resolve(userUid[0].user_uid); // if user exist then resolve
       else return Promise.reject("401 Unauthorized, please make sure you are logged in"); // else send a 401 error   
     }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
 }
 
-knex.addToken = (userToken, userUid) => {
+knex.addToken = (userToken, userUid, adminStatus) => {
   return knex('auth').where('user_uid', userUid).returning('user_uid') // check if user exist
     .then((uid) => { // array with MakerPass uid
       if(uid.length) // if user exist update it
-        return knex('auth').where({user_uid: userUid}).update("token", userToken).returning('*')
+        return knex('auth').where({user_uid: userUid}).update({token: userToken, admin:adminStatus}).returning('*')
           .then((authData) => authData[0]) // return the updated token with user
           .catch((err) => {console.log("error in updateToken:",err); throw new Error("Unable to add token, "+ err)}); // throw error if something went horribly wrong
       else // else add user to auth table
-        return knex('auth').insert({user_uid: userUid, token: userToken}).returning('*') // add token and token to auth table 
+        return knex('auth').insert({user_uid: userUid, token: userToken, admin:adminStatus}).returning('*') // add token and token to auth table 
           .then((authData) => authData[0]) // return the new token with user
           .catch((err) => {console.log("Error in addToken:",err); throw new Error("Unable to add token, "+ err)});// throw error if something went horribly wrong
     }).catch((err) => {console.log("error before addToken:",err); throw new Error("Unable to find token, "+ err)}) // throw error if something went horribly wrong
@@ -295,10 +294,8 @@ knex.getUserData = (userUid) => {
   .then((students) => {
     console.log("students,", students)
     for(var i=0, genIds =[]; i<students.length ;i++) if(!genIds.includes(students[i].gen_table_id)) genIds.push(students[i].gen_table_id);
-    console.log("genIds", genIds)
     return knex('generations').whereIn('id', genIds).returning("*")
     .then((generations) =>{
-          console.log("generations,", generations)
       for(var i=0, groupIds =[]; i<generations.length ;i++) if(!groupIds.includes(generations[i].group_id)) groupIds.push(generations[i].group_id); 
       return knex('groups').whereIn('id', groupIds).returning("*")
       .then((groups) => {
