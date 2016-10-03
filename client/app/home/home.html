@@ -2,8 +2,9 @@
 <div loading class="extraBtn" ng-show="loading"></div>
 <div class="home fade" ng-hide="loading">
   <h1 class="homeTitle">{{currentUser.name + "'s Pools"}}</h1>
-  <div class="homePool" ng-click="goToPool(pool)" ng-repeat="pool in pools" ng-show="pools.length && !loading">
-    <h3 class="homePoolName">
+  <div class="homePool"  ng-repeat="pool in pools" ng-show="pools.length && !loading">
+  <button ng-click="deletePool(pool)">x</button>
+    <h3   ng-click="goToPool(pool)" class="homePoolName">
       {{pool.name}}
     </h3>
     <div class="homeRoles">

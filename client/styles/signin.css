@@ -1,10 +1,17 @@
 .bodyclass{
-  background-image: url('../assets/giphy.gif') !important;
+/*  background-image: url('../assets/giphy.gif') !important;
   background-size: 23%;
-  height: 100vh;
+  height: 100vh;*/
+}
+
+.robots{
+  height:50vh;
+  width:100vw;
+   background-repeat: repeat-y;
 }
 
 .partnerUpWelcome{
+/*  writing-mode: tb-rl;*/
   text-align: center !important;
   color: white !important;
   text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black !important;
@@ -14,7 +21,7 @@
 }
 
 .login{
-   font-family: 'Anton', sans-serif;
+   font-family: 'Merriweather', Georgia, Times, 'Times New Roman', serif;
    font-size: 100px !important;
     display: flex;
   align-items: center;
@@ -27,12 +34,13 @@
   /*color:white;*/
   /*border-radius: 5px;*/
   /*height:35px;*/
-  /*width: 150px;*/
+  width: 150px;
   /*font-size:13px;*/
    margin: auto;
   display: block ;
-  margin-top: 100px;
-  margin-bottom: 100px;
+  /*max-height: 10%;*/
+  margin-top: 55px;
+  /*margin-bottom: 150px;*/
   /*position: relative;
    /*box-shadow:none;*/
    /*border: none;*/

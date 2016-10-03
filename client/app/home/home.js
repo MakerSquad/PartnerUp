@@ -24,6 +24,24 @@ $scope.goToPool = function(pool){
   $location.path(`/pools/${pool.id}`);
 }
 
+$scope.deletePool = function(pool){
+  if(pool.role === 'fellow' || pool.role === 'instructor' || pool.role === 'memberAdmin' ){
+    if(confirm('Do you want to delete this pool, once delete its gone forever?')){
+      DB.deletePool(pool.id)
+      .then(function(resp){
+        $route.reload();
+        console.log(resp)
+      })
+      .catch(function(err){
+        console.log(err)
+      })
+    }
+  }
+  else{
+    alert("you are not an admin, you may not delete this pool")
+  }
+}
+
  var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
     
     new Clipboard('.clipyclip');

@@ -1,6 +1,6 @@
 body{
-  height: 100%;
-  background-color: #F0F4F5;
+  height: 100vh;
+  
 }
 
 .fade {
@@ -9,6 +9,10 @@ body{
 }
 .fade.ng-hide {
   opacity:0;
+}
+.ng-scope{
+  /*background-color: #F0F4F5;*/
+/*background-color: #F0F4F5;*/
 }
 
 .extraBtn{

@@ -210,6 +210,15 @@ angular.module('PU.factories', [])
     .catch(err => Promise.reject(err.statusText))
   }
 
+  var deletePool = function(groupId){
+    return $http({
+      method: 'DELETE',
+      url: `/group/${groupId}`
+    })
+    .then(resp => resp.data)
+    .catch(err => Promise.reject(err.statusText))
+  }
+
   return{
     getClasses: getClasses,
     getMemberships: getMemberships,
@@ -220,7 +229,8 @@ angular.module('PU.factories', [])
     deleteAllGenerations: deleteAllGenerations,
     getRecentPairs: getRecentPairs,
     createClass: createClass,
-    getPool: getPool
+    getPool: getPool,
+    deletePool: deletePool
   }
   
 })
