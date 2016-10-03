@@ -147,7 +147,6 @@ knex.deleteGroup = (groupId) => {
     .then(() => {
       return knex('generations').where('group_id', groupId).del().returning('*')
       .then((genData) => {
-        console.log('genData: ', genData)
         for(var i = 0, genIds = []; i < genData.length; i++) {
           genIds.push(genData.id)
         } 
@@ -213,13 +212,20 @@ function addGeneration(genData) {
   }).catch((err) => {throw new Error("parems aren't correct when calling addGeneration, "+ err)}) // throw error if something went horribly wrong
 }
 
+knex.deleteGeneration = (id) => {
+  return knex('generations').where('id', id).del()
+    .then((resp) => {
+      return knex('pairs').where('gen_table_id', id).del()
+        .then((resp) => 'generation deleted')
+    }).catch((err) => {throw new Error("cannot delete group from groups table, "+ err)})  // throw error if something went horribly wrong
+}
 
 
 knex.getTables = () => {
   return knex('groups').returning('*')
 }
 knex.getTables2 = () => {
-  return knex('auth').returning('*')
+  return knex('pairs').returning('*')
 }
 
 /**

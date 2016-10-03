@@ -3,11 +3,14 @@ exports.up = (knex, Promise) => Promise.all([
     table.increments('id');
     table.string('user_uid');
     table.string('token');
+    table.boolean('admin');
   }),
   knex.schema.createTableIfNotExists('groups', table => {
     table.increments('id');
     table.string('name');
-    table.integer('group_size')
+    table.integer('group_size');
+    table.string('creator');
+    table.timestamp('created_at').defaultTo(knex.fn.now());
   }),
   knex.schema.createTableIfNotExists('pairs', table => {
     table.increments('id');
@@ -21,6 +24,7 @@ exports.up = (knex, Promise) => Promise.all([
     table.string('title');
     table.integer('group_id');
     table.integer('group_size');
+    table.timestamp('created_at').defaultTo(knex.fn.now());
   }),
   knex.schema.createTableIfNotExists('group_membership', table => {
     table.increments('id');

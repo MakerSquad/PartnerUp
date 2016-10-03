@@ -137,6 +137,14 @@ app.get('/group/:groupId/generations', (req,res) => { // done
   ).catch((err) => {res.status(401).send("" +err)})
 })    
 
+app.delete('/generation/:id', (req, res) => {
+  db.authenticate(req.cookies.token).then((uid) => 
+      db.deleteGeneration(req.params.id)
+      .then((resp) => res.send(resp))
+      .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  ).catch((err) => {res.status(401).send(err)}) 
+})
+
 app.get("/group/:groupId/members", (req, res) => {  // done  
   db.authenticate(req.cookies.token)
   .then((uid) => 
