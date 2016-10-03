@@ -82,7 +82,7 @@ app.get("/cohorts", (req, res) => { // done
 })
 
 app.get("/cohort/:groupUid", (req, res) => {
-  MP.memberships(req.params.groupUid, req.cookies.token)    
+  MP.memberships(req.params.groupUid)    
   .then((students) => res.send(students))
   .catch((err) => {console.log(" ", err); res.status(500).send("" +err)})
 })
@@ -96,7 +96,7 @@ app.get("/groups", (req, res) => {
 })
 
 app.get("/group/:groupId", (req, res) => { 
-  db.authenticate(req.cookies.token).then((uid) => {
+  db.authenticate(req.cookies.token, req.params.groupId).then((uid) => {
     db.getGroup(req.params.groupId)
     .then((group) => res.send(group))
     .catch((err) => {console.log(" ", err); res.status(500).send("" +err)})
@@ -122,7 +122,7 @@ app.delete("/group/:groupId", (req, res) => {
 })
 
 app.get("/group/:groupId/recent", (req, res) => { // done
-  db.authenticate(req.cookies.token).then((uid) => 
+  db.authenticate(req.cookies.token, req.params.groupId).then((uid) => 
       db.getNewGen(req.params.groupId)
       .then((newGen) => res.send(newGen))
       .catch((err) => {console.log(" ", err); res.status(500).send("" +err)})
@@ -130,7 +130,7 @@ app.get("/group/:groupId/recent", (req, res) => { // done
 })
 
 app.get('/group/:groupId/generations', (req,res) => { // done
-  db.authenticate(req.cookies.token).then((uid) => 
+  db.authenticate(req.cookies.token, req.params.groupId).then((uid) => 
       db.getGenerationsByGroup(req.params.groupId)
       .then((generations) => res.send(generations))
       .catch((err) => {console.log(" ", err); res.status(500).send("" +err)})
@@ -146,7 +146,7 @@ app.delete('/group/:groupId/generation/:id', (req, res) => {
 })
 
 app.get("/group/:groupId/members", (req, res) => {  // done  
-  db.authenticate(req.cookies.token)
+  db.authenticate(req.cookies.token, req.params.groupId)
   .then((uid) => 
     db.getMemberships(req.params.groupId)
     .then((students) => {
@@ -163,7 +163,7 @@ app.get("/group/:groupId/members", (req, res) => {  // done
 })    
 
 app.get('/group/:groupId/pairs', (req,res) => { // done
-  db.authenticate(req.cookies.token)
+  db.authenticate(req.cookies.token, req.params.groupId)
   .then((uid) => db.getPairsForGroup(req.params.groupId)
       .then((pairs) => res.send(pairs))
       .catch((err) => {console.log(" ", err); res.status(500).send("" +err)})

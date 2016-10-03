@@ -9,15 +9,24 @@ var hash = require('string-hash')
 knex.migrate.latest([config[env]]);
 
 /**
-  @params: token = (string) Session we get from MakerPass
+  @params: token = (string) Session we get from MakerPass, group to see if perosn is in the group
   return: throws 401 if no session or user UID if there is
 */
-knex.authenticate = (token) => {
+knex.authenticate = (token, groupId = null) => {
   if(process.env.TEST_AUTH) return Promise.resolve(); // for test env
-  var encToken = hash(token)
+  var encToken = hash(token);
   return knex('auth').where('token', encToken) // check for token in auth 
     .then((userUid) => { // userUid is an array
-      if(userUid.length) return Promise.resolve(userUid[0].user_uid); // if user exist then resolve
+      if(userUid.length){ 
+        if(groupId){
+          return knex('group_membership').where({user_uid: userUid[0].user_uid, group_id:groupId}).returning("*")
+          .then((info) => {
+            if(info.length) return Promise.resolve(userUid[0].user_uid);
+            else return Promise.reject("sorry you are not in that group")
+          }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
+        }    
+        else return Promise.resolve(userUid[0].user_uid);
+      } // if user exist then resolve
       else return Promise.reject("401 Unauthorized, please make sure you are logged in"); // else send a 401 error   
     }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
 }
@@ -30,12 +39,11 @@ knex.authenticateAdmin = (token, groupId) => {
       if(userUid.length) {
         return knex('group_membership').where('user_uid', userUid[0].user_uid).andWhere('group_id', groupId)
         .then((admin) => {
-          console.log(admin[0].role)
           if(admin[0].role === 'instructor' || admin[0].role === 'fellow' || admin[0].role === 'memberAdmin') {
             return Promise.resolve(userUid[0].user_uid); // if user exist then resolve
           } else return Promise.reject("401 Unauthorized, only administrators for this group can add pairs"); // else send a 401 error 
         })
-    }
+      }
       else return Promise.reject("401 Unauthorized, please make sure you are logged in"); // else send a 401 error   
     }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
 }
@@ -110,8 +118,8 @@ knex.getGroup = (groupId) =>{
 */
 knex.addGroup = (group, creator) => {
   return canCreateGroup(creator)
-  .then( (e) => {
-    if(!e) throw new Error("sorry you reached your limit");
+  .then( (canCreate) => {
+    if(!canCreate) throw new Error("sorry you reached your limit");
     return knex('groups').where('name', group.groupData.name).returning('id')
     .then((id) => {
       if(id.length === 0) {
@@ -134,8 +142,8 @@ knex.addGroup = (group, creator) => {
       else return id[0]
     }).catch((err) => {throw new Error("Failed to add to groups due to: "+ err)}) // throw error if something went horribly wrong
   }).catch((err) => {throw new Error(err)}) // throw error if something went horribly wrong
-
 }
+
 /**
   @params uid = (string) mks_uid
 
@@ -154,10 +162,6 @@ function canCreateGroup (creator){
 
 }
 
-
-
-
-
 knex.deleteGroup = (groupId) => {
   return knex('groups').where('id', groupId).del()
   .then(() => {
@@ -175,7 +179,6 @@ knex.deleteGroup = (groupId) => {
     }).catch((err) => {throw new Error("cannot delete users from group membership table, "+ err)})  // throw error if something went horribly wrong 
   }).catch((err) => {throw new Error("cannot delete group from groups table, "+ err)})  // throw error if something went horribly wrong 
 }
-
 
 /**
   @params: pairData = ({
@@ -201,7 +204,6 @@ knex.addPairs = (pairData, groupId) => {
         .catch((err) => {throw new Error("Batch Inrest Failed due to: "+ err)}) // throw error if something went horribly wrong
     }).catch((err) => {throw new Error("Unable to create generation, "+ err)}) // throw error if something went horribly wrong
 }
-
 
 /**
   @params: genData = {
@@ -243,7 +245,7 @@ knex.getTables = () => {
   return knex('generations').returning('*')
 }
 knex.getTables2 = () => {
-  return knex('auth').returning('*')
+  return knex('groups').returning('*')
 }
 
 /**
