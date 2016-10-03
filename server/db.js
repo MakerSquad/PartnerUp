@@ -86,32 +86,59 @@ knex.getGroup = (groupId) =>{
       name: (string)
       group_size: (int)
     }
-  }
+  },
+  creator : (string) user UID that created group
   return: 'added groups to group table' or error
 */
-knex.addGroup = (group) => {
-  return knex('groups').where('name', group.groupData.name).returning('id')
-  .then((id) => {
-    if(id.length === 0) {
-      return knex('groups').insert({name: group.groupData.name, group_size: group.groupData.group_size}).returning('id')
-      .then((groupsId) => {
-        for(var i = 0, rows = []; i < group.members.length; i++) {
-          console.log("Inserting: ", {user_uid: group.members[i].user_uid,
-            group_id: groupsId[0], role: group.members[i].role});
-          rows.push({
-            user_uid: group.members[i].user_uid,
-            group_id: groupsId[0],
-            role: group.members[i].role
-          })
-        }
-        return knex.batchInsert('group_membership', rows, rows.length)
-          .then((resp) => groupsId[0])
-          .catch((err) => {throw new Error("Batch Insert Failed due to: "+ err)}) // throw error if something went horribly wrong
-      })
-    }
-    else return id[0]
-  })
+knex.addGroup = (group, creator) => {
+  return canCreateGroup(creator)
+  .then( (e) => {
+    if(!e) throw new Error("sorry you reached your limit");
+    return knex('groups').where('name', group.groupData.name).returning('id')
+    .then((id) => {
+      if(id.length === 0) {
+        return knex('groups').insert({name: group.groupData.name, group_size: group.groupData.group_size, creator: creator}).returning('id')
+        .then((groupsId) => {
+          for(var i = 0, rows = []; i < group.members.length; i++) {
+            console.log("Inserting: ", {user_uid: group.members[i].user_uid,
+              group_id: groupsId[0], role: group.members[i].role});
+            rows.push({
+              user_uid: group.members[i].user_uid,
+              group_id: groupsId[0],
+              role: group.members[i].role
+            })
+          }
+          return knex.batchInsert('group_membership', rows, rows.length)
+            .then((resp) => groupsId[0])
+            .catch((err) => {throw new Error("Batch Insert Failed due to: "+ err)}) // throw error if something went horribly wrong
+        }).catch((err) => {throw new Error("Failed to add to groups due to: "+ err)}) // throw error if something went horribly wrong
+      }
+      else return id[0]
+    }).catch((err) => {throw new Error("Failed to add to groups due to: "+ err)}) // throw error if something went horribly wrong
+  }).catch((err) => {throw new Error(err)}) // throw error if something went horribly wrong
+
 }
+/**
+  @params uid = (string) mks_uid
+
+  returns (boolean) can create a group if student
+*/
+function canCreateGroup (creator){
+  return knex('auth').where('user_uid', creator).returning('admin')
+  .then((status) =>{
+    if(status[0].admin) return true
+    return knex('groups').where('creator', creator).returning("*")
+      .then((groups) => {
+        if(groups.length <2) return true;
+        else return false;
+      }).catch((err) => {throw new Error("(1) cant creat group:" +err)})
+  }).catch((err) => {throw new Error("(2) cant creat group:" +err)})
+
+}
+
+
+
+
 
 knex.deleteGroup = (groupId) => {
   return knex('groups').where('id', groupId).del()
@@ -189,7 +216,7 @@ function addGeneration(genData) {
 
 
 knex.getTables = () => {
-  return knex('pairs').returning('*')
+  return knex('groups').returning('*')
 }
 knex.getTables2 = () => {
   return knex('auth').returning('*')

@@ -31,8 +31,8 @@ AuthPort.on('auth', (req, res, data) => {
     .then((e) => {
       console.log("OAuth success! user logged:", data.data.user); // tell server when someone logs in
       res.send(data)
-    }).catch((err) => {console.log("auth error:", err); res.status(500).send(err)})
-  }) .catch((err) => {res.status(401).send(err)})
+    }).catch((err) => {console.log("auth error:", err); res.status(500).send("" +err)})
+  }) .catch((err) => {res.status(401).send("" +err)})
 })
  
 AuthPort.on('error', (req, res, data) => {
@@ -77,39 +77,39 @@ app.get("/cohorts", (req, res) => { // done
   db.authenticate(req.cookies.token).then( (uid) => {
     MP.user.groups(uid, req.cookies.token)    
     .then((data) => res.send(data))
-    .catch((err) => {res.status(401).send(err)})   
-  }).catch((err) => {res.status(401).send(err)}) 
+    .catch((err) => {res.status(401).send("" +err)})   
+  }).catch((err) => {res.status(401).send("" +err)}) 
 })
 
 app.get("/cohort/:groupUid", (req, res) => {
   MP.memberships(req.params.groupUid, req.cookies.token)    
   .then((students) => res.send(students))
-  .catch((err) => {console.log("error:", err); res.status(500).send(err)})
+  .catch((err) => {console.log("error:", err); res.status(500).send("" +err)})
 })
 
 app.get("/groups", (req, res) => { 
   db.authenticate(req.cookies.token).then((uid) => {
     db.getGroups(uid)
     .then((groups) => res.send(groups))
-    .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => {res.status(401).send(err)}) 
+    .catch((err) => {console.log("error:", err); res.status(500).send("" +err)})
+  }).catch((err) => {res.status(401).send("" +err)}) 
 })
 
 app.get("/group/:groupId", (req, res) => { 
   db.authenticate(req.cookies.token).then((uid) => {
     db.getGroup(req.params.groupId)
     .then((group) => res.send(group))
-    .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => {res.status(401).send(err)}) 
+    .catch((err) => {console.log("error:", err); res.status(500).send("" +err)})
+  }).catch((err) => {res.status(401).send("" +err)}) 
 })
 
 app.post("/group", (req, res) => {
   db.authenticate(req.cookies.token).then((uid) => {
-    db.addGroup(req.body)
+    db.addGroup(req.body, uid)
     .then((id) => {
       res.send(""+id)
-    }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => {res.status(401).send(err)}) 
+    }).catch((err) => {console.log("error:", err); res.status(500).send("" +err)})
+  }).catch((err) => {res.status(401).send("" +err)}) 
 })
 
 app.delete("/group/:groupId", (req, res) => {
@@ -117,24 +117,24 @@ app.delete("/group/:groupId", (req, res) => {
     db.deleteGroup(req.params.groupId)
     .then((resp) => {
       res.send(resp)
-    }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  }).catch((err) => {res.status(401).send(err)}) 
+    }).catch((err) => {console.log("error:", err); res.status(500).send("" +err)})
+  }).catch((err) => {res.status(401).send("" +err)}) 
 })
 
 app.get("/group/:groupId/recent", (req, res) => { // done
   db.authenticate(req.cookies.token).then((uid) => 
       db.getNewGen(req.params.groupId)
       .then((newGen) => res.send(newGen))
-      .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  ).catch((err) => {res.status(401).send(err)}) 
+      .catch((err) => {console.log("error:", err); res.status(500).send("" +err)})
+  ).catch((err) => {res.status(401).send("" +err)}) 
 })
 
 app.get('/group/:groupId/generations', (req,res) => { // done
   db.authenticate(req.cookies.token).then((uid) => 
       db.getGenerationsByGroup(req.params.groupId)
       .then((generations) => res.send(generations))
-      .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  ).catch((err) => {res.status(401).send(err)})
+      .catch((err) => {console.log("error:", err); res.status(500).send("" +err)})
+  ).catch((err) => {res.status(401).send("" +err)})
 })    
 
 app.get("/group/:groupId/members", (req, res) => {  // done  
@@ -149,17 +149,17 @@ app.get("/group/:groupId/members", (req, res) => {  // done
           for(let i=0; i < users.length; i++)  usersSeen[users[i].uid] = users[i];
           for(let i=0; i < students.length; i++) students[i].user = usersSeen[students[i].user_uid];
           res.send(students)
-        }).catch((err) => res.status(500).send(err))
-    }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  ).catch((err) => {res.status(401).send(err)})
+        }).catch((err) => res.status(500).send("" +err))
+    }).catch((err) => {console.log("error:", err); res.status(500).send("" +err)})
+  ).catch((err) => {res.status(401).send("" +err)})
 })    
 
 app.get('/group/:groupId/pairs', (req,res) => { // done
   db.authenticate(req.cookies.token)
   .then((uid) => db.getPairsForGroup(req.params.groupId)
       .then((pairs) => res.send(pairs))
-      .catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  ).catch((err) => res.status(401).send(err))
+      .catch((err) => {console.log("error:", err); res.status(500).send("" +err)})
+  ).catch((err) => res.status(401).send("" +err))
 })
 
 app.post('/group/:groupId/pairs', (req, res) => { // done
@@ -167,8 +167,8 @@ app.post('/group/:groupId/pairs', (req, res) => { // done
   .then((uid) => 
     db.addPairs(req.body, req.params.groupId).then(data =>
       res.status(201).send(data)
-    ).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-  ).catch((err) => res.status(401).send(err))
+    ).catch((err) => {console.log("error:", err); res.status(500).send("" +err)})
+  ).catch((err) => res.status(401).send("" +err))
 })
 
 app.get('/user/:uid', (req, res) => { // done
@@ -187,19 +187,19 @@ app.get('/user/:uid', (req, res) => { // done
           }
         }
         res.send(dataArray)
-      }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
-    }).catch((err) => {console.log("error:", err); res.status(500).send(err)})
+      }).catch((err) => {console.log("error:", err); res.status(500).send("" +err)})
+    }).catch((err) => {console.log("error:", err); res.status(500).send("" +err)})
 })
 
 
 app.get('/test2', (req, res) => {
     db.getTables2().then((d) => res.send(d))
-    .catch((err) => res.send(err));
+    .catch((err) => res.send("" +err));
 })
 
 app.get('/test1', (req, res) => {
   db.getTables().then((d) => res.send(d))
-  .catch((err) => res.send(err));
+  .catch((err) => res.send("" +err));
 })
 
 
