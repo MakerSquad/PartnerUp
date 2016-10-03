@@ -22,6 +22,24 @@ knex.authenticate = (token) => {
     }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
 }
 
+knex.authenticateAdmin = (token, groupId) => {
+  if(process.env.TEST_AUTH) return Promise.resolve(); // for test env
+  var encToken = hash(token)
+  return knex('auth').where('token', encToken) // check for token in auth 
+    .then((userUid) => { // userUid is an array
+      if(userUid.length) {
+        return knex('group_membership').where('user_uid', userUid[0].user_uid).andWhere('group_id', groupId)
+        .then((admin) => {
+          console.log(admin[0].role)
+          if(admin[0].role === 'instructor' || admin[0].role === 'fellow' || admin[0].role === 'memberAdmin') {
+            return Promise.resolve(userUid[0].user_uid); // if user exist then resolve
+          } else return Promise.reject("401 Unauthorized, only administrators for this group can add pairs"); // else send a 401 error 
+        })
+    }
+      else return Promise.reject("401 Unauthorized, please make sure you are logged in"); // else send a 401 error   
+    }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
+}
+
 knex.addToken = (userToken, userUid, adminStatus) => {
   return knex('auth').where('user_uid', userUid).returning('user_uid') // check if user exist
     .then((uid) => { // array with MakerPass uid

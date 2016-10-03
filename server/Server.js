@@ -171,7 +171,7 @@ app.get('/group/:groupId/pairs', (req,res) => { // done
 })
 
 app.post('/group/:groupId/pairs', (req, res) => { // done
-  db.authenticate(req.cookies.token)
+  db.authenticateAdmin(req.cookies.token, req.params.groupId)
   .then((uid) => 
     db.addPairs(req.body, req.params.groupId).then(data =>
       res.status(201).send(data)
@@ -206,7 +206,7 @@ app.get('/test2', (req, res) => {
 })
 
 app.get('/test1', (req, res) => {
-  db.getTables().then((d) => res.send(d))
+  db.authenticateAdmin(req.cookies.token, 1).then((d) => res.send(d))
   .catch((err) => res.send("" +err));
 })
 
