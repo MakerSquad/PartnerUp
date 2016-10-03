@@ -202,10 +202,10 @@ angular.module('PU.poolPage', ['PU.factories'])
       $scope.groups[i] = [];
     }
     for(var s in $scope.lockedStus){
-      $scope.groups[$scope.lockedStus[s]].push($scope.idMap[s]);
+      $scope.groups[$scope.lockedStus[s][0]].push($scope.idMap[s]);
     }
     var stus = $scope.students.filter(function(stu){
-      return !Number.isInteger($scope.lockedStus[stu.user.uid]); //don't shuffle the locked students
+      return !$scope.lockedStus[stu.user.uid]; //don't shuffle the locked students
     })
 
     var shuffled = [];

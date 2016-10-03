@@ -4,7 +4,7 @@
 <div class="poolPageBody fade" ng-show="!error.length && !loading">
 <h1 class="poolTitle" ng-hide="loading">{{currPool.name}}</h1>
 <br>
-<button class="partnerUpBtn" ng-hide="stuView || loading" ng-click="startNewGrouping()">Organize New Grouping</button>
+<button class="partnerUpBtn" ng-hide="stuView || loading" ng-click="startNewGrouping()">{{creatingGrouping ? "Close" : "Organize New Grouping"}}</button>
 <div loading ng-show="loadingNewGrouping"></div>
 <div class="newGrouping fade" ng-show="creatingGrouping && !loadingNewGrouping && !stuView">
   <input class="groupingName" ng-model="groupingName" maxlength="20" placeholder="Enter title">

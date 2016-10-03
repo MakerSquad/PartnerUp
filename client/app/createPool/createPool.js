@@ -14,6 +14,9 @@ angular.module('PU.createPool', ['PU.factories'])
 
 
   $scope.importStudents = function(){
+    if(!$scope.currentCohort){
+      return;
+    }
     $scope.loadingUsers = true;
     MakerPass.getMemberships($scope.currentCohort)
     .then(function(data){

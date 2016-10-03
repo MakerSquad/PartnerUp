@@ -23,26 +23,24 @@ body{
   text-align: center;
 }
 
-.Grid{
-  display: flex;
-}
-
 .Grid--cell{
   flex: 1;
 }
 
 
 .welcome{
+  display: flex;
   flex: 2;
   /*width: 33% !important;
   flex: none !important;*/
   padding-right: 1%;
-  vertical-align: bottom;
+  align-self: center;
   margin-left: 2%;
   /*border-bottom: 1px solid #DDD;*/
 }
 
 .headerBtns{
+  display: flex;
   flex: 1;
 }
 
@@ -56,6 +54,10 @@ body{
 }
 
 .headerBar{
-  border-bottom: 1px solid #DDD;
+  display: flex;
+  border-bottom: 1px solid #00B398;
   margin-bottom: 20px;
+  font-size: 2rem;
+  align-items: center;
+  /*padding-bottom: 10px;*/
 }
