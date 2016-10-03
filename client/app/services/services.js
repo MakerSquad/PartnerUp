@@ -41,6 +41,7 @@ angular.module('PU.factories', [])
       .then((userData) => {
         return userData.data.user;
       })
+      .catch((err) => Promise.reject(err.statusText))
     }else{
       console.log("No signin info");
       return Promise.reject("No signin info");
@@ -228,7 +229,17 @@ angular.module('PU.factories', [])
     .catch(err => Promise.reject(err.statusText))
   }
 
+  var getUserHistory = function(userUid){
+    return $http({
+      method: 'GET',
+      url: `/user/${userUid}`
+    })
+    .then(resp => resp.data)
+    .catch(err => Promise.reject(err.statusText))
+  }
+
   return{
+    getUserHistory: getUserHistory,
     getClasses: getClasses,
     getMemberships: getMemberships,
     getPairs: getPairs,

@@ -5,7 +5,8 @@ angular.module('PU', [
   'PU.home',
   'PU.createPool',
   'ngAnimate',
-  'PU.poolPage'
+  'PU.poolPage',
+  'PU.userHistory'
   ])
 .config(function($routeProvider, $httpProvider) {
   $routeProvider
@@ -24,6 +25,13 @@ angular.module('PU', [
   .when('/pools/:poolId', {
     templateUrl: 'poolPage/poolPage.html',
     controller: 'PoolPageController'
+  })
+  .when('/users/:userUid', {
+    templateUrl: 'userHistory/userHistory.html',
+    controller: 'UserHistoryController'
+  })
+  .otherwise({
+    redirectTo: '/'
   })
 })
 

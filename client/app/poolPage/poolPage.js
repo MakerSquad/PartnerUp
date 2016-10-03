@@ -67,8 +67,9 @@ angular.module('PU.poolPage', ['PU.factories'])
           }
 
           for(var j = 0; j < $scope.students.length % groupSize; j++){
-            $scope.students.push({user: {name: "Rubber Duck Debugger", uid: "-" + i, avatar_url:'../../assets/rubberducky.png'}}); //give them decrementing ids
+            $scope.students.push({user: {name: "Rubber Duck Debugger", uid: "-" + j, avatar_url:'../../assets/rubberducky.png'}}); //give them decrementing ids
           }
+          console.log("$scope.students: ", $scope.students);
 
           $scope.makeMap();
           if(!partOfGroup){
