@@ -113,7 +113,7 @@ app.post("/group", (req, res) => {
 })
 
 app.delete("/group/:groupId", (req, res) => {
-   db.authenticate(req.cookies.token).then((uid) => {
+   db.authenticateAdmin(req.cookies.token, req.params.groupId).then((uid) => {
     db.deleteGroup(req.params.groupId)
     .then((resp) => {
       res.send(resp)
@@ -137,8 +137,8 @@ app.get('/group/:groupId/generations', (req,res) => { // done
   ).catch((err) => {res.status(401).send("" +err)})
 })    
 
-app.delete('/generation/:id', (req, res) => {
-  db.authenticate(req.cookies.token).then((uid) => 
+app.delete('/group/:groupId/generation/:id', (req, res) => {
+  db.authenticateAdmin(req.cookies.token, req.params.groupId).then((uid) => 
       db.deleteGeneration(req.params.id)
       .then((resp) => res.send(resp))
       .catch((err) => {console.log(" ", err); res.status(500).send(err)})
