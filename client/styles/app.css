@@ -2,6 +2,8 @@ body{
   height: 100vh;
   
 }
+.full { height: 100%;}
+
 
 .fade {
   -webkit-transition:all linear 0.5s;

@@ -512,4 +512,13 @@ angular.module('PU.poolPage', ['PU.factories'])
     $scope.groups[indexTuple2[0]][indexTuple2[1]] = tmp;
   }
 
+  $scope.deleteGrouping = function(group){
+    console.log('dadadadadda', group)
+    if(confirm("Are you sure you want to delete this grouping? Once deleted, its gone forever!")){
+      DB.deleteAGrouping(group.generationData.id)
+      .then(function(resp){$route.reload()})
+      .catch(function(err){console.log(err)})
+    }
+  }
+
 })
