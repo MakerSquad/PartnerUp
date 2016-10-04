@@ -20,6 +20,10 @@ margin-right: 1em;
 /*  flex: 1;*/
 }
 
+.toggleRole{
+  margin-right: 1%;
+}
+
 .createListTitle{
   text-align: center;
 }
@@ -42,9 +46,12 @@ input.createCtrl{
 }
 
 .removed{
-  text-decoration: line-through;
   color: #AAA;
   opacity: 0.7;
+}
+
+.removed>.stuName{
+  text-decoration: line-through;
 }
 
 .creatingUserList{

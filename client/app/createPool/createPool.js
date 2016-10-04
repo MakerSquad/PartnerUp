@@ -126,15 +126,19 @@ angular.module('PU.createPool', ['PU.factories'])
     for(var i = 0; i<$scope.importedStudents.length; i++){
       var member = {};
       member.user_uid = $scope.importedStudents[i].user_uid
-      member.role = $scope.importedStudents[i].role
+      member.role = 'student';
       if(!$scope.removedStus[member.user_uid]){
         members.push(member);
       }
     }
     for(var j = 0; j<$scope.importedAdmins.length;j++){
       var member = {};
-      member.user_uid = $scope.importedAdmins[j].user_uid
-      member.role = $scope.importedAdmins[j].role
+      member.user_uid = $scope.importedAdmins[j].user_uid;
+      if($scope.importedAdmins[j].role === 'student'){
+        member.role = 'fellow'; //if they were a student and got swapped
+      }else{
+        member.role = $scope.importedAdmins[j].role;
+      }
       if(!$scope.removedAdmins[member.user_uid]){
         members.push(member);
       }
@@ -147,6 +151,19 @@ angular.module('PU.createPool', ['PU.factories'])
     .catch(function(err){console.log('pool not created', err)})
 
   }
+
+  $scope.toggleRole = function(user, newRole){
+    if(newRole === 'admin'){
+      delete $scope.removedStus[user.user_uid];
+      var u = $scope.importedStudents.splice($scope.importedStudents.indexOf(user), 1)[0];
+      $scope.importedAdmins.push(u);
+    }else if(newRole === 'student'){
+      delete $scope.removedAdmins[user.user_uid];
+      var u = $scope.importedAdmins.splice($scope.importedAdmins.indexOf(user), 1)[0];
+      $scope.importedStudents.push(u);
+    }
+  }
+
   $scope.getRequest = function(){
     DB.getClasses().then(function(data){console.log('FUCK YEAH', data)})
     .catch(function(err){console.log('you fucked up', err)})

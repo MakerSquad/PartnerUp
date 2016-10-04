@@ -29,7 +29,8 @@
     <div class="studentParent" ng-class="{removed: removedAdmins[admin.user_uid]}" ng-repeat="admin in importedAdmins" ng-hide="loadingUsers">
       <img class="stuImg" src='{{admin.user.avatar_url}}' width='40px' height='50px'>
       <p class="stuName">{{admin.user.name}}</p>
-      <button ng-show="$index > 0" class="deleteStu" ng-click="toggleRemoved(admin, 'admin')" width="40px" height="50px">{{removedAdmins[admin.user_uid] ? 'O' : 'X'}}</button>
+        <button ng-show="$index > 0" class="toggleRole" ng-click="toggleRole(admin, 'student')">↓</button>
+        <button ng-show="$index > 0" class="deleteStu" ng-click="toggleRemoved(admin, 'admin')" width="40px" height="50px">{{removedAdmins[admin.user_uid] ? 'O' : 'X'}}</button>
     </div>
   </div>
 
@@ -41,8 +42,9 @@
   <div loading class="extraBtn" ng-show="loadingUsers"></div>
     <div class="studentParent" ng-class="{removed: removedStus[student.user_uid]}" ng-repeat="student in importedStudents" ng-hide="loadingUsers">
       <img class="stuImg" src='{{student.user.avatar_url}}' width='40px' height='50px'>
-        <p class="stuName">{{student.user.name}}</p>
-          <button class="deleteStu" ng-click='toggleRemoved(student, "student")' width='40px' height='50px'>{{removedStus[student.user_uid] ? 'O' : 'X'}}</button>
+      <p class="stuName">{{student.user.name}}</p>
+      <button class="toggleRole" ng-click="toggleRole(student, 'admin')">↑</button>
+      <button class="deleteStu" ng-click='toggleRemoved(student, "student")' width='40px' height='50px'>{{removedStus[student.user_uid] ? 'O' : 'X'}}</button>
     </div>
   </div>
   <div class="extraBtn">
