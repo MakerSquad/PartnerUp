@@ -23,30 +23,22 @@
     </select>
     <button class="createCtrl" ng-click='createPool()' ng-href="`pool/{{pool.id}}`">Create Pool</button>
   </div>
-  <h3 class="createListTitle">Pool Admins</h3>
+  <h3 class="createListTitle">Pool Members</h3>
   <div class="creatingUserList">
     <div loading class="extraBtn" ng-show="loadingUsers"></div>
-    <div class="studentParent" ng-class="{removed: removedAdmins[admin.user_uid]}" ng-repeat="admin in importedAdmins" ng-hide="loadingUsers">
-      <img class="stuImg" src='{{admin.user.avatar_url}}' width='40px' height='50px'>
-      <p class="stuName">{{admin.user.name}}</p>
-        <button ng-show="$index > 0" class="toggleRole" ng-click="toggleRole(admin, 'student')">↓</button>
-        <button ng-show="$index > 0" class="deleteStu" ng-click="toggleRemoved(admin, 'admin')" width="40px" height="50px">{{removedAdmins[admin.user_uid] ? 'O' : 'X'}}</button>
+    <div class="studentParent" ng-class="{removed: !isStudent[user.user_uid] && !isAdmin[user.user_uid]}" ng-repeat="user in users" ng-hide="loadingUsers">
+      <img class="stuImg" src='{{user.user.avatar_url}}'>
+      <p class="stuName">{{user.user.name}}</p>
+      <div class="roleBtns">
+        <button class="adminBtn" ng-class="{offBtn: !isAdmin[user.user_uid]}" ng-click="toggleAdmin(user)">Ad</button>
+        <button class="stuBtn" ng-class="{offBtn: !isStudent[user.user_uid]}" ng-click="toggleStu(user)">Stu</button>
+      </div>
     </div>
   </div>
 
   <div id="noStusError" class="error" ng-show="noStusError && !importedStudents.length">
     Oops! We can't create a pool without any students. Get people involved!
   </div> 
-  <h3 class="createListTitle">Pool Members</h3>
-  <div class="creatingUserList" ng-show="importedStudents.length">
-  <div loading class="extraBtn" ng-show="loadingUsers"></div>
-    <div class="studentParent" ng-class="{removed: removedStus[student.user_uid]}" ng-repeat="student in importedStudents" ng-hide="loadingUsers">
-      <img class="stuImg" src='{{student.user.avatar_url}}' width='40px' height='50px'>
-      <p class="stuName">{{student.user.name}}</p>
-      <button class="toggleRole" ng-click="toggleRole(student, 'admin')">↑</button>
-      <button class="deleteStu" ng-click='toggleRemoved(student, "student")' width='40px' height='50px'>{{removedStus[student.user_uid] ? 'O' : 'X'}}</button>
-    </div>
-  </div>
   <div class="extraBtn">
     <button class="createCtrl" ng-click='createPool()' ng-href="`pool/{{pool.id}}`">Create Pool</button>
   </div>

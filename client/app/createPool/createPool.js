@@ -3,8 +3,9 @@ angular.module('PU.createPool', ['PU.factories'])
 .controller('CreatePoolController', function ($scope, MakerPass, $location, $route, $http, $window, $anchorScroll, DB, CurrentUser) {
   document.getElementById("bodyclass").className = "";
   $scope.allCohorts = [];
-  $scope.importedStudents = [];
-  $scope.importedAdmins = [];
+  $scope.isStudent = {};
+  $scope.users = [];
+  $scope.isAdmin = {};
   $scope.removedStus = {};
   $scope.removedAdmins = {};
   $scope.loadingPage = true;
@@ -19,35 +20,21 @@ angular.module('PU.createPool', ['PU.factories'])
     }
     $scope.loadingUsers = true;
     MakerPass.getMemberships($scope.currentCohort)
-    .then(function(data){
-      console.log('data', data)
-      for(var i = 0; i<data.length; i++){
-        if(data[i].role === 'student'){
-          var there = false
-          for(var j = 0; j<$scope.importedStudents.length;j++){
-            if(data[i].user_uid === $scope.importedStudents[j].user_uid){
-              there = true
-            }
-          }
-          if(there === false){
-            $scope.importedStudents.push(data[i])
-          }
+    .then(function(members){
+      var existingUsers = {};
+      for(var j = 0; j < $scope.users.length; j++){
+        existingUsers[$scope.users[j].user_uid] = true;
+      }
+      for(var i = 0; i < members.length; i++){
+        var there = existingUsers[members[i].user_uid];
+        if(members[i].role === 'student'){
+          $scope.isStudent[members[i].user_uid] = true; 
         }
-        $scope.noStusError = false;
-    
-        if(data[i].role === 'fellow' || data[i].role === 'instructor'){
-          var isThere = false
-          for(var k = 0; k<$scope.importedAdmins.length; k++){
-            console.log('yeah budddddy')
-            if(data[i].user_uid === $scope.importedAdmins[k].user_uid){
-            console.log('its there already doofus')
-            isThere = true
-            }
-          }
-          if(isThere === false){
-            $scope.importedAdmins.push(data[i]);
-          }
-          console.log('admins!', $scope.importedAdmins)
+        else if(members[i].role === 'instructor' || members[i].role === 'fellow'){
+          $scope.isAdmin[members[i].user_uid] = true;
+        }
+        if(!there){
+          $scope.users.push(members[i]);
         }
       }
       $scope.loadingUsers = false;
@@ -90,7 +77,7 @@ angular.module('PU.createPool', ['PU.factories'])
   $scope.createPool = function(){
     $scope.loadingPage = true;
     var didError = false;
-    if(!$scope.importedStudents.length || $scope.importedStudents.length === Object.keys($scope.removedStus).length){
+    if(!Object.keys($scope.isStudent).length){
       $scope.noStusError = true;
       didError = true;
     }
@@ -105,62 +92,50 @@ angular.module('PU.createPool', ['PU.factories'])
     }
 
     var members=[];
-    for (var a = 0; a<$scope.importedStudents.length; a++){
-      var stud = $scope.importedStudents[a]
-      if(!$scope.removedStus[stud.user_uid]){
-        for (var b=0; b<$scope.importedAdmins.length;b++){
-          var admin = $scope.importedAdmins[b]
-          if(stud.user_uid === admin.user_uid){
-            var member = {};
-            member.user_uid = stud.user_uid;
-            member.role = "memberAdmin";
-            members.push(member);
-            var index = $scope.importedStudents.indexOf(stud)
-            $scope.importedStudents.splice(index, 1)
-            var index2 = $scope.importedAdmins.indexOf(admin)
-            $scope.importedAdmins.splice(index2, 1)
-          }
-        }
-      }
-    }
-    for(var i = 0; i<$scope.importedStudents.length; i++){
+    for(var i = 0; i < $scope.users.length; i++){
       var member = {};
-      member.user_uid = $scope.importedStudents[i].user_uid
-      member.role = 'student';
-      if(!$scope.removedStus[member.user_uid]){
+      var userId = $scope.users[i].user_uid;
+      member.user_uid = userId;
+      if($scope.isStudent[userId] && $scope.isAdmin[userId]){
+        member.role = "memberAdmin";
         members.push(member);
       }
-    }
-    for(var j = 0; j<$scope.importedAdmins.length;j++){
-      var member = {};
-      member.user_uid = $scope.importedAdmins[j].user_uid;
-      if($scope.importedAdmins[j].role === 'student'){
-        member.role = 'fellow'; //if they were a student and got swapped
-      }else{
-        member.role = $scope.importedAdmins[j].role;
-      }
-      if(!$scope.removedAdmins[member.user_uid]){
+      else if($scope.isStudent[userId]){
+        member.role = "student";
         members.push(member);
       }
+      else if($scope.isAdmin[userId]){
+        member.role = $scope.users[i].role === 'student' ? 'fellow' : $scope.users[i].role;
+        members.push(member);
+      }
+      //don't push if neither student nor admin
     }
-    console.log('members', members)
     var groupData = {'name': $scope.poolName, 'group_size': $scope.groupSizeSelect}
     console.log('goupData', groupData)
     DB.createClass(members, groupData)
     .then(function(resp){$location.path('/pools/'+resp)})
     .catch(function(err){console.log('pool not created', err)})
-
   }
 
-  $scope.toggleRole = function(user, newRole){
-    if(newRole === 'admin'){
-      delete $scope.removedStus[user.user_uid];
-      var u = $scope.importedStudents.splice($scope.importedStudents.indexOf(user), 1)[0];
-      $scope.importedAdmins.push(u);
-    }else if(newRole === 'student'){
-      delete $scope.removedAdmins[user.user_uid];
-      var u = $scope.importedAdmins.splice($scope.importedAdmins.indexOf(user), 1)[0];
-      $scope.importedStudents.push(u);
+  $scope.toggleAdmin = function(user){
+    if(user.user_uid === $scope.currentUser.uid){
+      alert("You must be an admin of your own group");
+      return;
+    }
+    if($scope.isAdmin[user.user_uid]){
+      delete $scope.isAdmin[user.user_uid];
+    }
+    else{
+      $scope.isAdmin[user.user_uid] = true;
+    }
+  }
+
+  $scope.toggleStu = function(user){
+    if($scope.isStudent[user.user_uid]){
+      delete $scope.isStudent[user.user_uid];
+    }
+    else{
+      $scope.isStudent[user.user_uid] = true;
     }
   }
 
@@ -181,7 +156,8 @@ angular.module('PU.createPool', ['PU.factories'])
           else{
             $scope.currentUser = userData;
             //add the current user as an admin
-            $scope.importedAdmins.push({role: 'instructor', user: $scope.currentUser, user_uid: $scope.currentUser.uid});
+            $scope.isAdmin[$scope.currentUser.uid] = true;
+            $scope.users.push({role: 'instructor', user: $scope.currentUser, user_uid: $scope.currentUser.uid});
           }
             Promise.all([
               MakerPass.getCohorts()

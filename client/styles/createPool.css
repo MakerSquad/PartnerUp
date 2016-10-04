@@ -1,6 +1,6 @@
 .studentParent{
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   width: 300px;
   height: 40px;
   border-style: solid;
@@ -11,17 +11,59 @@
   border-radius: 10px;
 }
 .stuImg{
-margin-right: 1em;
+  margin-right: 1em;
+  max-height: 96%;
+}
+
+.stuProfile{
+  flex: 2;
+  display: flex;
 }
 .stuName{
-  flex:1;
+  flex:2;
 }
+
+.roleBtns{
+  display: flex;
+  flex: 1;
+}
+
 .deleteStu{
 /*  flex: 1;*/
 }
 
 .toggleRole{
   margin-right: 1%;
+}
+
+.offBtn{
+  background-color: rgba(0,0,0,0.12) !important;
+  color: rgba(0,0,0,0.38) !important;
+}
+
+.adminBtn{
+  background-color: rgba(220, 44, 05, .8);
+  flex: 1;
+}
+
+.adminBtn:hover{
+  background-color: rgba(220, 44, 05, 1);
+}
+
+.adminBtn:active{
+  background-color: rgba(220, 44, 05, 1);
+}
+
+.stuBtn{
+  background-color: rgba(86, 31, 41, .8);
+}
+
+.stuBtn:hover{
+  background-color: rgba(86, 31, 41, 1);
+}
+
+.studentBtn{
+  flex: 1;
 }
 
 .createListTitle{
