@@ -11,6 +11,11 @@ angular.module('PU.userHistory', [])
     $scope.loading = true;
     CurrentUser.get()
     .then(function(userData){
+      if(Number.isInteger(Number($routeParams.userUid))){ //a duck's history
+        $scope.error = "A duck's history is a great secret. Don't be nosy";
+        $scope.loading = false;
+        return;
+      }
       $scope.currentUser = userData;
       DB.getUserHistory($routeParams.userUid)
       .then(function(history){
@@ -21,7 +26,8 @@ angular.module('PU.userHistory', [])
         console.log("Scope: ", $scope);
       })
       .catch(function(err){
-        $scope.error = "Looks like there was an error getting the history for this user. Make sure they exist";
+        $scope.error = "Looks like there was an error getting the history for this user (Make sure they exist)";
+        $scope.loading = false;
       })
     })
     .catch(function(err){

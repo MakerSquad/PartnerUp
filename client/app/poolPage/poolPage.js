@@ -516,9 +516,19 @@ angular.module('PU.poolPage', ['PU.factories'])
   $scope.deleteGrouping = function(group){
     console.log('dadadadadda', group)
     if(confirm("Are you sure you want to delete this grouping? Once deleted, its gone forever!")){
-      DB.deleteAGrouping(group.generationData.id)
+      DB.deleteAGrouping($scope.currPool.id, group.generationData.id)
       .then(function(resp){$route.reload()})
       .catch(function(err){console.log(err)})
+    }
+  }
+
+  $scope.goToHistory = function(user){
+    if(!$scope.stuView){
+      if(Number.isInteger(Number(user.user.uid))){
+        alert("Quack.");
+        return;
+      }
+      $location.path(`/users/${user.user.uid}`);
     }
   }
 

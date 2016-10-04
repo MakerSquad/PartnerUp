@@ -63,6 +63,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 .portrait{
@@ -71,6 +72,15 @@
   /*margin-left: 33%;*/
   /*margin-right: 2%;*/
   /*border-left: 1px solid #CCC;*/
+}
+
+.tooltip{
+  position: absolute;
+  z-index: 3;
+  background-color: rgba(2, 152, 245, 0.6);
+  color: white;
+  text-shadow: 1px 1px #000;
+  border: 1px solid black;
 }
 
 .partnerName{

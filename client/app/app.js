@@ -65,6 +65,7 @@ angular.module('PU', [
           $location.path('/signin');
         }else{
           $scope.currentUser = user;
+          $scope.hideHist = path === `/users/${user.uid}`;
           console.log("In header, currentUser: ", $scope.currentUser);
         }
       })
@@ -80,6 +81,10 @@ angular.module('PU', [
 
     $scope.signOut = function(){
       CurrentUser.signOut();
+    }
+
+    $scope.goToMyHistory = function(){
+      $location.path(`/users/${$scope.currentUser.uid}`);
     }
   }
 

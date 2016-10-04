@@ -3,8 +3,8 @@
 <div class="home fade" ng-hide="loading">
   <h1 class="homeTitle">{{currentUser.name + "'s Pools"}}</h1>
   <div class="homePool"  ng-repeat="pool in pools" ng-show="pools.length && !loading">
-  <button ng-click="deletePool(pool)">x</button>
-    <h3   ng-click="goToPool(pool)" class="homePoolName">
+  <button ng-show="pool.role === 'fellow' || pool.role === 'instructor' || pool.role === 'memberAdmin'" ng-click="deletePool(pool)">x</button>
+    <h3 ng-click="goToPool(pool)" class="homePoolName">
       {{pool.name}}
     </h3>
     <div class="homeRoles">

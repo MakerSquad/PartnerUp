@@ -1,7 +1,12 @@
 <div header></div>
 <div loading class="extraBtn" ng-show="loading"></div>
 <div class="userHistoryBody" ng-hide="loading">
-  <h1 class="userHistoryHeader">{{user.name + "'s history"}}</h1>
+  <h1 class="userHistoryHeader" ng-hide="error.length">{{user.name + "'s history"}}</h1>
+  <h2 ng-show="error.length">{{error}}</h2>
+  <h2 class="userHistoryNoPools" ng-hide="pools.length || error.length">
+    {{user.name + "doesn't seem to have any past groupings (They should probably go to class more)"}}
+  </h2>
+  <div ng-show="pools.length && !error.length">
   <div class="userHistorySearchBars">
     <input ng-model="searchPools" placeholder="Search Pools">
     <input class="userHistoryGenSearch" ng-model="searchGens" placeholder="Search Groupings by Title">
@@ -16,5 +21,6 @@
         <img class="userHistoryPortrait" src={{user.avatar_url}}>
       </div>
     </div>
+  </div>
   </div>
 </div>

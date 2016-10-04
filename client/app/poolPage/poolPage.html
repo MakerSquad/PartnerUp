@@ -30,9 +30,12 @@
     <h3 class="groupingTitle"><button ng-click="deleteGrouping(grouping)" ng-show="!stuView">x</button>{{grouping.generationData.title}}</h3>
     <div unselectable="on" class="groupingUsers unselectable" id="groupingUsers">
       <div class="grp" ng-repeat='grp in grouping.groups | filter : filterGroupsByName'>
-        <div class="partner" ng-repeat='partner in grp'>
+        <div class="partner" ng-repeat='partner in grp' ng-click="goToHistory(idMap[partner])" ng-mouseover="idMap[partner].showHist = true" ng-mouseleave="idMap[partner].showHist = false">
           <img class="portrait" src='{{idMap[partner].user.avatar_url}}'>
           <!-- {{idMap[partner].user.name}} -->
+          <label class="tooltip clickable" ng-show="idMap[partner].showHist && !stuView">
+          Click to see this student's history
+          </label>
           <div class="partnerName">{{idMap[partner].user.name}}</div>
         </div>
       </div>

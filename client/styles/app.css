@@ -41,7 +41,7 @@ html{
 
 .welcome{
   display: flex;
-  flex: 2;
+  flex: 1;
   /*width: 33% !important;
   flex: none !important;*/
   padding-right: 1%;

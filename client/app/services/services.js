@@ -220,10 +220,10 @@ angular.module('PU.factories', [])
     .catch(err => Promise.reject(err.statusText))
   }
 
-  var deleteAGrouping = function(id){
+  var deleteAGrouping = function(groupId, id){
     return $http({
       method: 'DELETE',
-      url: `generation/${id}`
+      url: `/group/${groupId}/generation/${id}`
     })
     .then(resp => resp.data)
     .catch(err => Promise.reject(err.statusText))
