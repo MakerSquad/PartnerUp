@@ -11,14 +11,10 @@ describe("The Server", function() {
   app.testReady()
 
   it_("can get to the default endpoint", function * () {
-
-    //
-    // Notice how we're in a generator function (indicated by the the *)
-    // See test/test-helper.js for details of why this works.
-    //
     yield request(app)
       .get('/')
       .expect(200)
+
   })
 
   it_("will 404 on a bad request", function * (){
@@ -31,50 +27,63 @@ describe("The Server", function() {
       .expect(404)
   })
 
-  it_("will give 401 when tring to get data without session", function *(){
+  it_("will give 401 when tring to get/edit/delete group data without session", function *(){
 
     yield request(app)
-      .get('/mygroups')
+      .get('/group/1')
       .expect(401)
 
     yield request(app)
-      .get('/group/generations')
+      .post('/group')
       .expect(401)
 
     yield request(app)
-      .get('/group/members')
+      .delete('/group/1')
       .expect(401)
 
-    yield request(app)
-      .get('/group/pairs')
-      .expect(401)  
   })
 
-  describe("The past pair endpoints", function(){
-    it_("can post and retrieve pairs for a given class", function * (){
-      process.env.TEST_AUTH = true;
-      yield request(app)
-        .get('/MKS43/pairs')
-        .expect(200)
-        .expect(function(response){
-          expect(Array.isArray(response.body)).to.equal(true);
-        })
+  it_("will give 401 when tring to get/edit/delete pair data without session", function *(){
 
-      yield request(app)
-        .post('/MKS43/pairs')
-        .send({
-          "pairs": [["ddad747d5fab", "77955d3eb662"],["06df31cdd4bf", "90b72025841d"]],
-          "genTitle": "Dem Boyz",
-          "groupSize": 2
-        })
-        .expect(201)
+    yield request(app)
+      .get('/group/1/generations')
+      .expect(401)
 
-      yield request(app)
-        .get('/MKS43/pairs')
-        .expect(200)
-        .expect(function(response){
-          expect(response.body.length).to.not.equal(null);
-        })
-    })
+    yield request(app)
+      .get('/group/1/recent')
+      .expect(401)
+
+    yield request(app)
+      .get('/group/1/members')
+      .expect(401)
+
   })
+
+  // describe("The past pair endpoints", function(){
+  //   it_("can post and retrieve pairs for a given class", function * (){
+  //     process.env.TEST_AUTH = true;
+  //     yield request(app)
+  //       .get('/MKS43/pairs')
+  //       .expect(200)
+  //       .expect(function(response){
+  //         expect(Array.isArray(response.body)).to.equal(true);
+  //       })
+
+  //     yield request(app)
+  //       .post('/MKS43/pairs')
+  //       .send({
+  //         "pairs": [["ddad747d5fab", "77955d3eb662"],["06df31cdd4bf", "90b72025841d"]],
+  //         "genTitle": "Dem Boyz",
+  //         "groupSize": 2
+  //       })
+  //       .expect(201)
+
+  //     yield request(app)
+  //       .get('/MKS43/pairs')
+  //       .expect(200)
+  //       .expect(function(response){
+  //         expect(response.body.length).to.not.equal(null);
+  //       })
+  //   })
+  // })
 })

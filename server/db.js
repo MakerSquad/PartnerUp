@@ -11,26 +11,28 @@ knex.migrate.latest([config[env]]);
   @params: token = (string) Session we get from MakerPass, group to see if perosn is in the group
   return: throws 401 if no session or user UID if there is
 */
-knex.authenticate = (token, groupId = null) => {
+knex.authenticate = (token = 'null', groupId = null) => {
   if(process.env.TEST_AUTH) return Promise.resolve(); // for test env
   var encToken = hash(token);
   return knex('auth').where('token', encToken) // check for token in auth 
     .then((userUid) => { // userUid is an array
-      if(userUid.length){ 
+      if(userUid.length){ // if userUID.length checks if something 
         if(groupId){
           return knex('group_membership').where({user_uid: userUid[0].user_uid, group_id:groupId}).returning("*")
           .then((info) => {
             if(info.length) return Promise.resolve(userUid[0].user_uid);
             else return Promise.reject("sorry you are not in that group")
           }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
-        }    
-        else return Promise.resolve(userUid[0].user_uid);
+        } 
+        else {
+          return Promise.resolve(userUid[0].user_uid);
+        }
       } // if user exist then resolve
       else return Promise.reject("401 Unauthorized, please make sure you are logged in"); // else send a 401 error   
     }).catch((err) => {throw new Error("Unable to authenticate user, "+ err)}) // throw error if something went horribly wrong
 }
 
-knex.authenticateAdmin = (token, groupId) => {
+knex.authenticateAdmin = (token = 'null', groupId = null) => {
   if(process.env.TEST_AUTH) return Promise.resolve(); // for test env
   var encToken = hash(token)
   return knex('auth').where('token', encToken) // check for token in auth 
