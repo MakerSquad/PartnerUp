@@ -29,6 +29,16 @@
 .groupingName{
   margin-bottom: 2rem;
 }
+.trashButton{
+  height:43px;
+  width:45px;
+  padding: 0px !important;
+}
+.trash{
+  /*background-image: url('assets/trash-can.png');*/
+  height: 20px;
+  width:20px;
+}
 
 #partners{
   margin-bottom: 2rem;
