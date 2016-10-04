@@ -169,7 +169,7 @@ knex.deleteGroup = (groupId) => {
       return knex('generations').where('group_id', groupId).del().returning('*')
       .then((genData) => {
         for(var i = 0, genIds = []; i < genData.length; i++) {
-          genIds.push(genData.id)
+          genIds.push(genData[0].id)
         } 
         return knex('pairs').whereIn('gen_table_id', genIds).del()
         .then(() => 'group deleted')
@@ -240,7 +240,7 @@ knex.deleteGeneration = (id) => {
 }
 
 knex.getTables = () => {
-  return knex('auth').returning('*')
+  return knex('generations').returning('*')
 }
 knex.getTables2 = () => {
   return knex('groups').returning('*')
