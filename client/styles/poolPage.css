@@ -91,6 +91,13 @@
   color: white;
   text-shadow: 1px 1px #000;
   border: 1px solid black;
+  height: 100%;
+  /*text-align: center;*/
+  /*margin: 0px;*/
+  width:100%;
+  line-height: 1.5 !important;
+  /*padding: 0px;*/
+  align-items: center;
 }
 
 .partnerName{

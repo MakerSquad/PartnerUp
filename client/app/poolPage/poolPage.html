@@ -33,8 +33,9 @@
         <div class="partner" ng-repeat='partner in grp' ng-click="goToHistory(idMap[partner])" ng-mouseover="idMap[partner].showHist = true" ng-mouseleave="idMap[partner].showHist = false">
           <img class="portrait" src='{{idMap[partner].user.avatar_url}}'>
           <!-- {{idMap[partner].user.name}} -->
-          <label class="tooltip clickable" ng-show="idMap[partner].showHist && !stuView">
-          Click to see this student's history
+          <label class="tooltip clickable" ng-show="idMap[partner].showHist && !stuView" >
+          <!-- ng-show="idMap[partner].showHist && !stuView" -->
+          Click to see student's history
           </label>
           <div class="partnerName">{{idMap[partner].user.name}}</div>
         </div>
