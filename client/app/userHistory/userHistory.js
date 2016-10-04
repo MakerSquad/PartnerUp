@@ -11,7 +11,7 @@ angular.module('PU.userHistory', [])
     $scope.loading = true;
     CurrentUser.get()
     .then(function(userData){
-      if(Number.isInteger(Number($routeParams.userUid))){ //a duck's history
+      if(/-\d?\d?\d?/.test($routeParams.userUid)){ //a duck's history
         $scope.error = "A duck's history is a great secret. Don't be nosy";
         $scope.loading = false;
         return;

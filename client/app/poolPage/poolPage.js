@@ -524,8 +524,8 @@ angular.module('PU.poolPage', ['PU.factories'])
 
   $scope.goToHistory = function(user){
     if(!$scope.stuView){
-      if(Number.isInteger(Number(user.user.uid))){
-        alert("Quack.");
+      if(/-\d?\d?\d?/.test(user.user.uid)){
+        alert(`Quack.\n   __\n<(o )___\n ( ._>  /\n  '---'`);
         return;
       }
       $location.path(`/users/${user.user.uid}`);
