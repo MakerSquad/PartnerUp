@@ -74,17 +74,22 @@ app.get("/currentUser", (req, res) =>{
 })
 
 app.get("/cohorts", (req, res) => { // done
-  db.authenticate(req.cookies.token).then( (uid) => {
+  db.authenticate(req.cookies.token).then( (uid) => 
     MP.user.groups(uid, req.cookies.token)    
-    .then((data) => res.send(data))
+    .then((data) => {
+    console.log("groups", data)
+      res.send(data)
+    })
     .catch((err) => {res.status(401).send("" +err)})   
-  }).catch((err) => {res.status(401).send("" +err)}) 
+  ).catch((err) => {res.status(401).send("" +err)}) 
 })
 
 app.get("/cohort/:groupUid", (req, res) => {
-  MP.memberships(req.params.groupUid)    
-  .then((students) => res.send(students))
-  .catch((err) => {console.log(" ", err); res.status(500).send("" +err)})
+  db.authenticate(req.cookies.token).then( (uid) => 
+    MP.memberships(req.params.groupUid,  req.cookies.token)    
+    .then((students) => res.send(students))
+    .catch((err) => {console.log(" ", err); res.status(500).send("" +err)})
+  ).catch((err) => {res.status(401).send("" +err)})
 })
 
 app.get("/groups", (req, res) => { 
@@ -206,8 +211,8 @@ app.get('/test2', (req, res) => {
 })
 
 app.get('/test1', (req, res) => {
-  db.authenticateAdmin(req.cookies.token, 1).then((d) => res.send(d))
-  .catch((err) => res.send("" +err));
+    db.getTables().then((d) => res.send(d))
+    .catch((err) => res.send("" +err));
 })
 
 

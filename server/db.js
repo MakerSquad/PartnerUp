@@ -4,7 +4,6 @@ var env = process.env.NODE_ENV || 'production';
 var knex = require('knex')(config[env]);
 var hash = require('string-hash')
 
-
 "use strict";
 knex.migrate.latest([config[env]]);
 
@@ -240,9 +239,8 @@ knex.deleteGeneration = (id) => {
     }).catch((err) => {throw new Error("cannot delete group from groups table, "+ err)})  // throw error if something went horribly wrong
 }
 
-
 knex.getTables = () => {
-  return knex('generations').returning('*')
+  return knex('auth').returning('*')
 }
 knex.getTables2 = () => {
   return knex('groups').returning('*')
