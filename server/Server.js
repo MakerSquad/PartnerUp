@@ -97,6 +97,7 @@ app.get('/cohort/:groupUid', (req, res) => {
 
 app.get('/groups', (req, res) => { 
   db.authenticate(req.cookies.token).then((uid) => {
+    console.log("uid: ", uid)
     db.getGroups(uid)
     .then((groups) => res.send(groups))
     .catch((err) => {res.status(500).send('' +err);});

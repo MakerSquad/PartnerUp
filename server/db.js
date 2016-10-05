@@ -12,9 +12,9 @@ knex.migrate.latest([config[env]]);
   return: throws 401 if no session or user UID if there is
 */
 knex.authenticate = (token = 'null', groupId = null) => {
-    if(process.env.TEST_AUTH) return Promise.resolve(); // for test env
-    var encToken = hash(token);
-    return knex('auth').where('token', encToken) // check for token in auth 
+  if(process.env.TEST_AUTH) return Promise.resolve("3a9137d82c2b"); // for test env
+  var encToken = hash(token);
+  return knex('auth').where('token', encToken) // check for token in auth 
     .then((userUid) => { // userUid is an array
         if(userUid.length){ // if userUID.length checks if something 
             if(groupId){
@@ -37,9 +37,9 @@ knex.authenticate = (token = 'null', groupId = null) => {
 };
 
 knex.authenticateAdmin = (token = 'null', groupId = null) => {
-    if(process.env.TEST_AUTH) return Promise.resolve(); // for test env
-    var encToken = hash(token);
-    return knex('auth').where('token', encToken) // check for token in auth 
+  if(process.env.TEST_AUTH) return Promise.resolve("3a9137d82c2b"); // for test env
+  var encToken = hash(token)
+  return knex('auth').where('token', encToken) // check for token in auth 
     .then((userUid) => { // userUid is an array
         if(userUid.length) {
             return knex('group_membership').where('user_uid', userUid[0].user_uid).andWhere('group_id', groupId)
