@@ -10,18 +10,6 @@ angular.module('PU.signin', [
   $scope.user = {};
 
 
-  // $http({ //Check the current user
-  //   method: "GET",
-  //   url: "/currentUser"
-  // })
-  // .then(function(resp){
-  //   console.log("data", resp.data)
-  //   if(resp.data !== ""){
-  //     console.log("data fron resp:", resp.data)
-  //     $location.path('/');
-  //   }
-  // })
-
   CurrentUser.get()
   .then((userData) => {
     $location.path('/');
@@ -62,11 +50,11 @@ angular.module('PU.signin', [
       document.cookie = `token=${signInInfo.token}`;
       //CurrentUser.set(signInInfo.data.user);
       $window.location.href = ('/#/');
-    }})
-
-
-
-
+  }})
   }
+
 });
+
+
+
 

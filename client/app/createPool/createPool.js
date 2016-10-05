@@ -1,7 +1,6 @@
 angular.module('PU.createPool', ['PU.factories'])
 
 .controller('CreatePoolController', function ($scope, MakerPass, $location, $route, $http, $window, $anchorScroll, DB, CurrentUser) {
-  document.getElementById("bodyclass").className = "";
   $scope.allCohorts = [];
   $scope.isStudent = {};
   $scope.users = [];
@@ -11,8 +10,11 @@ angular.module('PU.createPool', ['PU.factories'])
   $scope.loadingPage = true;
   $scope.loadingUsers = false;
 
-  // $scope.currentCohort = '';
-
+//******************************************************************************
+//This imports all the MakerPass members and separates them to two sub groups: 
+//admins and members. If the makerPass member is not found in the group it will 
+//add them. It is possible to be both an admin and a member
+//******************************************************************************
 
   $scope.importStudents = function(){
     if(!$scope.currentCohort){
@@ -45,6 +47,10 @@ angular.module('PU.createPool', ['PU.factories'])
     })
   }
 
+//******************************************************************************
+//This allows the group size to be selected. The max group size can be changed 
+//in the HTML but raising the num. 
+//******************************************************************************
 
   $scope.getIndexArray = function(num){
     var arr = [];
@@ -54,11 +60,10 @@ angular.module('PU.createPool', ['PU.factories'])
     return arr;
   }
 
-  // $scope.removeStudent = function(student){
-  //   // var index = $scope.importedStudents.indexOf(student);
-  //   // $scope.importedStudents.splice(index,1)
-  //   removed[student.user.uid] = true;
-  // }
+//******************************************************************************
+//This allows you to remove and re-add members and admins. Currently if a member
+//it not selected as a member or admin they are "removed" from the group
+//******************************************************************************
 
   $scope.toggleRemoved = function(person, role){
     if(role === 'admin'){
@@ -73,6 +78,11 @@ angular.module('PU.createPool', ['PU.factories'])
       $scope.noStusError = false;
     }
   }
+
+//******************************************************************************
+//This creates the pools. it has error catching for no title or no members. It 
+//automatically makes the creator an admin. This also adds the pool to the database
+//******************************************************************************
 
   $scope.createPool = function(){
     $scope.loadingPage = true;
@@ -117,6 +127,11 @@ angular.module('PU.createPool', ['PU.factories'])
     .catch(function(err){console.log('pool not created', err)})
   }
 
+//******************************************************************************
+//This allows you to toggle between being an admin and not an admin except the
+//creator of the group MUST be an admin of their own group. 
+//******************************************************************************
+
   $scope.toggleAdmin = function(user){
     if(user.user_uid === $scope.currentUser.uid){
       alert("You must be an admin of your own group");
@@ -130,6 +145,11 @@ angular.module('PU.createPool', ['PU.factories'])
     }
   }
 
+//******************************************************************************
+//This allows you to toggle between being a member or not a member. You do not 
+//have to be a member in the group you created.
+//******************************************************************************
+
   $scope.toggleStu = function(user){
     if($scope.isStudent[user.user_uid]){
       delete $scope.isStudent[user.user_uid];
@@ -139,10 +159,12 @@ angular.module('PU.createPool', ['PU.factories'])
     }
   }
 
-  $scope.getRequest = function(){
-    DB.getClasses().then(function(data){console.log('FUCK YEAH', data)})
-    .catch(function(err){console.log('you fucked up', err)})
-  }
+
+//******************************************************************************
+//THis intializes the page. It gets all the groups that the signed in user is 
+//apart of and sets them to be an admin. It also has catches for if a non-logged
+//in user tries to access the page.
+//******************************************************************************
 
   var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
       // $scope.loading = true;
@@ -167,10 +189,8 @@ angular.module('PU.createPool', ['PU.factories'])
               console.log('resolveData', resolveData[0])
               var cohorts = resolveData[0].reverse(); //reverse for recency order
               for(var i = 0; i<cohorts.length; i++){
-                // if(resolveData[0][i].user_role === 'instructor' || resolveData[0][i].user_role === 'fellow'){
                   $scope.allCohorts.push(cohorts[i]);
                   console.log('$scope.allCohorts', $scope.allCohorts)
-                // }
               }
 
               console.log("Current scope: ", $scope);
@@ -183,7 +203,6 @@ angular.module('PU.createPool', ['PU.factories'])
         $location.path('/signin');
         $scope.$apply();
        })
-      //})
     }())
 
 })
