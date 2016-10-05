@@ -9,6 +9,18 @@ html{
   background-color: #F0F4F5;
 }
 
+.demoSideBar{
+  position: absolute;
+  top:10%;
+  right:0px;
+  width: 13%;
+  height: 100%;
+  border-left: 1px solid black;
+  border-top: 1px solid black;
+  padding-left: 1%;
+  line-height: 1.75;
+  background-color: rgba(0, 0, 0, 0.1);
+}
 
 .fade {
   -webkit-transition:all linear 0.5s;

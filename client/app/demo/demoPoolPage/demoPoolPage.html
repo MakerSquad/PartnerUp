@@ -1,0 +1,63 @@
+<div demoheader></div>
+<div loading class="extraBtn" ng-show="loading"></div>
+<h2 class="errMsg" ng-show="error.length">{{error}}</h2>
+<div class="poolPageBody fade" ng-show="!error.length && !loading">
+<h1 class="poolTitle" ng-hide="loading">{{currPool.name}}</h1>
+<br>
+<button class="partnerUpBtn" ng-hide="stuView || loading" ng-click="startNewGrouping()">{{creatingGrouping ? "Close" : "Organize New Grouping"}}</button>
+<div loading ng-show="loadingNewGrouping"></div>
+<div class="newGrouping fade" ng-show="creatingGrouping && !loadingNewGrouping && !stuView">
+  <input class="groupingName" ng-model="groupingName" maxlength="20" placeholder="Enter title">
+  <button class="reroll" ng-click="randomize()">Re-roll</button>
+  <div id="partners" class='pair' unselectable="on" class="unselectable"> 
+    <div class="grp" ng-repeat="group in groups" ng-class="{clash: clashes.includes(group)}" >
+      <div class="partner" ng-class="{locked: lockedStus[stu.user.uid]}" ng-repeat="stu in group" class="stu"> 
+        <img class='portrait' src='{{stu.user.avatar_url}}'>
+        <div class='partnerName' ng-class="{selectedStu: selectedForSwap === stu, clickable: !stuView}" ng-click="selectForSwap(stu)">{{stu.user.name}}</div>
+        <img class='Grid Grid--cell lockBtn' src= "http://simpleicon.com/wp-content/uploads/lock-3.png" width='15px' height='15px' ng-show='lockedStus[stu.user.uid] === undefined' ng-click="toggleLockStu(stu)">
+        <img class='Grid Grid--cell lockBtn' src= "http://image.flaticon.com/icons/svg/26/26053.svg" width='15px' height='15px' ng-show='lockedStus[stu.user.uid] !== undefined' ng-click="toggleLockStu(stu)">
+      </div>
+    </div>
+  </div>
+  <button class="finalize" ng-click="finalize()">Finalize Grouping</button>
+</div>
+<div class="history" ng-show="!loading">
+  <h2>Past Groupings</h2>
+  <input ng-model="searchHist" placeholder="Search groupings">
+  <input ng-model="stuSearch" placeholder="Search for a student">
+  <div class="pastGrouping" ng-repeat="grouping in pastGroupings | filter : filterGroupingsByName">
+
+    <h3 class="groupingTitle">{{grouping.generationData.title}}</h3>
+    <div unselectable="on" class="groupingUsers unselectable" id="groupingUsers">
+      <div class="grp" ng-repeat='grp in grouping.groups | filter : filterGroupsByName'>
+        <div class="partner" ng-repeat='partner in grp' ng-click="goToHistory(idMap[partner])" ng-mouseover="idMap[partner].showHist = true" ng-mouseleave="idMap[partner].showHist = false">
+          <img class="portrait" src='{{idMap[partner].user.avatar_url}}'>
+          <!-- {{idMap[partner].user.name}} -->
+          <label class="tooltip clickable" ng-show="idMap[partner].showHist && !stuView" >
+          <!-- ng-show="idMap[partner].showHist && !stuView" -->
+          Click to see student's history
+          </label>
+          <div class="partnerName">{{idMap[partner].user.name}}</div>
+        </div>
+      </div>
+    </div>
+    <button class="trashButton" ng-click="deleteGrouping(grouping)" ng-show="!stuView"><img src="assets/oie_transparent.png" class="trash" ></button>
+    <button class="clipyclip histclip" data-clipboard-target="#groupingUsers">copy me</button>
+  </div>
+</div>
+</div>
+<div class="demoSideBar">
+<div ng-hide="creatingGrouping">
+-This is the page for individual pools<br>
+-Here you can see all the past student groupings for this pool<br>
+-If you're an admin of this pool, you'll be able to organize new groupings as well<br>
+-Clicking on a student's name in a past grouping will bring up their personal history
+</div>
+<div ng-show="creatingGrouping">
+-The random creation of groupings will avoid pairing partners who have previously worked together
+<br>
+-You can manually swap any two students by clicking on their names, or you can re-roll the group entirely<br>
+-You can also lock students in place before re-rolling<br>
+-When you're happy with the group, clicking finalize will make it official!
+</div>
+</div>

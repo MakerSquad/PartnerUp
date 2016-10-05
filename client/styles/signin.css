@@ -10,6 +10,11 @@
    background-repeat: repeat-y;
 }
 
+.demoBtn{
+  float: right;
+  margin-right: 2%;
+}
+
 .partnerUpWelcome{
 /*  writing-mode: tb-rl;*/
   text-align: center !important;

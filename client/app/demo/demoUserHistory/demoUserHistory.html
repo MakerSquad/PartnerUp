@@ -1,0 +1,30 @@
+<div demoheader></div>
+<div loading class="extraBtn" ng-show="loading"></div>
+<div class="userHistoryBody" ng-hide="loading">
+  <h1 class="userHistoryHeader" ng-hide="error.length">{{user.name + "'s history"}}</h1>
+  <h2 ng-show="error.length">{{error}}</h2>
+  <h2 class="userHistoryNoPools" ng-hide="pools.length || error.length">
+    {{user.name + "doesn't seem to have any past groupings (They should probably go to class more)"}}
+  </h2>
+  <div ng-show="pools.length && !error.length">
+  <div class="userHistorySearchBars">
+    <input ng-model="searchPools" placeholder="Search Pools">
+    <input class="userHistoryGenSearch" ng-model="searchGens" placeholder="Search Groupings by Title">
+    <input ng-model="searchStus" placeholder="Search Groupings by Student">
+  </div> 
+  <div class="userHistoryPool" ng-repeat="pool in pools | filter : filterPools">
+    <h2 class="userHistoryPoolTitle">{{pool.title}}</h2>
+    <div class="userHistoryGen" ng-repeat="gen in pool.generations | filter: filterGens">
+      <label class="userHistoryGenTitle">{{gen.title}}</label>
+      <div class="userHistoryUser" ng-repeat="user in gen.group" ng-mouseover="user.showName = true" ng-mouseleave="user.showName = false">
+        <label class="userHistoryUserName" ng-show="user.showName">{{user.name}}</label>
+        <img class="userHistoryPortrait" src={{user.avatar_url}}>
+      </div>
+    </div>
+  </div>
+  </div>
+</div>
+<div class="demoSideBar">
+-This is the page for a specific user's history<br>
+-All of this user's previous groupings will appear here, and can be searched through if necessary
+</div>

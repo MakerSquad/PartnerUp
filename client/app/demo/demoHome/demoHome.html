@@ -1,0 +1,32 @@
+<div demoheader></div>
+<div loading class="extraBtn" ng-show="loading"></div>
+<div class="home fade" ng-hide="loading">
+  <h1 class="homeTitle">{{currentUser.name + "'s Pools"}}</h1>
+  <div class="homePool"  ng-repeat="pool in pools" ng-show="pools.length && !loading">
+    <div class="homePoolNameSection">
+      <button class="homePoolRemoveBtn" ng-show="pool.role === 'fellow' || pool.role === 'instructor' || pool.role === 'memberAdmin'" ng-click="deletePool(pool)">x</button>
+      <h3 ng-click="goToPool(pool)" class="homePoolName">
+        {{pool.name}}
+      </h3>
+    </div>
+    <div class="homeRoles">
+      <div class="admin homeRole" ng-if="pool.role === 'fellow' || pool.role === 'instructor' || pool.role === 'memberAdmin'">
+        admin
+      </div>
+      <div class="member homeRole" ng-if="pool.role==='student' || pool.role === 'memberAdmin'">member</div>
+    </div>
+  </div>
+  <h3 class='noPools' ng-show="!pools.length && !loading">You have no open pools. Go create one now!</h3>
+  <div class="extraBtn" ng-show="!loading">
+    <button ng-click="goToCreatePool()">Create New Pool</button>
+  </div>
+</div>
+<div class="demoSideBar">
+  <div>
+    -This is your home page, where you can access all your pools 
+    <br>
+    -You can be a member of a pool, an admin of a pool, or both
+    <br>
+    -Non-admins of pools have read-only access
+  </div>
+</div>

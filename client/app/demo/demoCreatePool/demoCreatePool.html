@@ -1,0 +1,51 @@
+<div demoheader></div> 
+<br>
+<div loading class="extraBtn" ng-show="loadingPage"></div>
+<div class='form fade' ng-hide="loadingPage">
+  <div id="noNameError" class="error" ng-show="noNameError && poolName.length <= 0">
+    Oops! That pool needs a name <br> (Anonymous pools confuse us greatly)
+  </div>
+  <div class="createControls">
+    <h3 class="createCtrl">Pool Name: </h3>
+    <input class="createCtrl" ng-init="poolName = ''" ng-model="poolName" maxlength="20">
+  </div>
+  <div class="createControls">
+    <h4 class="createCtrl">Import from MakerPass: </h4>
+    <select class="createCtrl" ng-model="currentCohort" ng-options="cohort as cohort.name for cohort in allCohorts" >
+    <option value="">Choose a Cohort</option>
+    </select>
+    <button class="createCtrl" ng-click="importStudents()">Import</button>
+  </div>
+  <div class="createControls">
+    <h4 class="createCtrl">Group Size: </h4>
+    <select class="createCtrl" ng-init="groupSizeSelect = 2" ng-model="groupSizeSelect">
+    <option class="createCtrl" ng-repeat="idx in getIndexArray(8)">{{idx+2}}</option>
+    </select>
+    <button class="createCtrl" ng-click='createPool()' ng-href="`pool/{{pool.id}}`">Create Pool</button>
+  </div>
+  <h3 class="createListTitle">Pool Members</h3>
+  <div class="creatingUserList">
+    <div loading class="extraBtn" ng-show="loadingUsers"></div>
+    <div class="studentParent" ng-class="{removed: !isStudent[user.user_uid] && !isAdmin[user.user_uid]}" ng-repeat="user in users" ng-hide="loadingUsers">
+      <img class="stuImg" src='{{user.user.avatar_url}}'>
+      <p class="stuName">{{user.user.name}}</p>
+      <div class="roleBtns">
+        <button class="adminBtn" ng-class="{offBtn: !isAdmin[user.user_uid]}" ng-click="toggleAdmin(user)">Ad</button>
+        <button class="stuBtn" ng-class="{offBtn: !isStudent[user.user_uid]}" ng-click="toggleStu(user)">Stu</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="noStusError" class="error" ng-show="noStusError && !importedStudents.length">
+    Oops! We can't create a pool without any students. Get people involved!
+  </div> 
+  <div class="extraBtn">
+    <button class="createCtrl" ng-click='createPool()' ng-href="`pool/{{pool.id}}`">Create Pool</button>
+  </div>
+</div>
+<div class="demoSideBar">
+-This is the page for creating new pools<br>
+-Here you can import members of any Makerpass cohort that you are also a part of<br>
+-You can set who has what privileges by clicking the buttons next to their names, although you are automatically made an admin of any pool you create<br>
+-When you are happy with your pool, click create pool to start partnering up!
+</div>

@@ -6,7 +6,12 @@ angular.module('PU', [
   'PU.createPool',
   'ngAnimate',
   'PU.poolPage',
-  'PU.userHistory'
+  'PU.userHistory',
+  'PU.demoHome',
+  'PU.demoPoolPage',
+  'PU.demoUserHistory',
+  'PU.demoCreatePool',
+  'PU.demoStart'
   ])
 .config(function($routeProvider, $httpProvider) {
   $routeProvider
@@ -29,6 +34,26 @@ angular.module('PU', [
   .when('/users/:userUid', {
     templateUrl: 'userHistory/userHistory.html',
     controller: 'UserHistoryController'
+  })
+  .when('/demo/', {
+    templateUrl: 'demo/demoStart/demoStart.html',
+    controller: 'DemoStartController'
+  })
+  .when('/demo/home', {
+    templateUrl: 'demo/demoHome/demoHome.html',
+    controller: 'DemoHomeController'
+  })
+  .when('/demo/pools/:poolId', {
+    templateUrl: 'demo/demoPoolPage/demoPoolPage.html',
+    controller: 'DemoPoolPageController'
+  })
+  .when('/demo/users/:userUid', {
+    templateUrl: 'demo/demoUserHistory/demoUserHistory.html',
+    controller: 'DemoUserHistoryController'
+  })
+  .when('/demo/createPool', {
+    templateUrl: 'demo/demoCreatePool/demoCreatePool.html',
+    controller: 'DemoCreatePoolController'
   })
   .otherwise({
     redirectTo: '/'
@@ -94,4 +119,39 @@ angular.module('PU', [
   }
 })
 
+.directive('demoheader', function(){
+  var controller = function($scope, $location, $http, CurrentUser){
+    var path = $location.path();
+
+    $scope.hideMyPools = path === '/demo/home'; //NB: these routes might change
+    $scope.hideCreatePool = path === '/demo/createPool';
+    $scope.currentUser;
+
+    var init = (function(){
+        $scope.currentUser = window.currentUser;
+        $scope.hideHist = path === `/demo/users/${currentUser.uid}`;
+      }())
+
+    $scope.seeMyPools = function(){
+      $location.path('/demo/home');
+    }
+
+    $scope.goToCreatePool = function(){
+      $location.path('/demo/createPool');
+    }
+
+    $scope.signOut = function(){
+      CurrentUser.signOut();
+    }
+
+    $scope.goToMyHistory = function(){
+      $location.path(`/demo/users/${$scope.currentUser.uid}`);
+    }
+  }
+
+  return {
+    controller: controller,
+    templateUrl: 'directives/header.html'
+  }
+})
 // .run();

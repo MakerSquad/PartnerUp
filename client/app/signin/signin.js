@@ -17,6 +17,10 @@ angular.module('PU.signin', [
   })
   .catch(() => {})
 
+  $scope.startDemo = function(){
+    $location.path('/demo');
+  }
+
   $scope.loginMakerPass = function(){
     // $window.location.href = '/auth/makerpass';
     $.oauthpopup = function(options) {
