@@ -59,12 +59,12 @@ knex.addToken = (userToken, userUid, adminStatus) => {
         if(uid.length) // if user exist update it
             return knex('auth').where({user_uid: userUid}).update({token: userToken, admin:adminStatus}).returning('*')
           .then((authData) => authData[0]) // return the updated token with user
-          .catch((err) => {console.log('error in updateToken:',err); throw new Error('Unable to add token, '+ err);}); // throw error if something went horribly wrong
+          .catch((err) => {throw new Error('Unable to add token, '+ err);}); // throw error if something went horribly wrong
         else // else add user to auth table
         return knex('auth').insert({user_uid: userUid, token: userToken, admin:adminStatus}).returning('*') // add token and token to auth table 
           .then((authData) => authData[0]) // return the new token with user
-          .catch((err) => {console.log('Error in addToken:',err); throw new Error('Unable to add token, '+ err);});// throw error if something went horribly wrong
-    }).catch((err) => {console.log('error before addToken:',err); throw new Error('Unable to find token, '+ err);}); // throw error if something went horribly wrong
+          .catch((err) => {throw new Error('Unable to add token, '+ err);});// throw error if something went horribly wrong
+    }).catch((err) => {throw new Error('Unable to find token, '+ err);}); // throw error if something went horribly wrong
 };
 
 /**
@@ -128,7 +128,9 @@ knex.getGroup = (groupId) =>{
 knex.addGroup = (group, creator) => {
     return canCreateGroup(creator)
   .then( (canCreate) => {
-      if(!canCreate) throw new Error('sorry you reached your limit');
+      if(!canCreate) {
+        throw new Error('sorry you reached your limit');
+      }
       return knex('groups').where('name', group.groupData.name)
       .returning('id')
       .then((id) => {
@@ -238,13 +240,11 @@ function addGeneration(genData) {
     return knex('generations').where({group_id: genData.groupId, title: genData.genTitle, group_size: genData.groupSize}).returning('*')
   .then((exist) => {
       if(!exist.length){ // if array is empty  
-          return knex('generations').where({group_id:genData.groupId}).returning('gen_id')
+          return knex('generations').where({group_id:genData.groupId}).returning('*')
       .then((next) => {
-          for(var i=0, max =0; i<next.length;i++) if(next[i].gen_id > max) max = next[i].gen_id;
           return knex('generations').insert({ 
               group_id:   genData.groupId, // adds the group
               title:      genData.genTitle,// adds the title
-              gen_id:     max+1,     // adds the generation by finding how many generation were before
               group_size: genData.groupSize// group size for better history 
           }).returning('id').then((id) => id[0]);// returns the id
       }).catch((err) => {throw new Error('unable to create new generation,'+ err);}); // throw error if something went horribly wrong
@@ -337,7 +337,6 @@ knex.getPairsForGroup = (groupId) => {
 /**
   @params: groupId = (int) group_id
   return: return [{
-    genId: (int) gen_id,
     groupSize: (int) group_size,
     groupTitle: (string) group_title 
   }]
@@ -373,7 +372,6 @@ knex.getMemberships = (groupId) => {
       id : (int) generation id
       uid : (string) generation uid,
       title : (string),
-      gen_id : (int) the generation number,
       group_size: (int)
     } 
   }
@@ -381,7 +379,7 @@ knex.getMemberships = (groupId) => {
 knex.getNewGen = (groupId) => { 
     return knex('generations').where('group_id', groupId).returning('*')
   .then((next) => {
-      for(var i=0, max =0; i<next.length;i++) if(next[i].gen_id > max) max = i;
+      for(var i=0, max =0; i<next.length;i++) if(next[i].id > max) max = i;
       return knex('pairs').where('gen_table_id', next[max].id).returning('*')
     .then((pairs) => {return {pairs:pairs, generationData:next[max]};})
     .catch((err) => {throw new Error('cannot find pairs, '+ err);}); // throw error if something went horribly wrong
