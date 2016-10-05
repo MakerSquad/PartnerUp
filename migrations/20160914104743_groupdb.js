@@ -38,6 +38,6 @@ exports.down = (knex, Promise) => Promise.all([
   knex.schema.dropTableIfExists('groups'),
   knex.schema.dropTableIfExists('pairs'),
   knex.schema.dropTableIfExists('generations'),
-  knex.schema.dropTableIfExists('auth')
+  knex.schema.dropTableIfExists('auth'),
   knex.schema.dropTableIfExists('group_membership')
 ]);
