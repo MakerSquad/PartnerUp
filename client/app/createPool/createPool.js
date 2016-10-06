@@ -66,24 +66,6 @@ angular.module('PU.createPool', ['PU.factories'])
     return arr;
   };
 
-// ******************************************************************************
-// This allows you to remove and re-add members and admins. Currently if a member
-// it not selected as a member or admin they are "removed" from the group
-// ******************************************************************************
-
-  $scope.toggleRemoved = function(person, role) {
-    if (role === 'admin') {
-      var removedUsers = $scope.removedAdmins;
-    } else {
-      var removedUsers = $scope.removedStus;
-    }
-    if (removedUsers[person.user_uid] === undefined) {
-      removedUsers[person.user_uid] = true;
-    } else {
-      delete removedUsers[person.user_uid];
-      $scope.noStusError = false;
-    }
-  };
 
 // ******************************************************************************
 // This creates the pools. it has error catching for no title or no members. It
@@ -216,5 +198,5 @@ angular.module('PU.createPool', ['PU.factories'])
       $scope.$apply();
       console.log(err);
     });
-  }());
+  })();
 });

@@ -575,7 +575,7 @@ angular.module('PU.poolPage', ['PU.factories'])
 
   var swapStus = function(indexTuple1, indexTuple2) {
     var tmp = $scope.groups[indexTuple1[0]][indexTuple1[1]];
-    $scope.groups[indexTuple1[0]][indexTuple1[1]] = $scope.groups[indexTuple2[0]][indexTuple2[1]]
+    $scope.groups[indexTuple1[0]][indexTuple1[1]] = $scope.groups[indexTuple2[0]][indexTuple2[1]];
     $scope.groups[indexTuple2[0]][indexTuple2[1]] = tmp;
   };
 
@@ -612,6 +612,5 @@ angular.module('PU.poolPage', ['PU.factories'])
       }
       $location.path(`/users/${user.user.uid}`);
     }
-  }
-
-})
+  };
+});

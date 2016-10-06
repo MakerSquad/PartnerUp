@@ -93,5 +93,5 @@ angular.module('PU.home', ['PU.factories'])
       $scope.$apply();
       console.log(err);
     });
-  }());
+  })();
 });
