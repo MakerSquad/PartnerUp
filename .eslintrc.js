@@ -1,3 +1,9 @@
 module.exports = {
-    "extends": "google"
+    "extends": "google",
+    "rules": {
+     "no-use-before-define": 0,
+     "no-undef":1,
+     "no-confirm": 0,
+     "no-alert": 0
+   }
 };

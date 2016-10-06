@@ -10,13 +10,13 @@ angular.module('PU.home', ['PU.factories'])
   // ******************************************************************************
 
   $scope.showPools = function() {
-   return DB.getClasses()
+    return DB.getClasses()
     .then(function(data) {
       $scope.pools = data.reverse(); // shows pools in more recent order first
     })
     .catch(function(err) {
-      console.log('showPools err',err);
-    })
+      console.log('showPools err', err);
+    });
   };
 
   // ******************************************************************************
@@ -42,7 +42,7 @@ angular.module('PU.home', ['PU.factories'])
 
   $scope.deletePool = function(pool) {
     // precautionary if statement to make sure a student may not delete a pool.
-    if (pool.role === 'fellow' || pool.role === 'instructor' || pool.role === 'memberAdmin' ) {
+    if (pool.role === 'fellow' || pool.role === 'instructor' || pool.role === 'memberAdmin') {
       // confirms that you want to delete the pool. pressing cancel will cancel the event
       if (confirm('Do you want to delete this pool, once delete its gone forever?')) {
         DB.deletePool(pool.id)
@@ -52,7 +52,7 @@ angular.module('PU.home', ['PU.factories'])
         })
         .catch(function(err) {
           console.log(err);
-        })
+        });
       }
     } else {
       // says why you may not delete this pool
@@ -65,32 +65,33 @@ angular.module('PU.home', ['PU.factories'])
   // also calls show pools so all the pools may be displayed on the page.
   // ******************************************************************************
 
-   var init = (function() { // function that runs on load; it'll call all the fns to set up the page
-      // this is our copy button code. its makes copying so easy. clipboard.js!
-      new Clipboard('.clipyclip');
-      $scope.loading = true; // sets loading to true so the gif can come into play
-       CurrentUser.get() // gets all user data
-       .then(function(userData) {
-        console.log("Userdata: ", userData);
-          if (!userData) {
-            $location.path('/signin'); // whoops you aren't signed in! so its redirects you to sign in
-          } else {
-            $scope.currentUser = userData; // sets the user data to the current user
-            Promise.all([
-              $scope.showPools() //promises that showPools will finish
-            ])
-            .then(function(resolveData) {
-              console.log("Promises resolved");
-              console.log('resolveData', resolveData);
-              console.log("Current scope: ", $scope);
-              $scope.loading = false; // sets loading to false. no more loading gif.
-              $scope.$apply(); // applies all the changes to the page
-            })
-          }
-       })
-       .catch(function(err) {
-        $location.path('/signin'); //is this fails send them back to login
-        $scope.$apply();
-       })
-    }())
-})
+  var init = (function() { // function that runs on load; it'll call all the fns to set up the page
+    // this is our copy button code. its makes copying so easy. clipboard.js!
+    new Clipboard('.clipyclip');
+    $scope.loading = true; // sets loading to true so the gif can come into play
+    CurrentUser.get() // gets all user data
+    .then(function(userData) {
+      console.log("Userdata: ", userData);
+      if (!userData) {
+        $location.path('/signin'); // whoops you aren't signed in! so its redirects you to sign in
+      } else {
+        $scope.currentUser = userData; // sets the user data to the current user
+        Promise.all([
+          $scope.showPools() // promises that showPools will finish
+        ])
+        .then(function(resolveData) {
+          console.log("Promises resolved");
+          console.log('resolveData', resolveData);
+          console.log("Current scope: ", $scope);
+          $scope.loading = false; // sets loading to false. no more loading gif.
+          $scope.$apply(); // applies all the changes to the page
+        });
+      }
+    })
+    .catch(function(err) {
+      $location.path('/signin'); // is this fails send them back to login
+      $scope.$apply();
+      console.log(err);
+    });
+  }());
+});
