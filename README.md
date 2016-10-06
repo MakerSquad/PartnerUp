@@ -1,7 +1,7 @@
 # PartnerUp
 By [MakerSquad](https://github.com/makersquad)
 
-[**_PartnerUp_**](http://partnerup.makerpass.com) is an app built for [**Hack Reactor Coding Immersive**](http://www.hackreactor.com), aimed at automating the process of creating student groups for coding exercises, whiteboarding, large projects, etc., with a few base goals in mind:
+[**_PartnerUp_**](http://partnerup.makerpass.com) is an app built for [**Hack Reactor Software Engineering Immersive**](http://www.hackreactor.com), aimed at automating the process of creating student groups for coding exercises, whiteboarding, large projects, etc., with a few base goals in mind:
 
   - Students who have previously worked together should not be paired together again until it is necessary
   - The history of past groupings should be recorded and should be accessible both for whole classes, and for individual students.
