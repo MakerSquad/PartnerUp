@@ -32,6 +32,12 @@
     </select>
     <button class="createCtrl" ng-click='createPool()' ng-href="`pool/{{pool.id}}`">Create Pool</button>
   </div>
+  <div class="createControls">
+    <h4 class="createCtrl">{{"Number of Students: " + numKeys(isStudent).length}}</h4>
+  </div>
+  <div class="createControls">
+    <h4 class="createCtrl">{{"Number of Admins: " + numKeys(isAdmin).length}}</h4>
+  </div>
   <h3 class="createListTitle">Pool Members</h3>
   <div class="creatingUserList">
     <div loading class="extraBtn" ng-show="loadingUsers"></div>
@@ -45,7 +51,7 @@
     </div>
   </div>
 
-  <div id="noStusError" class="error" ng-show="noStusError && !importedStudents.length">
+  <div id="noStusError" class="error" ng-show="noStusError && !numKeys(isStudent).length">
     Oops! We can't create a pool without any students. Get people involved!
   </div> 
   <div class="extraBtn">

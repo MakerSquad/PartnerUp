@@ -1,10 +1,10 @@
 {
   "name": "PU",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "index.js",
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "scripts": {
     "postinstall": "bower install",
     "start": "./node_modules/.bin/nodemon --ignore node_modules server/Server.js",

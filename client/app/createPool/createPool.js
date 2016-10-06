@@ -11,6 +11,8 @@ angular.module('PU.createPool', ['PU.factories'])
   $scope.loadingUsers = false;
   $scope.error = "";
 
+  $scope.numKeys = Object.keys;
+
 //******************************************************************************
 //This imports all the MakerPass members and separates them to two sub groups: 
 //admins and members. If the makerPass member is not found in the group it will 

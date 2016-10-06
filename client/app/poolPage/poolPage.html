@@ -3,6 +3,8 @@
 <h2 class="errMsg" ng-show="error.length">{{error}}</h2>
 <div class="poolPageBody fade" ng-show="!error.length && !loading">
 <h1 class="poolTitle" ng-hide="loading">{{currPool.name}}</h1>
+<h5 class="poolTitle" ng-hide="loading">{{"Owner: " + currPool.user.name}}</h5>
+<h4 class="poolTitle" ng-hide="loading || !stuView">{{"You are just a student in this group and cannot organize new groupings"}}</h4>
 <br>
 <button class="partnerUpBtn" ng-hide="stuView || loading" ng-click="startNewGrouping()">{{creatingGrouping ? "Close" : "Organize New Grouping"}}</button>
 <div loading ng-show="loadingNewGrouping"></div>
