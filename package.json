@@ -16,6 +16,8 @@
     "bluebird": "^3.4.6",
     "browser-sync": "^1.5.7",
     "chai": "^3.5.0",
+    "eslint": "^3.7.1",
+    "eslint-config-google": "^0.6.0",
     "karma-chrome-launcher": "^2.0.0",
     "karma-jasmine": "^1.0.2",
     "karma-nyan-reporter": "^0.2.4",
