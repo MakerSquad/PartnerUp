@@ -7,6 +7,11 @@ var hash = require('string-hash');
 'use strict';
 knex.migrate.latest([config[env]]);
 
+
+const maxForStudent = 2; // Change this verible to set how many groups a student can create!
+
+/******************************************************* Authentication *******************************************************/
+
 /**
   @params: token = (string) Session we get from MakerPass, group to see if perosn is in the group
   return: throws 401 if no session or user UID if there is
@@ -80,6 +85,9 @@ knex.addToken = (userToken, userUid, adminStatus) => {
     "created_at": (date)
   }
 */
+
+/**************************************************** Groups insert/del/get ****************************************************/
+
 knex.getGroups = (userUid) => {
   var groupArray = knex('group_membership').where("user_uid", userUid)
     .join('groups', 'groups.id', "=" ,"group_membership.group_id")
@@ -125,6 +133,7 @@ knex.getGroup = (groupId) =>{
   creator : (string) user UID that created group
   return: 'added groups to group table' or error
 */
+
 knex.addGroup = (group, creator) => {
     return knex.canCreateGroup(creator)
   .then( (canCreate) => {
@@ -157,8 +166,10 @@ knex.addGroup = (group, creator) => {
 };
 
 /**
-  @params uid = (string) mks_uid
+  Private fucntion to check if user can create group
+  P.S change  maxForStudent up top for how many groups a student can create
 
+  @params uid = (string) mks_uid
   returns (boolean) can create a group if student
 */
 knex.canCreateGroup = (creator) => {
@@ -171,15 +182,19 @@ knex.canCreateGroup = (creator) => {
       return knex('groups').where('creator', creator)
       .returning('*')
       .then((groups) => {
-          if(groups.length <2) { // change this varible to set how many groups students can create
+          if(groups.length <maxForStudent) { // change maxForStudent varible to set how many groups students can create
             return true;
           }
           else return false;
       }).catch((err) => {throw new Error('(1) cant creat group:' +err);});
   }).catch((err) => {throw new Error('(2) cant creat group:' +err);});
-
 }
 
+/**
+  Deletes everything related to a group
+  @params id = (int) group id in the db
+  returns (string) 'pairs deleted'
+*/
 knex.deleteGroup = (groupId) => {
     return knex('groups').where('id', groupId)
     .del()
@@ -203,6 +218,22 @@ knex.deleteGroup = (groupId) => {
 };
 
 /**
+  gets all memberts for a group
+  @params: groupId = (int) group id
+  return: return { an array of these students for group
+    Role: (string) role (admin or member)
+    UserUid: (string) user uid from makerpass 
+  }
+*/
+knex.getMemberships = (groupId) => {
+    return knex('group_membership').where('group_id', groupId).returning('*')
+  .then((students) => students)
+  .catch((err) => {throw new Error('cannot get membeships for that group, '+ err);}); // throw error if something went horribly wrong
+};
+
+/*********************************************** Pairs and Generations insert/del/get ***********************************************/
+
+/**
   @params: pairData = ({
     'pairs': (array)       [(user1_uid, user2_uid), (user1_uid, user2_uid), ...] array of 2 user ids in order,
     'genTitle': (string)   title of the genaration,
@@ -212,9 +243,14 @@ knex.deleteGroup = (groupId) => {
   return: 201(if added pairs) or error
 */
 knex.addPairs = (pairData, groupId) => {
-    return addGeneration({groupId: groupId, genTitle: pairData.genTitle, groupSize: pairData.groupSize}) //adds or finds generation for group
+    return addGeneration({ // private functions that returns the id 
+      groupId: groupId, 
+      genTitle: pairData.genTitle, 
+      groupSize: pairData.groupSize
+    }) //adds or finds generation for group
     .then((genId) => { // gets the generation Id for each pair 
       // i for index and row for each pair
+      // format it for vatchInsert
         for(var i = 0, rows = []; i < pairData.pairs.length; i++) 
             rows.push({ // row for batch insert
                 user1_uid: pairData.pairs[i][0], // user 1
@@ -228,6 +264,7 @@ knex.addPairs = (pairData, groupId) => {
 };
 
 /**
+  Private function to add generation when new group is created
   @params: genData = {
             groupId: (integer)id,
             genTitle: (string)genTitle,
@@ -260,15 +297,6 @@ knex.deleteGeneration = (id) => {
     }).catch((err) => {throw new Error('cannot delete group from groups table, '+ err);});  // throw error if something went horribly wrong
 };
 
-knex.getTables = () => {
-    return knex('generations').where("group_id", 5)
-            .join('pairs', 'pairs.gen_table_id', "=" ,"generations.id")
-            .select('*',"*")
-};
-knex.getTables2 = () => {
-    return knex('groups').returning('*');
-};
-
 /**
   @params: groupId = (string) group id
   return: [{array of that contain pair data and generation data for entries with group id
@@ -286,22 +314,22 @@ knex.getTables2 = () => {
     } ... ]
 */
 knex.getPairsForGroup = (groupId) => {
-  return knex('generations').where("group_id", groupId)
+  return knex('generations').where("group_id", groupId) 
         .join('pairs', 'pairs.gen_table_id', "=" ,"generations.id")
         .select('*',"*")
-        .then((info = null) => {
-
+        .then((info = null) => { // gets all generations and pairs that are togather
+          //throw error if no pairs for that generation
           if(info == null) {
-            throw new Error("sorry no info found");
+            throw new Error("sorry no data in the dataBase was found");
           } 
 
-          var pairsData = [];
+          var pairsData = []; // format the data/info for the front end
           for(let i=0; i<info.length; i++){
-
+            // in case data is changed to null  
             if(!info[i]){
              continue;
             }
-
+            // add a new generationData
             pairsData.push({    
               generationData: {
                 id         : info[i].gen_table_id,
@@ -312,13 +340,13 @@ knex.getPairsForGroup = (groupId) => {
               },
               pairs: []
             });
-
+            // adds all the pairs to generations
             for(let j=0; j<info.length; j++){
-
+              //in case data is changed to null
               if(!info[j]){
                 continue;
               }
-
+              // checks if pair matches a new generation 
               if(pairsData[pairsData.length-1].generationData.id === info[j].gen_table_id){
                 pairsData[pairsData.length-1].pairs.push({
                   user1_uid    : info[j].user1_uid,
@@ -342,22 +370,10 @@ knex.getPairsForGroup = (groupId) => {
   }]
 */
 knex.getGenerationsByGroup = (groupId) => {
-    return knex('generations').where('group_id', groupId).returning('*')
+  return knex('generations').where('group_id', groupId)
+  .returning('*')
   .then((gen) => gen) // returns all gens for id
   .catch((err) => {throw new Error('database off-line, '+ err);}); // throw error if something went horribly wrong
-};
-
-/**
-  @params: groupId = (int) group id
-  return: return { an array of these students for group
-    Role: (string) role (admin or member)
-    UserUid: (string) user uid from makerpass 
-  }
-*/
-knex.getMemberships = (groupId) => {
-    return knex('group_membership').where('group_id', groupId).returning('*')
-  .then((students) => students)
-  .catch((err) => {throw new Error('cannot get membeships for that group, '+ err);}); // throw error if something went horribly wrong
 };
 
 /**
@@ -377,68 +393,82 @@ knex.getMemberships = (groupId) => {
   }
 */
 knex.getNewGen = (groupId) => { 
-    return knex('generations').where('group_id', groupId).returning('*')
-  .then((next) => {
-      for(var i=0, max =0; i<next.length;i++) if(next[i].id > max) max = i;
-      return knex('pairs').where('gen_table_id', next[max].id).returning('*')
-    .then((pairs) => {return {pairs:pairs, generationData:next[max]};})
-    .catch((err) => {throw new Error('cannot find pairs, '+ err);}); // throw error if something went horribly wrong
+    return knex('generations').where('group_id', groupId)
+    .returning('*')
+    .then((next) => {
+      // checks for latest creation
+      for(var i=0, maxIndex =0; i<next.length;i++){
+        if(next[i].id > maxIndex){
+          maxIndex = i; // if id is later will change to it (only for updated)
+        }
+      }
+      return knex('pairs').where('gen_table_id', next[maxIndex].id).returning('*')
+      .then((pairs) => {
+        return {
+          generationData:next[maxIndex], 
+          pairs:pairs 
+        };
+      })
+      .catch((err) => {throw new Error('cannot find pairs, '+ err);}); // throw error if something went horribly wrong
   }).catch((err) => {throw new Error('cannot find gen_id, '+ err);}); // throw error if something went horribly wrong
 };
 
+/******************************************************* Misc (user things) *******************************************************/
+
 /**
-  @params: groupId = (int) group id
-  return: return { an array of these students for group
-    Role: (string) role (admin or member)
-    UserUid: (string) user uid from makerpass 
+  Gets all the data for a single user
+  @params: userUid = (string) User mks uid
+  return: return an array of these students for group
+  {
+    "user1_uid": "bfc5a48d77ae",
+    "user2_uid": "-0",
+    "generations": {
+      "id": 1,
+      "title": "abc",
+      "group_id": 1,
+      "group_size": 2,
+    },
+    "group": {
+      "id": 1,
+      "name": "SearchBarTest",
+      "group_size": 2,
+      "creator": "3a9137d82c2b",
+      "created_at": "2016-10-04T19:40:55.012Z"
+    } 
   }
 */
 knex.getUserData = (userUid) => {
-    return knex('pairs').where('user1_uid', userUid).orWhere('user2_uid', userUid).returning('*')
-  .then((students) => {
-      for(var i=0, genIds =[]; i<students.length ;i++) if(!genIds.includes(students[i].gen_table_id)) genIds.push(students[i].gen_table_id);
-      return knex('generations').whereIn('id', genIds).returning('*')
-    .then((generations) =>{
-        for(var i=0, groupIds =[]; i<generations.length ;i++) if(!groupIds.includes(generations[i].group_id)) groupIds.push(generations[i].group_id); 
-        return knex('groups').whereIn('id', groupIds).returning('*')
-      .then((groups) => {
-          for(var i=0, generation = null,group = null, data =[]; i<students.length; i++) {
-
-              generation  = knex.findItemById(generations, students[i].gen_table_id);
-              group  = knex.findItemById(groups, generation.group_id);
-              data.push({
-                  user1_uid : students[i].user1_uid,
-                  user2_uid : students[i].user2_uid,
-                  generations : generation,
-                  group : group,
-              });
-          }
-          return data;
-      }).catch((err) => {throw new Error('cannot get group from gen, '+ err);}); // throw error if something went horribly wrong
-    }).catch((err) => {throw new Error('cannot get gen from pair, '+ err);}); // throw error if something went horribly wrong
-  }).catch((err) => {throw new Error('cannot get pair from user, '+ err);}); // throw error if something went horribly wrong
-};
-
-knex.findItemById = (array, id) => {
-    if(!array || array.length == 0 || !id) return -1;
-    var low = 0;
-    var high = array.length - 1;
-    var found = false;
-    while(!found){
-        var mid = Math.floor((high + low) /2);  
-        if(array[high].id === id) return array[high];
-        if(array[low].id === id) return array[low];  
-        if(array[mid].id === id) return array[mid];  
-        else if(array[mid].id > id){
-            if(high === mid) break;
-            high = mid;
-        }   
-        else if(array[mid].id < id){
-            if(low === mid) break;
-            low = mid;
+  return knex('pairs').where('user1_uid', userUid)
+  .orWhere('user2_uid', userUid)
+  .join('generations', 'pairs.gen_table_id', "=" ,"generations.id")
+  .select('*',"*")
+  .join('groups', 'groups.id', "=" ,"generations.group_id")
+  .select('*',"*")
+  .then( (data) => {
+    var fullHistory =[] // for the front end formatting
+    for(let i=0; i<data.length; i++){
+      fullHistory.push({
+        user1_uid  : data[i].user1_uid, // user uid 
+        user2_uid  : data[i].user2_uid, // user uid
+        generations : { // all the generation data (exept for created at)
+          id        : data[i].gen_table_id, // gen id
+          title     : data[i].title,        // title/name
+          group_id  : data[i].group_id,     // id of group (also in group)
+          group_size: data[i].group_size,   // size of the group (also in group)
+        },
+        group: { //all group data including created at)
+          id          : data[i].group_id,   // id of the group (also in gen)
+          name        : data[i].name,       // group name
+          group_size  : data[i].group_size, // size of the group (also in gen)
+          creator     : data[i].creator,    // user who created the group
+          created_at  : data[i].created_at  // when it was created
         }
+      })
     }
-    return -1;
+    return fullHistory
+  })
+  .catch((err) => {throw new Error('cannot get join table for history because, '+ err);}); // throw error if something went horribly wrong
 };
+
 module.exports = knex;
 

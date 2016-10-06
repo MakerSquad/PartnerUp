@@ -202,15 +202,23 @@ app.get('/user/:uid', (req, res) => { // done
   db.getUserData(req.params.uid)
   .then((dataArray) => {
     for(var i=0, studentsUid = []; i<dataArray.length; i++){
-      if(!studentsUid.includes(dataArray[i].user1_uid)) studentsUid.push(dataArray[i].user1_uid);
-      if(!studentsUid.includes(dataArray[i].user2_uid)) studentsUid.push(dataArray[i].user2_uid);
+      if(!studentsUid.includes(dataArray[i].user1_uid)){
+       studentsUid.push(dataArray[i].user1_uid);
+      }
+      if(!studentsUid.includes(dataArray[i].user2_uid)){
+        studentsUid.push(dataArray[i].user2_uid);
+      }
     }
     MP.Memberships.get('/users/'+studentsUid.join('+'), req.cookies.token)
       .then((users)=> {
         for(var i=0; i<dataArray.length; i++){
           for(var j=0; j<users.length; j++){
-            if(dataArray[i].user1_uid == users[j].uid) dataArray[i].user1 = users[j];
-            if(dataArray[i].user2_uid == users[j].uid) dataArray[i].user2 = users[j];
+            if(dataArray[i].user1_uid == users[j].uid){ 
+              dataArray[i].user1 = users[j];
+            }
+            if(dataArray[i].user2_uid == users[j].uid){
+             dataArray[i].user2 = users[j];
+            }
           }
         }
         res.send(dataArray);
