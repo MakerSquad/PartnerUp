@@ -68,9 +68,15 @@ app.get('/signout', (req, res) =>{
   res.redirect('/');
 });
 
-app.get('/currentUser', (req, res) =>{
-  MP.me(req.cookies.token) // MakerPass call to get personal data based on token
-    .then((user) => res.send(user)); // sends user object
+app.get('/currentUser', (req, res) => { 
+  db.authenticate(req.cookies.token, null, true)
+  .then((userData) => {
+    MP.me(req.cookies.token) // MakerPass call to get personal data based on token
+      .then((user) => {
+        user.admin = userData.admin;
+        res.send(user)// sends user object
+      }).catch((err) => {res.status(401).send('' +err);}) 
+  }).catch((err) => {res.status(401).send('' +err);}) 
 });
 
 app.get('/cohorts', (req, res) => { // done
@@ -82,7 +88,7 @@ app.get('/cohorts', (req, res) => { // done
       })
     .catch((err) => {res.status(401).send('' +err);})   
     )
-    .catch((err) => {res.status(401).send('' +err);}); 
+    .catch((err) => {res.status(401).send('' +err);}) 
 });
 
 app.get('/cohort/:groupUid', (req, res) => {
