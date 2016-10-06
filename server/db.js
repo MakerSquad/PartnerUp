@@ -126,7 +126,7 @@ knex.getGroup = (groupId) =>{
   return: 'added groups to group table' or error
 */
 knex.addGroup = (group, creator) => {
-    return canCreateGroup(creator)
+    return knex.canCreateGroup(creator)
   .then( (canCreate) => {
       if(!canCreate) {
         throw new Error('sorry you reached your limit');
@@ -161,7 +161,7 @@ knex.addGroup = (group, creator) => {
 
   returns (boolean) can create a group if student
 */
-function canCreateGroup (creator){
+knex.canCreateGroup = (creator) => {
     return knex('auth').where('user_uid', creator)
     .returning('admin')
     .then((status) =>{

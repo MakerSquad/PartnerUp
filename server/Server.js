@@ -138,6 +138,14 @@ app.get('/group/:groupId/recent', (req, res) => { // done
   ).catch((err) => {res.status(401).send('' +err);}); 
 });
 
+app.get('/cancreate', (req, res) => { // done
+  db.authenticate(req.cookies.token).then((uid) => 
+      db.canCreateGroup(uid)
+      .then((resp) => res.send(resp))
+      .catch((err) => {res.status(500).send('' +err);})
+  ).catch((err) => {res.status(401).send('' +err);}); 
+});
+
 app.get('/group/:groupId/generations', (req,res) => { // done
   db.authenticate(req.cookies.token, req.params.groupId).then((uid) => 
       db.getGenerationsByGroup(req.params.groupId)
