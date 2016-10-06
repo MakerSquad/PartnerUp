@@ -1,6 +1,3 @@
-// do not tamper with this code in here, study it, but do not touch
-// this Auth controller is responsible for our client side authentication
-// in our signup/signin forms using the injected Auth service
 angular.module('PU.signin', [
 
 ])
@@ -9,7 +6,9 @@ angular.module('PU.signin', [
   document.getElementById("bodyclass").className = "bodyclass";
   $scope.user = {};
 
-
+  /*
+  * If the user is already signed in, redirect to home
+  */
   CurrentUser.get()
   .then((userData) => {
     $location.path('/');
@@ -17,10 +16,18 @@ angular.module('PU.signin', [
   })
   .catch(() => {})
 
+  /**
+  * Function to path to the demo
+  */
+
   $scope.startDemo = function(){
     $location.path('/demo');
   }
 
+  /**
+  * LoginMakerPass redirects the user to the Makerpass OAuth for login via a pop up
+  */
+  
   $scope.loginMakerPass = function(){
     // $window.location.href = '/auth/makerpass';
     $.oauthpopup = function(options) {

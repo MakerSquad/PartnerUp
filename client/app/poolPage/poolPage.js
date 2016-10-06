@@ -24,7 +24,14 @@ angular.module('PU.poolPage', ['PU.factories'])
   var timeoutCounter = 0;
   var timeoutThreshold = 4000;
 
-  var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
+  /**
+  * The init function sets up the page, loading all the necessary data from the back end
+  * before showing the page content (via $scope.loading). The init function loads the pool info,
+  * the members of the pool, the past pairs, and all the past groupings. If any of the database calls
+  * fail, the init function will render an error
+  */
+
+  var init = (function(){
     new Clipboard('.clipyclip');
     $scope.loading = true;
     CurrentUser.get()
@@ -104,6 +111,12 @@ angular.module('PU.poolPage', ['PU.factories'])
     })
   }())
 
+  /**
+  * RefreshGroupings retrieves the past pairs from the back end and stores them in memory
+  * to avoid repeats. RefreshGroupings also calls createGroupings to generate the past groupings
+  * from the retrieved pairs.
+  */
+
   var refreshGroupings = function(){
     return DB.getPairs($scope.currPool)
     .then(function(groupings){
@@ -125,11 +138,12 @@ angular.module('PU.poolPage', ['PU.factories'])
     })
   }
 
-  $scope.filterGroupsByName = function(group){
-    if(!$scope.stuSearch) return true;
-    var search = $scope.stuSearch.toLowerCase();
-    return group.filter(stu => stu.user.name.toLowerCase().includes(search)).length;
-  }
+  /**
+  * CreateGroupings is a helper function for refreshGroupings that takes in a list of past pairs
+  * and uses them to generate full groupings (for when group size is larger than just 2).
+  * @param pairs A list of the pairs for a grouping
+  * @return an array of full groupings
+  */
 
   var createGroupings = function(pairs){
     var pastGroupings = {};
@@ -154,6 +168,12 @@ angular.module('PU.poolPage', ['PU.factories'])
     return grpArray;
   }
 
+  /**
+  * StartNewGrouping is the function called when the "organize new grouping" button
+  * is clicked. It changes the state to show the controls for creating a new grouping
+  * and calls randomize to generate a new grouping
+  */
+
   $scope.startNewGrouping = function(){
     if($scope.loadingNewGrouping){
       return; //in case user double clicks the button
@@ -165,7 +185,6 @@ angular.module('PU.poolPage', ['PU.factories'])
     $scope.loadingNewGrouping = true;
     $scope.creatingGrouping = true;
     $scope.groupingName = "";
-    console.log("Loading new Grouping? : ", $scope.loadingNewGrouping);
     $scope.randomize();
     $scope.loadingNewGrouping = false;
   }
@@ -183,6 +202,11 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
     return arr;
   }
+
+  /**
+  * makeMap generates an object that maps student uids to the full student objects.
+  * This map is used to quickly lookup the students in the cases where we only have ids
+  */
 
   $scope.makeMap = function(){
     for(var i = 0; i < $scope.students.length; i++){
@@ -332,6 +356,12 @@ angular.module('PU.poolPage', ['PU.factories'])
     return $scope.groups;
   }
 
+  /**
+  * SwapLockedStusBack is a helper function to the two randomize functions.
+  * It is called after randomizing a grouping to place students marked as "locked"
+  * back into their original positions, giving the illusion that they haven't moved
+  */
+
   var swapLockedStusBack = function(){
     for(var s in $scope.lockedStus){
       var currGroup = $scope.lockedStus[s][0];
@@ -340,6 +370,13 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
   }
 
+  /**
+  * FilterGroupsByName is a function used in the html to search the rendered groups
+  * by student names
+  * @param group the group being searched
+  * @return true if any student name in the group contains $scope.search, false otherwise
+  */
+
   $scope.filterGroupsByName = function(group){
     if(!$scope.stuSearch) return true;
     var search = $scope.stuSearch.toLowerCase();
@@ -347,8 +384,22 @@ angular.module('PU.poolPage', ['PU.factories'])
   }
 
   /**
+  * FilterGroupingsByName is a function used to search the groupings by title
+  * The search parameter is defined by an input box in the HTML
+  * @param grouping the grouping being searched
+  * @return true if the grouping title contains $scope.searchHist, or false otherwise
+  */
+
+  $scope.filterGroupingsByName = function(grouping){
+    if(!$scope.searchHist) return true;
+    var search = $scope.searchHist.toLowerCase();
+    return grouping.generationData.title.toLowerCase().includes(search)
+  }
+
+  /**
   * CheckClashes checks the current groups for any groups in which students have previously worked together
-  * Any clashing groups will be pushed to $scope.groups
+  * Any clashing groups will be pushed to $scope.clashes
+  * checkClashes is called by the randomize functions, and after swapping students
   */
 
   var checkClashes = function(){
@@ -374,7 +425,10 @@ angular.module('PU.poolPage', ['PU.factories'])
   }
 
   /**
-  * Finalize takes the current pairings and records them into the "past pairs" object
+  * Finalize is called when a user is happy with the new grouping.
+  * Finalize takes the current pairings and records them into the "past pairs" object,
+  * as well as sending them to the back-end for persisting storage
+  * Finalize also calls refreshGroupings after the database finishes storing the pairs
   */
 
   $scope.finalize = function(){
@@ -412,6 +466,15 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
   }
 
+  /**
+  * ToggleLockStu takes a student object and marks it as locked in $scope.lockedStus,
+  * or unlocks the student, if they are already locked, by deleting their key in lockedStus.
+  * The students are stored in lockedStus by their uids as a key, and as their current indices
+  * as values, to allow them to stay in place when the groupings are re-rolled.
+  * If groupSize is set to 2, their current partner will be locked as well
+  * @param stu The student to lock in place
+  */
+
   $scope.toggleLockStu = function(stu){
     var index = searchGroupsForStu(stu);
     if(!$scope.lockedStus[stu.user.uid]){
@@ -433,6 +496,13 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
   }
 
+  /**
+  * SearchGroupsForStu takes in a student object and returns the 2-dimensional index
+  * where the student is located in $scope.groups
+  * @param stu The student being searched for
+  * @return The index of the student as a tuple, or -1 if not found
+  */
+  
   var searchGroupsForStu = function(stu){
     for(var i = 0; i < $scope.groups.length; i++){
       for(var j = 0; j < $scope.groups[i].length; j++){
@@ -444,11 +514,6 @@ angular.module('PU.poolPage', ['PU.factories'])
     return -1;
   }
 
-  $scope.filterGroupingsByName = function(grouping){
-    if(!$scope.searchHist) return true;
-    var search = $scope.searchHist.toLowerCase();
-    return grouping.generationData.title.toLowerCase().includes(search)
-  }
 
   //Functions for rearranging students
 
@@ -512,14 +577,26 @@ angular.module('PU.poolPage', ['PU.factories'])
     $scope.groups[indexTuple2[0]][indexTuple2[1]] = tmp;
   }
 
+  /**
+  * deleteGrouping makes a database call to remove a specific grouping
+  * The user is first prompted to confirm the deletion
+  * After the deletion occurs, the page is reloaded
+  * @param group The grouping being deleted
+  */
+
   $scope.deleteGrouping = function(group){
-    console.log('dadadadadda', group)
     if(confirm("Are you sure you want to delete this grouping? Once deleted, its gone forever!")){
       DB.deleteAGrouping($scope.currPool.id, group.generationData.id)
       .then(function(resp){$route.reload()})
       .catch(function(err){console.log(err)})
     }
   }
+
+  /**
+  * GoToHistory paths the user to a specified user's history page
+  * If a Rubber Duck Debugger is selected, the user will receive an alert instead
+  * @param user The user whose history will be visited
+  */
 
   $scope.goToHistory = function(user){
     if(!$scope.stuView){
