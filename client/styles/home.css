@@ -81,10 +81,14 @@
 
 .admin{
   background-color: rgba(220, 44, 05, .8) !important;
+  border-bottom-right-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .member{
   background-color: rgba(86, 31, 41, .8) !important;
+  border-bottom-right-radius: 8px;
+  border-top-right-radius: 8px;
   /*color: rgba(0,0,0,0.38) !important;*/
 }
 .noPools{
