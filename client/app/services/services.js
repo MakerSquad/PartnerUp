@@ -238,6 +238,15 @@ angular.module('PU.factories', [])
     .catch(err => Promise.reject(err.statusText))
   }
 
+  var canCreate = function(){
+    return $http({
+      method: 'GET',
+      url: '/canCreate'
+    })
+    .then((resp) => resp.data)
+    .catch(err => Promise.reject(err.statusText))
+  }
+
   return{
     getUserHistory: getUserHistory,
     getClasses: getClasses,
@@ -251,7 +260,8 @@ angular.module('PU.factories', [])
     createClass: createClass,
     getPool: getPool,
     deletePool: deletePool,
-    deleteAGrouping: deleteAGrouping
+    deleteAGrouping: deleteAGrouping,
+    canCreate: canCreate
   }
   
 })

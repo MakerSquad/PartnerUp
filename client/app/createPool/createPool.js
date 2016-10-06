@@ -9,6 +9,7 @@ angular.module('PU.createPool', ['PU.factories'])
   $scope.removedAdmins = {};
   $scope.loadingPage = true;
   $scope.loadingUsers = false;
+  $scope.error = "";
 
 //******************************************************************************
 //This imports all the MakerPass members and separates them to two sub groups: 
@@ -45,6 +46,10 @@ angular.module('PU.createPool', ['PU.factories'])
       console.error("Error fetching users: ", err);
       $scope.loadingUsers = false;
     })
+  }
+
+  $scope.goHome = function(){
+    $location.path('/');
   }
 
 //******************************************************************************
@@ -124,7 +129,10 @@ angular.module('PU.createPool', ['PU.factories'])
     console.log('goupData', groupData)
     DB.createClass(members, groupData)
     .then(function(resp){$location.path('/pools/'+resp)})
-    .catch(function(err){console.log('pool not created', err)})
+    .catch(function(err){
+      $scope.error = err;
+      $scope.loadingPage = false;
+    }) //TODO
   }
 
 //******************************************************************************
@@ -167,42 +175,52 @@ angular.module('PU.createPool', ['PU.factories'])
 //******************************************************************************
 
   var init = (function(){ //function that runs on load; it'll call all the fns to set up the page
-      // $scope.loading = true;
-      new Clipboard('.clipyclip');
-       CurrentUser.get()
-       .then(function(userData){
-        console.log("Userdata: ", userData);
-          if(!userData){
-            $location.path('/signin');
-          } 
-          else{
-            $scope.currentUser = userData;
-            //add the current user as an admin
-            $scope.isAdmin[$scope.currentUser.uid] = true;
-            $scope.users.push({role: 'instructor', user: $scope.currentUser, user_uid: $scope.currentUser.uid});
-          }
-            Promise.all([
-              MakerPass.getCohorts()
-            ])
-            .then(function(resolveData){
-              console.log("Promises resolved");
-              console.log('resolveData', resolveData[0])
-              var cohorts = resolveData[0].reverse(); //reverse for recency order
-              for(var i = 0; i<cohorts.length; i++){
-                  $scope.allCohorts.push(cohorts[i]);
-                  console.log('$scope.allCohorts', $scope.allCohorts)
-              }
-
-              console.log("Current scope: ", $scope);
+    // $scope.loading = true;
+    new Clipboard('.clipyclip');
+    CurrentUser.get()
+    .then(function(userData){
+      console.log("Userdata: ", userData);
+        if(!userData){
+          $location.path('/signin');
+        } 
+        else{
+          $scope.currentUser = userData;
+          DB.canCreate($scope.currentUser)
+          .then(function(canCreate){
+            console.log("Can create? ", canCreate);
+            if(!canCreate){
+              $scope.cantCreateError = true;
               $scope.loadingPage = false;
-              $scope.$apply();
-            })
-          
-       })
-       .catch(function(err){
-        $location.path('/signin');
-        $scope.$apply();
-       })
-    }())
+              return;
+            }
+            else{
+              //add the current user as an admin
+              $scope.isAdmin[$scope.currentUser.uid] = true;
+              $scope.users.push({role: 'instructor', user: $scope.currentUser, user_uid: $scope.currentUser.uid});
+              Promise.all([
+                MakerPass.getCohorts()
+              ])
+              .then(function(resolveData){
+                console.log("Promises resolved");
+                console.log('resolveData', resolveData[0])
+                var cohorts = resolveData[0].reverse(); //reverse for recency order
+                for(var i = 0; i<cohorts.length; i++){
+                    $scope.allCohorts.push(cohorts[i]);
+                    console.log('$scope.allCohorts', $scope.allCohorts)
+                }
+
+                console.log("Current scope: ", $scope);
+                $scope.loadingPage = false;
+                $scope.$apply();
+              })
+            }
+          })          
+        }
+      })
+    .catch(function(err){
+      $location.path('/signin');
+      $scope.$apply();
+    })
+  }())
 
 })

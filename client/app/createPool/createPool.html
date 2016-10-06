@@ -1,7 +1,16 @@
 <div header></div> 
 <br>
+<h1 ng-show="error.length">{{error}}</h1>
 <div loading class="extraBtn" ng-show="loadingPage"></div>
-<div class='form fade' ng-hide="loadingPage">
+<div class="error" ng-show="cantCreateError">
+  Sorry! Since you're just a student, we can only let you control 2 pools at a time.
+  Feel free to delete an old pool, then come back here. <br>
+  Sorry for the inconvenience, but we have our reasons. (We don't trust you)
+</div>
+<div class="extraBtn" ng-show="cantCreateError">
+  <button ng-click="goHome()" ng-show="cantCreateError">My Pools</button>
+</div>
+<div class='form fade' ng-hide="loadingPage || cantCreateError">
   <div id="noNameError" class="error" ng-show="noNameError && poolName.length <= 0">
     Oops! That pool needs a name <br> (Anonymous pools confuse us greatly)
   </div>
