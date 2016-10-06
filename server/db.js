@@ -13,28 +13,37 @@ const maxForStudent = 2; // Change this verible to set how many groups a student
 /******************************************************* Authentication *******************************************************/
 
 /**
-  @params: token = (string) Session we get from MakerPass, group to see if perosn is in the group
+  @params: token = (string) Session we get from MakerPass, 
+           group = (int)to see if perosn is in the group,
+           needData = (bool) check if need full data(like admin etc/.)
   return: throws 401 if no session or user UID if there is
 */
-knex.authenticate = (token = 'null', groupId = null) => {
+knex.authenticate = (token = 'null', groupId = null, needData = false) => {
   if(process.env.TEST_AUTH) return Promise.resolve("3a9137d82c2b"); // for test env
   var encToken = hash(token);
   return knex('auth').where('token', encToken) // check for token in auth 
     .then((userUid) => { // userUid is an array
         if(userUid.length){ // if userUID.length checks if something 
             if(groupId){
-                return knex('group_membership').where({user_uid: userUid[0].user_uid, group_id:groupId}).returning('*')
-          .then((info) => {
-              if(info.length){
-                return Promise.resolve(userUid[0].user_uid);
-              } 
-              else {
-                return Promise.reject('sorry you are not in that group');
-              }
-          }).catch((err) => {throw new Error('Unable to authenticate user, '+ err);}); // throw error if something went horribly wrong
+              return knex('group_membership').where({user_uid: userUid[0].user_uid, group_id:groupId})
+              .returning('*')
+              .then((info) => {
+                if(info.length){
+                  if(needData){
+                    return Promise.resolve(userUid[0]);
+                  }
+                  return Promise.resolve(userUid[0].user_uid);
+                } 
+                else {
+                  return Promise.reject('sorry you are not in that group');
+               }
+              }).catch((err) => {throw new Error('Unable to authenticate user, '+ err);}); // throw error if something went horribly wrong
             } 
             else {
-                return Promise.resolve(userUid[0].user_uid);
+              if(needData){
+                return Promise.resolve(userUid[0]);
+              }
+              return Promise.resolve(userUid[0].user_uid);
             }
         } // if user exist then resolve
         else return Promise.reject('401 Unauthorized, please make sure you are logged in'); // else send a 401 error   

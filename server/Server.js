@@ -199,31 +199,40 @@ app.post('/group/:groupId/pairs', (req, res) => { // done
 });
 
 app.get('/user/:uid', (req, res) => { // done
-  db.getUserData(req.params.uid)
-  .then((dataArray) => {
-    for(var i=0, studentsUid = []; i<dataArray.length; i++){
-      if(!studentsUid.includes(dataArray[i].user1_uid)){
-       studentsUid.push(dataArray[i].user1_uid);
-      }
-      if(!studentsUid.includes(dataArray[i].user2_uid)){
-        studentsUid.push(dataArray[i].user2_uid);
-      }
+  db.authenticate(req.cookies.token, null, true)
+  .then((userAuthData) => {
+    console.log("userAuthData,", userAuthData)
+    if(userAuthData.user_uid !== req.params.uid && !userAuthData.admin){
+      res.status(401).send("you may only acess your own history, make sure you are logged in");
     }
-    MP.Memberships.get('/users/'+studentsUid.join('+'), req.cookies.token)
-      .then((users)=> {
-        for(var i=0; i<dataArray.length; i++){
-          for(var j=0; j<users.length; j++){
-            if(dataArray[i].user1_uid == users[j].uid){ 
-              dataArray[i].user1 = users[j];
-            }
-            if(dataArray[i].user2_uid == users[j].uid){
-             dataArray[i].user2 = users[j];
-            }
+    else {
+      db.getUserData(req.params.uid)
+      .then((dataArray) => {
+        for(var i=0, studentsUid = []; i<dataArray.length; i++){
+          if(!studentsUid.includes(dataArray[i].user1_uid)){
+           studentsUid.push(dataArray[i].user1_uid);
+          }
+          if(!studentsUid.includes(dataArray[i].user2_uid)){
+            studentsUid.push(dataArray[i].user2_uid);
           }
         }
-        res.send(dataArray);
+        MP.Memberships.get('/users/'+studentsUid.join('+'), req.cookies.token)
+          .then((users)=> {
+            for(var i=0; i<dataArray.length; i++){
+              for(var j=0; j<users.length; j++){
+                if(dataArray[i].user1_uid == users[j].uid){ 
+                  dataArray[i].user1 = users[j];
+                }
+                if(dataArray[i].user2_uid == users[j].uid){
+                 dataArray[i].user2 = users[j];
+                }
+              }
+            }
+            res.send(dataArray);
+          }).catch((err) => {res.status(500).send('' +err);});
       }).catch((err) => {res.status(500).send('' +err);});
-  }).catch((err) => {res.status(500).send('' +err);});
+    }
+  }).catch((err) => res.status(401).send('' +err));
 });
 
 
