@@ -1,4 +1,3 @@
-
 angular.module('PU', [
   'ngRoute',
   'PU.signin',
@@ -57,96 +56,95 @@ angular.module('PU', [
   })
   .otherwise({
     redirectTo: '/'
-  })
+  });
 })
 
-.directive('loading', function(){
-  return{
+.directive('loading', function() {
+  return {
     templateUrl: 'directives/loading.html'
-  }
+  };
 })
 
-.directive('header', function(){
-  var controller = function($scope, $location, $http, CurrentUser){
+.directive('header', function() {
+  var controller = function($scope, $location, $http, CurrentUser) {
     var path = $location.path();
     $scope.nicknames = {
-      'a4fa408de847' : 'Patty Cakes',
+      'a4fa408de847': 'Patty Cakes',
       '90b72025841d': 'Gilby',
       "ab2bc0473a48": 'Kitty',
       "8534c57b54f4": 'Waltisha',
       "bfc5a48d77ae": 'Russian Man',
       '2a97b80a545a': 'Jam Jam',
       '3a9137d82c2b': 'Ez'
-    }
+    };
 
-    $scope.hideMyPools = path === '/'; //NB: these routes might change
+    $scope.hideMyPools = path === '/'; // NB: these routes might change
     $scope.hideCreatePool = path === '/createPool';
     $scope.currentUser;
 
-    var init = (function(){
+    var init = (function()
+     {
       CurrentUser.get()
-      .then(function(user){
-        if(!user){
+      .then(function(user) {
+        if(!user) {
           $location.path('/signin');
-        }else{
+        } else {
           $scope.currentUser = user;
           $scope.hideHist = path === `/users/${user.uid}`;
           console.log("In header, currentUser: ", $scope.currentUser);
         }
-      })
-    }())
+      });
+    }());
 
-    $scope.seeMyPools = function(){
+    $scope.seeMyPools = function() {
       $location.path('/');
-    }
+    };
 
-    $scope.goToCreatePool = function(){
+    $scope.goToCreatePool = function() {
       $location.path('/createPool');
-    }
+    };
 
-    $scope.signOut = function(){
+    $scope.signOut = function() {
       CurrentUser.signOut();
-    }
+    };
 
-    $scope.goToMyHistory = function(){
+    $scope.goToMyHistory = function() {
       $location.path(`/users/${$scope.currentUser.uid}`);
-    }
-  }
+    };
+  };
 
   return {
     controller: controller,
     templateUrl: 'directives/header.html'
-  }
+  };
 })
 
-.directive('demoheader', function(){
-  var controller = function($scope, $location, $http, CurrentUser){
+.directive('demoheader', function() {
+  var controller = function($scope, $location, $http, CurrentUser) {
     var path = $location.path();
-
-    $scope.hideMyPools = path === '/demo/home'; //NB: these routes might change
+    $scope.hideMyPools = path === '/demo/home'; // NB: these routes might change
     $scope.hideCreatePool = path === '/demo/createPool';
     $scope.currentUser;
-
-    var init = (function(){
+    var init = (function() {
         $scope.currentUser = window.currentUser;
         $scope.hideHist = path === `/demo/users/${currentUser.uid}`;
       }())
 
-    $scope.seeMyPools = function(){
+    $scope.seeMyPools = function() {
       $location.path('/demo/home');
-    }
+    };
 
-    $scope.goToCreatePool = function(){
+    $scope.goToCreatePool = function() {
       $location.path('/demo/createPool');
-    }
+    };
 
-    $scope.signOut = function(){
+    $scope.signOut = function() {
       CurrentUser.signOut();
-    }
+    };
 
-    $scope.goToMyHistory = function(){
+    $scope.goToMyHistory = function() {
       $location.path(`/demo/users/${$scope.currentUser.uid}`);
-    }
+    };
   }
 
   return {
