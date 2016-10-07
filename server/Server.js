@@ -78,7 +78,8 @@ app.get('/currentUser', (req, res) => {
       .then(user => {
         user.admin = userData.admin;
         res.send(user); // sends user object
-      }).catch(err => {
+      })
+      .catch(err => {
         res.status(401).send(String(err));
       });
   })
@@ -172,7 +173,8 @@ app.get('/group/:groupId', (req, res) => {
 creates a pool in the database, and adds members to the pool
 */
 app.post('/group', (req, res) => {
-  db.authenticate(req.cookies.token).then(uid => {
+  db.authenticate(req.cookies.token)
+  .then(uid => {
     db.addGroup(req.body, uid)
     .then(id => {
       res.send(String(id)); // sends the id of the pool in the groups table
@@ -190,7 +192,7 @@ app.post('/group', (req, res) => {
 
 */
 app.delete('/group/:groupId', (req, res) => {
-  db.authenticateAdmin(req.cookies.token, req.params.groupId)
+  db.authenticate(req.cookies.token, req.params.groupId, false, true)
   .then(uid => {
     db.deleteGroup(req.params.groupId)
     .then(resp => {
@@ -260,7 +262,7 @@ app.get('/group/:groupId/generations', (req, res) => { // done
 
 */
 app.delete('/group/:groupId/generation/:id', (req, res) => {
-  db.authenticateAdmin(req.cookies.token, req.params.groupId)
+  db.authenticate(req.cookies.token, req.params.groupId, false, true)
   .then(uid => {
     db.deleteGeneration(req.params.id)
       .then(resp => res.send(resp))
@@ -330,7 +332,7 @@ app.get('/group/:groupId/pairs', (req, res) => { // done
 
 */
 app.post('/group/:groupId/pairs', (req, res) => { // done
-  db.authenticateAdmin(req.cookies.token, req.params.groupId)
+  db.authenticate(req.cookies.token, req.params.groupId, false, true)
   .then(uid => {
     db.addPairs(req.body, req.params.groupId)
     .then(data => {
@@ -349,44 +351,40 @@ app.post('/group/:groupId/pairs', (req, res) => { // done
 
 */
 app.get('/user/:uid', (req, res) => { // done
-  db.authenticate(req.cookies.token, null, true)
+  db.authenticate(req.cookies.token)
   .then(userAuthData => {
-    if (userAuthData.user_uid !== req.params.uid && !userAuthData.admin) {
-      res.status(401).send("you may only acess your own history, make sure you are logged in");
-    } else {
-      db.getUserData(req.params.uid)
-      .then(dataArray => {
-        var studentsUid = [];
-        for (let i = 0; i < dataArray.length; i++) {
-          if (!studentsUid.includes(dataArray[i].user1_uid)) {
-            studentsUid.push(dataArray[i].user1_uid);
-          }
-          if (!studentsUid.includes(dataArray[i].user2_uid)) {
-            studentsUid.push(dataArray[i].user2_uid);
-          }
+    db.getUserData(req.params.uid)
+    .then(dataArray => {
+      var studentsUid = [];
+      for (let i = 0; i < dataArray.length; i++) {
+        if (!studentsUid.includes(dataArray[i].user1_uid)) {
+          studentsUid.push(dataArray[i].user1_uid);
         }
-        MP.Memberships.get('/users/' + studentsUid.join('+'), req.cookies.token)
-          .then(users => {
-            for (var i = 0; i < dataArray.length; i++) {
-              for (var j = 0; j < users.length; j++) {
-                if (dataArray[i].user1_uid === users[j].uid) {
-                  dataArray[i].user1 = users[j];
-                }
-                if (dataArray[i].user2_uid === users[j].uid) {
-                  dataArray[i].user2 = users[j];
-                }
+        if (!studentsUid.includes(dataArray[i].user2_uid)) {
+          studentsUid.push(dataArray[i].user2_uid);
+        }
+      }
+      MP.Memberships.get('/users/' + studentsUid.join('+'), req.cookies.token)
+        .then(users => {
+          for (var i = 0; i < dataArray.length; i++) {
+            for (var j = 0; j < users.length; j++) {
+              if (dataArray[i].user1_uid === users[j].uid) {
+                dataArray[i].user1 = users[j];
+              }
+              if (dataArray[i].user2_uid === users[j].uid) {
+                dataArray[i].user2 = users[j];
               }
             }
-            res.send(dataArray);
-          })
-          .catch(err => {
-            res.status(500).send(String(err));
-          });
-      })
-      .catch(err => {
-        res.status(500).send(String(err));
-      });
-    }
+          }
+          res.send(dataArray);
+        })
+        .catch(err => {
+          res.status(500).send(String(err));
+        });
+    })
+    .catch(err => {
+      res.status(500).send(String(err));
+    });
   }).catch(err => res.status(401).send(String(err)));
 });
 

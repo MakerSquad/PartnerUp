@@ -13,65 +13,69 @@ const adminRoles = ['instructor', 'fellow', 'memberAdmin']; // admin roles
 /** ***************************************************** Authentication *******************************************************/
 
 /**
-  @params: token = (string) Session we get from MakerPass,
-           groupId = (int)to see if perosn is in the group,
-           needData = (bool) check if need full data(like admin etc/.)
-  return: throws 401 if no session or user UID if there is
+  Authenticates a user, can change modify if admin rights needed or group if group is needed,
+  also allows to check rights for a group
+
+  @param {String} [token='null'] Session we get from MakerPass,
+  @param {Int} [groupId=null] extra to see if user has acess to group,
+  @param {Bool} [needData=false] return changed to object if true (full data (like admin bool etc...))
+  @param {Bool} [modify=false] if needs to modify group user must have rights there
+
+  @return {String|Object} throws promise.reject if users doesnt exist
 */
-knex.authenticate = (token = 'null', groupId = null, needData = false) => {
+knex.authenticate = (token = 'null', groupId = null, needData = false, modify = false) => {
   // return Promise.resolve("3a9137d82c2b"); //for easy testing
   if (process.env.TEST_AUTH) return Promise.resolve("3a9137d82c2b"); // for test env
   var encToken = hash(token);
   return knex('auth').where('token', encToken) // check for token in auth
     .then(userUid => { // userUid is an array
-      if (userUid.length) { // if userUID.length checks if something
-        if (groupId) {
+      if (userUid.length) { // if userUID.length checks if users exist at all
+        if (groupId) { // test if need to test the group
           return knex('group_membership').where({user_uid: userUid[0].user_uid, group_id: groupId})
           .returning('*')
-          .then(info => {
-            if (info.length) {
-              if (needData) {
+          .then(userDataForGroup => { // userDataForGroup is array of 1 of info for the group
+            if (userDataForGroup.length) { // test if there is anything there at all
+              // test if user has any of the admin rights and if they are needed (modify)
+              if (!adminRoles.includes(userDataForGroup[0].role) && modify) {
+                return Promise.reject('sorry you are cannot edit group');
+              }
+              // test if the rest of the data is needed and not need to modify
+              if (needData && !modify) {
                 return Promise.resolve(userUid[0]);
               }
-              return Promise.resolve(userUid[0].user_uid);
+              // else if you just need basic data and not to modify
+              else if (!modify) {
+                return Promise.resolve(userUid[0].user_uid);
+              }
             }
+            // if you didnt pass any of the auth things you get regected
             return Promise.reject('sorry you are not in that group');
           }).catch(err => {
-            throw new Error('Unable to authenticate user, ' + err);
+            throw new Error(err + '\n Unable to authenticate user');
           }); // throw error if something went horribly wrong
         }
+        // if need data but group doesnt matter
         if (needData) {
           return Promise.resolve(userUid[0]);
         }
+        // if doesnt need data and group is doesnt matter
         return Promise.resolve(userUid[0].user_uid);
       } // if user exist then resolve
       return Promise.reject('401 Unauthorized, please make sure you are logged in'); // else send a 401 error
     }).catch(err => {
-      throw new Error('Unable to authenticate user, ' + err);
+      throw new Error(err + '\n Unable to authenticate user');
     }); // throw error if something went horribly wrong
 };
 
-knex.authenticateAdmin = (token = 'null', groupId = null) => {
-  // return Promise.resolve("3a9137d82c2b"); //for easy testing
-  if (process.env.TEST_AUTH) return Promise.resolve("3a9137d82c2b"); // for test env
-  var encToken = hash(token);
-  return knex('auth').where('token', encToken) // check for token in auth
-    .then(userUid => { // userUid is an array
-      if (userUid.length) {
-        return knex('group_membership').where('user_uid', userUid[0].user_uid).andWhere('group_id', groupId)
-        .then(admin => {
-          if (adminRoles.includes(admin[0].role)) {
-            return Promise.resolve(userUid[0].user_uid); // if user exist then resolve
-          }
-          return Promise.reject('401 Unauthorized, only administrators for this group can add pairs'); // else send a 401 error
-        });
-      }
-      return Promise.reject('401 Unauthorized, please make sure you are logged in'); // else send a 401 error
-    }).catch(err => {
-      throw new Error('Unable to authenticate user, ' + err);
-    }); // throw error if something went horribly wrong
-};
+/**
+  adds a token to auth table
 
+  @param {String} [userToken] adds the token to auth table,
+  @param {String} [userUid] assosiates UID to token,
+  @param {String} [adminStatus] to see acess user is allowed to have
+
+  @return {String} throws 401 if no session or user UID if there is
+*/
 knex.addToken = (userToken, userUid, adminStatus) => {
   return knex('auth').where('user_uid', userUid).returning('user_uid') // check if user exist
   .then(uid => { // array with MakerPass uid
@@ -85,39 +89,43 @@ knex.addToken = (userToken, userUid, adminStatus) => {
     return knex('auth').insert({user_uid: userUid, token: userToken, admin: adminStatus}).returning('*') // add token and token to auth table
       .then(authData => authData[0]) // return the new token with user
       .catch(err => {
-        throw new Error('Unable to add token, ' + err);
+        throw new Error(err + '\n Unable to add token');
       });// throw error if something went horribly wrong
   }).catch(err => {
-    throw new Error('Unable to find token, ' + err);
+    throw new Error(err + '\n Unable to find token');
   }); // throw error if something went horribly wrong
 };
 
-/**
-  @params: groupId = (string) user_uid
-  return: return { an array of group objects from group and memberships
-    "id": (int) join table id(gets delted right after),
-    "user_uid": (string) MKS user uid,
-    "group_id": (int) group,
-    "role": (string) the role of the user,
-    "name": (string) group name,
-    "size": (int) size,
-    "creator": (string) MKS user that created table uid,
-    "created_at": (date)
-  }
-*/
-
 /** ************************************************** Groups insert/del/get ****************************************************/
 
+/**
+  gives an array of group objects from group and memberships
+
+  @param {String} userUid user_uid in the database
+
+  @typeof {Object} groupArray
+
+  @property {Int}     groupArray.id         - join table id(gets delted right after),
+  @property {String}  groupArray.user_uid   - MKS user uid,
+  @property {Int}     groupArray.group_id   - group,
+  @property {String}  groupArray.role       - the role of the user,
+  @property {String}  groupArray.name       - group name,
+  @property {Int}     groupArray.size       - size of the group,
+  @property {String}  groupArray.creator    - MKS user that created table uid,
+  @property {date}    groupArray.created_at - created date
+
+  @return {groupArray} arrayOfgroupArrays
+*/
 knex.getGroups = userUid => {
   var groupArray = knex('group_membership').where("user_uid", userUid)
     .join('groups', 'groups.id', "=", "group_membership.group_id")
-    .select('*', "*")
-    .then(data => {
-      for (let i = 0; i < data.length; i++) {
-        data[i].size = data[i].group_size; // remodeled for front end
-        delete data[i].group_size;
+    .select('*', "*") // join table to get groups for a user and the memeberships for the group
+    .then(groupData => {
+      for (let i = 0; i < groupData.length; i++) {
+        groupData[i].size = groupData[i].group_size; // remodeled for front end
+        delete groupData[i].group_size;
       }
-      return data;
+      return groupData;
     }).catch(err => {
       throw new Error(err + '\n error getting data from groups');
     }); // throw error if something went horribly wrong
@@ -126,157 +134,193 @@ knex.getGroups = userUid => {
 };
 
 /**
-  @params: groupId = (string) group id
-  return: return {
-    groupId: (int) id,
-    groupName: (string) name
-    group_size: (int) the size
-    }
+  returns a specific group object
+
+  @param {String} groupId group id in the database
+
+  @typeof {Object} group
+
+  @property {Int}     group.groupId         - group data base id (as as param),
+  @property {String}  groupArray.name       - group name,
+  @property {Int}     groupArray.size       - size of the group,
+  @property {String}  groupArray.creator    - MKS user that created table uid,
+  @property {date}    groupArray.created_at - created date
+
+  @return {group} groupObject
+
 */
 knex.getGroup = groupId => {
   return knex('groups').where('id', groupId)
   .returning('*')
-  .then(group => group[0])
+  .then(group => group[0]) // returns the group as an object
   .catch(err => {
-    throw new Error('cannot access groups, ' + err);
+    throw new Error(err + '\n cannot access groups, ');
   }); // throw error if something went horribly wrong
 };
 
 /**
-  @params:group= {members: [{
-    user_uid: (string)
-    role: (string)
-  }],
-    groupData: {
-      name: (string)
-      group_size: (int)
-    }
-  },
-  creator : (string) user UID that created group
-  return: 'added groups to group table' or error
-*/
+  adds group with members to the database
 
+  @typeof {Object} groupData
+
+  @property {String}  groupArray.name       - group name,
+  @property {Int}     groupArray.size       - size of the group,
+  @property {String}  groupArray.creator    - MKS user that created table uid,
+
+  @typeof {Object} member
+
+  @property {Int}     member.id    - join table id(gets delted right after),
+  @property {String}  member.role  - role of the user,
+
+  @param {Object} group array of members and groupData
+  @param {String} creator the Uid of the creator
+
+  @return {int} id Id of the new cleated group
+*/
 knex.addGroup = (group, creator) => {
-  return knex.canCreateGroup(creator)
+  return knex.canCreateGroup(creator) // checks if non admin user reached limit
   .then(canCreate => {
-    if (!canCreate) {
-      throw new Error('sorry you reached your limit');
+    if (!canCreate) { // if limit is reached
+      return Promise.reject('sorry you reached your limit');
     }
     return knex('groups').where('name', group.groupData.name)
     .returning('id')
-    .then(id => {
+    .then(id => { // checks if group exist with the same naem
       if (id.length === 0) {
+        // inserts new group to the groups table to get an id
         return knex('groups').insert({
-          name: group.groupData.name,
-          group_size: group.groupData.group_size,
-          creator: creator
-        }).returning('id')
-      .then(groupsId => {
-        for (var i = 0, rows = []; i < group.members.length; i++) {
-          rows.push({
-            user_uid: group.members[i].user_uid,
-            group_id: groupsId[0],
-            role: group.members[i].role
-          });
-        }
-        return knex.batchInsert('group_membership', rows, rows.length)
-        .then(resp => groupsId[0])
+          name: group.groupData.name,               // the name given in params
+          group_size: group.groupData.group_size,   // the size given in params
+          creator: creator                          // the creator given in params
+        })
+        .returning('id')
+        .then(groupId => { // group id for new group
+          var rows = []; // rows set for batch insert
+          for (let i = 0; i < group.members.length; i++) {
+            rows.push({
+              user_uid: group.members[i].user_uid,    // goes and adds each user to the group
+              group_id: groupId[0],                  // the group id which returned from creation
+              role: group.members[i].role             // the role given in params
+            });
+          }
+          // adds all group connections in table
+          return knex.batchInsert('group_membership', rows, rows.length)
+          .then(resp => groupId[0]) // returns the group id
+          .catch(err => {
+            throw new Error(err + '\n Batch Insert Failed due to: ');
+          }); // throw error if something went horribly wrong
+        })
         .catch(err => {
-          throw new Error('Batch Insert Failed due to: ' + err);
+          throw new Error(err + '\n Failed to add to groups');
         }); // throw error if something went horribly wrong
-      }).catch(err => {
-        throw new Error('Failed to add to groups due to: ' + err);
-      }); // throw error if something went horribly wrong
-      }
-      return id[0];
-    }).catch(err => {
-      throw new Error('Failed to add to groups due to: ' + err);
+      } // if !exist
+      return id[0]; // returns the group if it exist
+    })
+    .catch(err => {
+      throw new Error(err + '\n Failed to authenticate create groups');
     }); // throw error if something went horribly wrong
-  }).catch(err => {
-    throw new Error(err);
+  })
+  .catch(err => {
+    throw new Error(err + '\n Failed to authenticate create groups');
   }); // throw error if something went horribly wrong
 };
 
 /**
-  Private fucntion to check if user can create group
-  P.S change  maxForStudent up top for how many groups a student can create
+  checks if student and if so checks if user can create table
+  change @const maxForStudent for how many groups a student can create
 
-  @params uid = (string) mks_uid
-  returns (boolean) can create a group if student
+  @param {String} [creator] the person who attemping to create the group,
+
+  @return {Bool} creatingGroup if user can create group
 */
 knex.canCreateGroup = creator => {
   return knex('auth').where('user_uid', creator)
     .returning('admin')
     .then(status => {
+      // checks if user has admin rights (if adminRoles but not adminMember)
       if (status[0].admin) {
-        return true;
+        return true; // if so there is no limit on groups
       }
       return knex('groups').where('creator', creator)
       .returning('*')
       .then(groups => {
+        // checks if user reached limit for amount of groups created
         if (groups.length < maxForStudent) { // change maxForStudent varible to set how many groups students can create
-          return true;
+          return true; // returns true if user can create more pools
         }
-        return false;
-      }).catch(err => {
-        throw new Error('(1) cant creat group:' + err);
+        return false; // if user reached limit
+      })
+      .catch(err => {
+        throw new Error(err + '\n cant creat group');
       });
-    }).catch(err => {
-      throw new Error('(2) cant creat group:' + err);
+    })
+    .catch(err => {
+      throw new Error(err + '\n cant access auth table');
     });
 };
 
 /**
   Deletes everything related to a group
-  @params id = (int) group id in the db
-  returns (string) 'pairs deleted'
+
+  @param {Int} [groupId] the id of the group that needs to be deleted,
+
+  @return {String} 'pairs deleted' if user can create group
 */
 knex.deleteGroup = groupId => {
+  // delete from group talbe
   return knex('groups').where('id', groupId)
   .del()
-  .then(() => {
+  .then(e => { // e for even
+    // delete from join table
     return knex('group_membership').where('group_id', groupId)
     .del()
-    .then(() => {
+    .then(e => { // e for even
+      // delete from generations talbe
       return knex('generations').where('group_id', groupId)
       .del()
       .returning('*')
-      .then(genData => {
-        for (var i = 0, genIds = []; i < genData.length; i++) {
+      .then(genData => { // everthing deleted
+        var genIds = []; // all generation ids that were deleted
+        for (var i = 0; i < genData.length; i++) {
           genIds.push(genData[0].id);
         }
-        return knex('pairs').whereIn('gen_table_id', genIds).del()
-      .then(() => 'group deleted')
-      .catch(err => {
-        throw new Error('cannot delete pairs from pairs table,' + err);
-      });  // throw error if something went horribly wrong
+        // delete all pairs with from the generaions that were deleted
+        return knex('pairs').whereIn('gen_table_id', genIds)
+        .del()
+        .then(() => 'group deleted')
+        .catch(err => {
+          throw new Error(err + '\n cannot delete pairs from pairs table');
+        });  // throw error if something went horribly wrong
       })
-    .catch(err => {
-      throw new Error('cannot delete generations from generations table, ' + err);
-    });  // throw error if something went horribly wrong
+      .catch(err => {
+        throw new Error(err + '\n cannot delete generations from generations table');
+      });  // throw error if something went horribly wrong
     })
-  .catch(err => {
-    throw new Error('cannot delete users from group membership table, ' + err);
-  });  // throw error if something went horribly wrong
+    .catch(err => {
+      throw new Error(err + '\n cannot delete users from group membership table');
+    });  // throw error if something went horribly wrong
   })
-.catch(err => {
-  throw new Error('cannot delete group from groups table, ' + err);
-});  // throw error if something went horribly wrong
+  .catch(err => {
+    throw new Error(err + '\n cannot delete group from groups table');
+  });  // throw error if something went horribly wrong
 };
 
 /**
   gets all memberts for a group
-  @params: groupId = (int) group id
-  return: return { an array of these students for group
-    Role: (string) role (admin or member)
-    UserUid: (string) user uid from makerpass
-  }
+  @typeof {Object} member
+
+  @property {Int}     member.UserUid  - uid of the users,
+  @property {String}  member.role     - role of the user,
+
+  @param {Int} [groupId] the id of the group that needs to get members of,
+
+  @return {member} members Array of member objects
 */
 knex.getMemberships = groupId => {
   return knex('group_membership').where('group_id', groupId).returning('*')
   .then(students => students)
   .catch(err => {
-    throw new Error('cannot get membeships for that group, ' + err);
+    throw new Error(err + '\n cannot get membeships for that group');
   }); // throw error if something went horribly wrong
 };
 
