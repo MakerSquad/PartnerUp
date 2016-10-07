@@ -22,7 +22,7 @@ AuthPort.createServer({
 
 AuthPort.on('auth', (req, res, data) => {
   var token = hash(data.token);
-  MP.user.groups(data.data.user.uid, data.token)
+  MP.user.groups(data.data.user.uid, data.token) // MakerPass call to get the cohorts of a user
   .then(groups => {
     var admin = false;
     for (let i = 0; i < groups.length; i++) {
@@ -65,7 +65,7 @@ Clears session and redirects to root
 */
 app.get('/signout', (req, res) => {
   req.session.destroy(); // clears session on logout
-  res.redirect('/'); //
+  res.redirect('/'); // redirects to root
 });
 
 /**
