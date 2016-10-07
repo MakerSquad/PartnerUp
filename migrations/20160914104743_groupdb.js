@@ -31,8 +31,8 @@ exports.up = (knex, Promise) => Promise.all([
     table.string('user_uid');
     table.integer('group_id');
     table.string('role');
-  }),
-])
+  })
+]);
 
 exports.down = (knex, Promise) => Promise.all([
   knex.schema.dropTableIfExists('groups'),

@@ -60,15 +60,21 @@ app.get('/style.css', LESS.serve('./client/style/index.less'));
 
 app.get('/auth/:service', AuthPort.app);
 
+/**
+Clears session and redirects to root
+*/
 app.get('/signout', (req, res) => {
   req.session.destroy(); // clears session on logout
-  res.redirect('/');
+  res.redirect('/'); //
 });
 
+/**
+returns an object with the current user's info
+*/
 app.get('/currentUser', (req, res) => {
   db.authenticate(req.cookies.token, null, true)
   .then(userData => {
-    MP.me(req.cookies.token) // MakerPass call to get personal data based on token
+    MP.me(req.cookies.token) // MakerPass call to get personal data
       .then(user => {
         user.admin = userData.admin;
         res.send(user); // sends user object
@@ -81,12 +87,15 @@ app.get('/currentUser', (req, res) => {
   });
 });
 
-app.get('/cohorts', (req, res) => { // done
+/**
+returns the cohorts that the current user is a member or administator of
+*/
+app.get('/cohorts', (req, res) => {
   db.authenticate(req.cookies.token)
     .then(uid => {
-      MP.user.groups(uid, req.cookies.token)
+      MP.user.groups(uid, req.cookies.token) // MakerPass call to get user group data
       .then(data => {
-        res.send(data);
+        res.send(data); // sends an array of cohort objects
       })
       .catch(err => {
         res.status(401).send(String(err));
@@ -97,11 +106,14 @@ app.get('/cohorts', (req, res) => { // done
     });
 });
 
+/**
+returns the students that are members of a particular cohort
+*/
 app.get('/cohort/:groupUid', (req, res) => {
   db.authenticate(req.cookies.token).then(uid => {
-    MP.memberships(req.params.groupUid, req.cookies.token)
+    MP.memberships(req.params.groupUid, req.cookies.token) // MakerPass call to student info for cohort
     .then(students => {
-      res.send(students);
+      res.send(students); // sends an array of student objects
     })
     .catch(err => {
       res.status(401).send(String(err));
@@ -112,11 +124,14 @@ app.get('/cohort/:groupUid', (req, res) => {
   });
 });
 
+/**
+returns the pools that the current user is a member or administator of
+*/
 app.get('/groups', (req, res) => {
   db.authenticate(req.cookies.token).then(uid => {
     db.getGroups(uid)
     .then(groups => {
-      res.send(groups);
+      res.send(groups); // sends an array of pools
     })
     .catch(err => {
       res.status(500).send(String(err));
@@ -127,15 +142,18 @@ app.get('/groups', (req, res) => {
   });
 });
 
+/**
+returns the information for a particular pool
+*/
 app.get('/group/:groupId', (req, res) => {
   db.authenticate(req.cookies.token, req.params.groupId)
   .then(uid => {
     db.getGroup(req.params.groupId)
     .then(group => {
-      MP.user(group.creator, req.cookies.token)
+      MP.user(group.creator, req.cookies.token) // MakerPass call to get user data
       .then(userData => {
         group.user = userData;
-        res.send(group);
+        res.send(group); // sends an object with the pool's info
       })
       .catch(err => {
         res.status(500).send(String(err));
@@ -150,11 +168,14 @@ app.get('/group/:groupId', (req, res) => {
   });
 });
 
+/**
+creates a pool in the database, and adds members to the pool
+*/
 app.post('/group', (req, res) => {
   db.authenticate(req.cookies.token).then(uid => {
     db.addGroup(req.body, uid)
     .then(id => {
-      res.send(String(id));
+      res.send(String(id)); // sends the id of the pool in the groups table
     })
     .catch(err => {
       res.status(500).send(String(err));
@@ -165,6 +186,9 @@ app.post('/group', (req, res) => {
   });
 });
 
+/**
+
+*/
 app.delete('/group/:groupId', (req, res) => {
   db.authenticateAdmin(req.cookies.token, req.params.groupId)
   .then(uid => {
@@ -181,6 +205,9 @@ app.delete('/group/:groupId', (req, res) => {
   });
 });
 
+/**
+
+*/
 app.get('/group/:groupId/recent', (req, res) => { // done
   db.authenticate(req.cookies.token, req.params.groupId)
   .then(uid => {
@@ -195,6 +222,9 @@ app.get('/group/:groupId/recent', (req, res) => { // done
   });
 });
 
+/**
+
+*/
 app.get('/cancreate', (req, res) => { // done
   db.authenticate(req.cookies.token)
   .then(uid => {
@@ -209,6 +239,9 @@ app.get('/cancreate', (req, res) => { // done
   });
 });
 
+/**
+
+*/
 app.get('/group/:groupId/generations', (req, res) => { // done
   db.authenticate(req.cookies.token, req.params.groupId)
   .then(uid => {
@@ -223,6 +256,9 @@ app.get('/group/:groupId/generations', (req, res) => { // done
   });
 });
 
+/**
+
+*/
 app.delete('/group/:groupId/generation/:id', (req, res) => {
   db.authenticateAdmin(req.cookies.token, req.params.groupId)
   .then(uid => {
@@ -237,6 +273,9 @@ app.delete('/group/:groupId/generation/:id', (req, res) => {
   });
 });
 
+/**
+
+*/
 app.get('/group/:groupId/members', (req, res) => {  // done
   db.authenticate(req.cookies.token, req.params.groupId)
   .then(uid => {
@@ -270,6 +309,9 @@ app.get('/group/:groupId/members', (req, res) => {  // done
   });
 });
 
+/**
+
+*/
 app.get('/group/:groupId/pairs', (req, res) => { // done
   db.authenticate(req.cookies.token, req.params.groupId)
   .then(uid => {
@@ -284,6 +326,9 @@ app.get('/group/:groupId/pairs', (req, res) => { // done
   });
 });
 
+/**
+
+*/
 app.post('/group/:groupId/pairs', (req, res) => { // done
   db.authenticateAdmin(req.cookies.token, req.params.groupId)
   .then(uid => {
@@ -300,6 +345,9 @@ app.post('/group/:groupId/pairs', (req, res) => { // done
   });
 });
 
+/**
+
+*/
 app.get('/user/:uid', (req, res) => { // done
   db.authenticate(req.cookies.token, null, true)
   .then(userAuthData => {
