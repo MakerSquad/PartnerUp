@@ -4,7 +4,7 @@ angular.module('PU.userHistory', [])
   $scope.currentUser = {};
   $scope.error = "";
   $scope.pools = []; // [{title: String, generations: [{title: String, group: [users]}]}]
-  $scope.user = {};
+  $scope.user = null; // must be initially set to null
 
   var init = (function() {
     $scope.loading = true;

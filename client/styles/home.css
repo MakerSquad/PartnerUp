@@ -61,6 +61,8 @@
   display: flex;
  /* flex-direction: column;*/
   flex: 1;
+  background-color: #DC4405;
+  border-radius: 8px;
 }
 
 .homeRole{
@@ -80,13 +82,13 @@
 }
 
 .admin{
-  background-color: rgba(220, 44, 05, .8) !important;
+  background-color: #DC4405 !important;
   border-bottom-right-radius: 8px;
   border-top-right-radius: 8px;
 }
 
 .member{
-  background-color: rgba(86, 31, 41, .8) !important;
+  background-color: #861F41 !important;
   border-bottom-right-radius: 8px;
   border-top-right-radius: 8px;
   /*color: rgba(0,0,0,0.38) !important;*/
