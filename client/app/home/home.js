@@ -1,6 +1,6 @@
 angular.module('PU.home', ['PU.factories'])
 
-.controller('HomeController', function($scope, MakerPass, $location, $route, $http, StateSaver, DB, CurrentUser) {
+.controller('HomeController', function($scope, MakerPass, $location, $route, $http, DB, CurrentUser) {
   $scope.currentUser = {}; // where we store the current user's information
   $scope.pools = []; // where  we store the total amout of pools from the owner
   $scope.loading = true; // states whether the page is loading or not. used for loading gif.
