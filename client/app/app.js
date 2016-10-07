@@ -6,12 +6,7 @@ angular.module('PU', [
   'ngAnimate',
   'PU.poolPage',
   'PU.userHistory',
-  'PU.demoHome',
-  'PU.demoPoolPage',
-  'PU.demoUserHistory',
-  'PU.demoCreatePool',
-  'PU.demoStart'
-  ])
+])
 .config(function($routeProvider, $httpProvider) {
   $routeProvider
   .when('/', {
@@ -33,26 +28,6 @@ angular.module('PU', [
   .when('/users/:userUid', {
     templateUrl: 'userHistory/userHistory.html',
     controller: 'UserHistoryController'
-  })
-  .when('/demo/', {
-    templateUrl: 'demo/demoStart/demoStart.html',
-    controller: 'DemoStartController'
-  })
-  .when('/demo/home', {
-    templateUrl: 'demo/demoHome/demoHome.html',
-    controller: 'DemoHomeController'
-  })
-  .when('/demo/pools/:poolId', {
-    templateUrl: 'demo/demoPoolPage/demoPoolPage.html',
-    controller: 'DemoPoolPageController'
-  })
-  .when('/demo/users/:userUid', {
-    templateUrl: 'demo/demoUserHistory/demoUserHistory.html',
-    controller: 'DemoUserHistoryController'
-  })
-  .when('/demo/createPool', {
-    templateUrl: 'demo/demoCreatePool/demoCreatePool.html',
-    controller: 'DemoCreatePoolController'
   })
   .otherwise({
     redirectTo: '/'

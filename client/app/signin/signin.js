@@ -19,7 +19,7 @@ angular.module('PU.signin', [])
   */
 
   $scope.startDemo = function() {
-    $location.path('/demo');
+    $window.location.href = "https://partnerup.herokuapp.com";
   };
 
   /**
