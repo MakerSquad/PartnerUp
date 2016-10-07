@@ -132,7 +132,7 @@ app.get('/groups', (req, res) => {
   db.authenticate(req.cookies.token).then(uid => {
     db.getGroups(uid)
     .then(groups => {
-      res.send(groups); // sends an array of pools
+      res.send(groups); // sends an array of pool objects
     })
     .catch(err => {
       res.status(500).send(String(err));
@@ -189,14 +189,14 @@ app.post('/group', (req, res) => {
 });
 
 /**
-
+deletes a particular pool from the database
 */
 app.delete('/group/:groupId', (req, res) => {
   db.authenticate(req.cookies.token, req.params.groupId, false, true)
   .then(uid => {
     db.deleteGroup(req.params.groupId)
     .then(resp => {
-      res.send(resp);
+      res.send(resp); // sends string 'group deleted'
     })
     .catch(err => {
       res.status(500).send(String(err));
@@ -208,13 +208,13 @@ app.delete('/group/:groupId', (req, res) => {
 });
 
 /**
-
+return the most recent generation of a pool
 */
-app.get('/group/:groupId/recent', (req, res) => { // done
+app.get('/group/:groupId/recent', (req, res) => {
   db.authenticate(req.cookies.token, req.params.groupId)
   .then(uid => {
     db.getNewGen(req.params.groupId)
-      .then(newGen => res.send(newGen))
+      .then(newGen => res.send(newGen)) // sends object with generation data and an array with student pairings
       .catch(err => {
         res.status(500).send(String(err));
       });
@@ -225,13 +225,13 @@ app.get('/group/:groupId/recent', (req, res) => { // done
 });
 
 /**
-
+returns where the current user is authorized to create a pool
 */
-app.get('/cancreate', (req, res) => { // done
+app.get('/cancreate', (req, res) => {
   db.authenticate(req.cookies.token)
   .then(uid => {
     db.canCreateGroup(uid)
-      .then(resp => res.send(resp))
+      .then(resp => res.send(resp)) // sends a boolean indicating whether user can create a group
       .catch(err => {
         res.status(500).send(String(err));
       });
@@ -242,13 +242,13 @@ app.get('/cancreate', (req, res) => { // done
 });
 
 /**
-
+returns all the generations for a particular pool
 */
-app.get('/group/:groupId/generations', (req, res) => { // done
+app.get('/group/:groupId/generations', (req, res) => {
   db.authenticate(req.cookies.token, req.params.groupId)
   .then(uid => {
     db.getGenerationsByGroup(req.params.groupId)
-      .then(generations => res.send(generations))
+      .then(generations => res.send(generations)) // sends an array of generation objects
       .catch(err => {
         res.status(500).send(String(err));
       });
@@ -259,13 +259,13 @@ app.get('/group/:groupId/generations', (req, res) => { // done
 });
 
 /**
-
+deletes a particular generation from the database
 */
 app.delete('/group/:groupId/generation/:id', (req, res) => {
   db.authenticate(req.cookies.token, req.params.groupId, false, true)
   .then(uid => {
     db.deleteGeneration(req.params.id)
-      .then(resp => res.send(resp))
+      .then(resp => res.send(resp)) // sends string 'generation deleted'
       .catch(err => {
         res.status(500).send(err);
       });
@@ -276,9 +276,9 @@ app.delete('/group/:groupId/generation/:id', (req, res) => {
 });
 
 /**
-
+returns all the members of a particular pool
 */
-app.get('/group/:groupId/members', (req, res) => {  // done
+app.get('/group/:groupId/members', (req, res) => {
   db.authenticate(req.cookies.token, req.params.groupId)
   .then(uid => {
     db.getMemberships(req.params.groupId)
@@ -287,6 +287,7 @@ app.get('/group/:groupId/members', (req, res) => {  // done
       for (var i = 0; i < students.length; i++) {
         people += students[i].user_uid + '+';
       }
+      // MakerPass call to get users data
       MP.Memberships.get('/users/' + people.substring(0, people.length - 1), req.cookies.token)
         .then(users => {
           var usersSeen = {};
@@ -296,7 +297,7 @@ app.get('/group/:groupId/members', (req, res) => {  // done
           for (let i = 0; i < students.length; i++) {
             students[i].user = usersSeen[students[i].user_uid];
           }
-          res.send(students);
+          res.send(students); // sends an array of student objects
         })
         .catch(err => {
           res.status(500).send(String(err));
@@ -312,13 +313,13 @@ app.get('/group/:groupId/members', (req, res) => {  // done
 });
 
 /**
-
+returns the pairs for a particular pool
 */
-app.get('/group/:groupId/pairs', (req, res) => { // done
+app.get('/group/:groupId/pairs', (req, res) => {
   db.authenticate(req.cookies.token, req.params.groupId)
   .then(uid => {
     db.getPairsForGroup(req.params.groupId)
-      .then(pairs => res.send(pairs))
+      .then(pairs => res.send(pairs)) // sends an array of pairs
       .catch(err => {
         res.status(500).send(String(err));
       });
@@ -329,14 +330,14 @@ app.get('/group/:groupId/pairs', (req, res) => { // done
 });
 
 /**
-
+creates pairs in the database for a particular pool
 */
-app.post('/group/:groupId/pairs', (req, res) => { // done
+app.post('/group/:groupId/pairs', (req, res) => {
   db.authenticate(req.cookies.token, req.params.groupId, false, true)
   .then(uid => {
     db.addPairs(req.body, req.params.groupId)
     .then(data => {
-      res.status(201).send(data);
+      res.status(201).send(data); // sends the string 'pairs added'
     })
     .catch(err => {
       res.status(500).send(String(err));
@@ -348,10 +349,10 @@ app.post('/group/:groupId/pairs', (req, res) => { // done
 });
 
 /**
-
+returns the uid of a user from Makerpass
 */
-app.get('/user/:uid', (req, res) => { // done
-  db.authenticate(req.cookies.token)
+app.get('/user/:uid', (req, res) => {
+  db.authenticate(req.cookies.token, null, true)
   .then(userAuthData => {
     db.getUserData(req.params.uid)
     .then(dataArray => {
