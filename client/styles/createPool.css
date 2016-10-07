@@ -42,7 +42,7 @@
 }
 
 .adminBtn{
-  background-color: rgba(220, 44, 05, .8);
+  background-color: #DC4405;
   flex: 1;
 }
 
@@ -54,12 +54,28 @@
   background-color: rgba(220, 44, 05, 1);
 }
 
+.adminBtn:focus{
+  background-color: rgba(220, 44, 05, 1);
+}
+
+.adminBtn.offBtn:focus{
+  background-color: rgba(0,0,0,0.12) !important;
+}
+
 .stuBtn{
-  background-color: rgba(86, 31, 41, .8);
+  background-color: #861F41;
 }
 
 .stuBtn:hover{
   background-color: rgba(86, 31, 41, 1);
+}
+
+.stuBtn:focus{
+  background-color: rgba(86, 31, 41, 1);
+}
+
+.stuBtn.offBtn:focus{
+  background-color: rgba(0,0,0,0.12) !important;
 }
 
 .studentBtn{
