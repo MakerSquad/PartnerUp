@@ -16,9 +16,9 @@
     <h2 class="userHistoryPoolTitle">{{pool.title}}</h2>
     <div class="userHistoryGen" ng-repeat="gen in pool.generations | filter: filterGens">
       <label class="userHistoryGenTitle">{{gen.title}}</label>
-      <div class="userHistoryUser" ng-repeat="user in gen.group" ng-mouseover="user.showName = true" ng-mouseleave="user.showName = false">
-        <label class="userHistoryUserName" ng-show="user.showName">{{user.name}}</label>
-        <img class="userHistoryPortrait" src={{user.avatar_url}}>
+      <div class="userHistoryUser" ng-repeat="user in gen.group" ng-mouseover="user.showName = true" ng-mouseleave="user.showName = false" ng-click="switchUser(user)">
+        <label class="userHistoryUserName clickable" ng-show="user.showName">{{user.name}}</label>
+        <img class="userHistoryPortrait clickable" src={{user.avatar_url}}>
       </div>
     </div>
   </div>

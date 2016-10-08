@@ -97,4 +97,8 @@ angular.module('PU.userHistory', [])
       stu => stu.name.toLowerCase().includes($scope.searchStus.toLowerCase())).length :
       true;
   };
+
+  $scope.switchUser = function(user) {
+    $location.path(`/users/${user.uid}`);
+  };
 });
