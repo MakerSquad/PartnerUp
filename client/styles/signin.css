@@ -18,8 +18,8 @@
 .partnerUpWelcome{
 /*  writing-mode: tb-rl;*/
   text-align: center !important;
-  color: #861F41 !important;
-  text-shadow: 2px 2px black;
+  color: black !important;
+  /*text-shadow: 2px 2px black;*/
   /*text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black !important;*/
    max-width: 50%;
 
