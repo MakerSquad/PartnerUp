@@ -125,7 +125,7 @@ angular.module('PU.createPool', ['PU.factories'])
   $scope.toggleAdmin = function(user) {
     if (user.user_uid === $scope.currentUser.uid) {
       alert("You must be an admin of your own group");
-      return;
+      return "You must be an admin of your own group";
     }
     if ($scope.isAdmin[user.user_uid]) {
       delete $scope.isAdmin[user.user_uid];

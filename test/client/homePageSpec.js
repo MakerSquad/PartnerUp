@@ -9,7 +9,7 @@ describe('The Home Page', function() {
   var createController;
   var DB;
   var $routeParams;
-  var StateSaver;
+
   var $location;
   var $q;
   var deferred;
@@ -48,7 +48,7 @@ describe('The Home Page', function() {
     $httpBackend = $injector.get('$httpBackend');
     $scope = $rootScope.$new();
     $routeParams = $injector.get('$routeParams');
-    StateSaver = $injector.get('StateSaver');
+
     DB = $injector.get('DB');
     $location = $injector.get('$location');
     $q = $injector.get('$q');
