@@ -1,4 +1,32 @@
-var pg = require('pg');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: db.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: db.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>var pg = require('pg');
 var config = require('../knexfile.js');
 var env = process.env.NODE_ENV || 'production';
 /**
@@ -40,11 +68,11 @@ knex.authenticate = (token = 'null', groupId = null, needData = false, modify = 
           .then(userDataForGroup => { // userDataForGroup is array of 1 of info for the group
             if (userDataForGroup.length) { // test if there is anything there at all
               // test if user has any of the admin rights and if they are needed (modify)
-              if (!adminRoles.includes(userDataForGroup[0].role) && modify) {
+              if (!adminRoles.includes(userDataForGroup[0].role) &amp;&amp; modify) {
                 return Promise.reject('sorry you are cannot edit group');
               }
               // test if the rest of the data is needed and not need to modify
-              if (needData && !modify) {
+              if (needData &amp;&amp; !modify) {
                 return Promise.resolve(userUid[0]);
               }
               // else if you just need basic data and not to modify
@@ -127,7 +155,7 @@ knex.getGroups = userUid => {
     .join('groups', 'groups.id', "=", "group_membership.group_id")
     .select('*', "*") // join table to get groups for a user and the memeberships for the group
     .then(groupData => {
-      for (let i = 0; i < groupData.length; i++) {
+      for (let i = 0; i &lt; groupData.length; i++) {
         groupData[i].size = groupData[i].group_size; // remodeled for front end
         delete groupData[i].group_size;
       }
@@ -204,7 +232,7 @@ knex.addGroup = (group, creator) => {
         .returning('id')
         .then(groupId => { // group id for new group
           var rows = []; // rows set for batch insert
-          for (let i = 0; i < group.members.length; i++) {
+          for (let i = 0; i &lt; group.members.length; i++) {
             rows.push({
               user_uid: group.members[i].user_uid,    // goes and adds each user to the group
               group_id: groupId[0],                  // the group id which returned from creation
@@ -255,7 +283,7 @@ knex.canCreateGroup = creator => {
       .returning('*')
       .then(groups => {
         // checks if user reached limit for amount of groups created
-        if (groups.length < maxForStudent) { // change maxForStudent varible to set how many groups students can create
+        if (groups.length &lt; maxForStudent) { // change maxForStudent varible to set how many groups students can create
           return true; // returns true if user can create more pools
         }
         return false; // if user reached limit
@@ -291,7 +319,7 @@ knex.deleteGroup = groupId => {
       .returning('*')
       .then(genData => { // everthing deleted
         var genIds = []; // all generation ids that were deleted
-        for (var i = 0; i < genData.length; i++) {
+        for (var i = 0; i &lt; genData.length; i++) {
           genIds.push(genData[0].id);
         }
         // delete all pairs with from the generaions that were deleted
@@ -361,7 +389,7 @@ knex.addPairs = (pairData, groupId) => {
     // i for index and row for each pair
     var rows = [];
     // format it for vatchInsert
-    for (let i = 0; i < pairData.pairs.length; i++) {
+    for (let i = 0; i &lt; pairData.pairs.length; i++) {
       rows.push({ // row for batch insert
         user1_uid: pairData.pairs[i][0], // user 1
         user2_uid: pairData.pairs[i][1], // user 2
@@ -483,7 +511,7 @@ knex.getPairs = groupId => {
             throw new Error("sorry no data in the dataBase was found");
           }
           var pairsData = []; // format the data/info for the front end
-          for (let i = 0; i < info.length; i++) {
+          for (let i = 0; i &lt; info.length; i++) {
             // in case data is changed to null
             if (!info[i]) {
               continue;
@@ -501,7 +529,7 @@ knex.getPairs = groupId => {
               pairs: [] // creating the pairs array to push things into later
             });
             // adds all the pairs to generations
-            for (let j = 0; j < info.length; j++) {
+            for (let j = 0; j &lt; info.length; j++) {
               // in case data is changed to null
               if (!info[j]) {
                 continue;
@@ -580,7 +608,7 @@ knex.getNewGen = groupId => {
   .then(next => {
     // checks for latest creation
     var maxIndex = 0; // latest generation
-    for (let i = 0; i < next.length; i++) {
+    for (let i = 0; i &lt; next.length; i++) {
       if (next[i].id > maxIndex) {
         maxIndex = i; // if id is later will change to it (only for updated)
       }
@@ -638,7 +666,7 @@ knex.getUserData = userUid => {
   .select('*', "*")
   .then(data => {
     var fullHistory = []; // for the front end formatting
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 0; i &lt; data.length; i++) {
       fullHistory.push({
         user1_uid: data[i].user1_uid,     // user uid
         user2_uid: data[i].user2_uid,     // user uid
@@ -666,3 +694,26 @@ knex.getUserData = userUid => {
 };
 
 module.exports = knex;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="database.html">database</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.2</a> on Sat Oct 08 2016 11:37:03 GMT-0500 (Central Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
