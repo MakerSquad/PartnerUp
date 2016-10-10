@@ -40,8 +40,9 @@ knex.authenticate = (token = 'null', groupId = null, needData = false, modify = 
           .then(userDataForGroup => { // userDataForGroup is array of 1 of info for the group
             if (userDataForGroup.length) { // test if there is anything there at all
               // test if user has any of the admin rights and if they are needed (modify)
-              if (!adminRoles.includes(userDataForGroup[0].role) && modify) {
-                return Promise.reject('sorry you are cannot edit group');
+              console.log("role", adminRoles.includes(userDataForGroup[0].role));
+              if (adminRoles.includes(userDataForGroup[0].role) && modify) {
+                return Promise.resolve(userUid[0]);
               }
               // test if the rest of the data is needed and not need to modify
               if (needData && !modify) {
@@ -51,6 +52,7 @@ knex.authenticate = (token = 'null', groupId = null, needData = false, modify = 
               if (!modify) {
                 return Promise.resolve(userUid[0].user_uid);
               }
+              return Promise.resolve(userUid[0]);
             }
             // if you didnt pass any of the auth things you get regected
             return Promise.reject('sorry you are not in that group');

@@ -13,6 +13,7 @@ var hash = require('string-hash');
 
 AuthPort.registerService('makerpass', MakerpassService);
 
+
 AuthPort.createServer({
   service: 'makerpass',
   id: process.env.MAKERPASS_CLIENT_ID || 'd125322e59940ae2554e017b1bde13259f187bfd2e58c7dc24eed0ec52d980cf',
