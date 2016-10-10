@@ -47,8 +47,8 @@ knex.authenticate = (token = 'null', groupId = null, needData = false, modify = 
               if (needData && !modify) {
                 return Promise.resolve(userUid[0]);
               }
-              // else if you just need basic data and not to modify
-              else if (!modify) {
+              // if you just need basic data and not to modify
+              if (!modify) {
                 return Promise.resolve(userUid[0].user_uid);
               }
             }
@@ -479,9 +479,6 @@ knex.getPairs = groupId => {
         // by default they dont exist
         .then(info => { // gets all generations and pairs that are togather
           // throw error if no pairs for that generation
-          if (!info.length) {
-            throw new Error("sorry no data in the dataBase was found");
-          }
           var pairsData = []; // format the data/info for the front end
           for (let i = 0; i < info.length; i++) {
             // in case data is changed to null

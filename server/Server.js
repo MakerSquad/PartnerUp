@@ -318,9 +318,10 @@ returns the pairs for a particular pool
 app.get('/group/:groupId/pairs', (req, res) => {
   db.authenticate(req.cookies.token, req.params.groupId)
   .then(uid => {
-    db.getPairsForGroup(req.params.groupId)
+    db.getPairs(req.params.groupId)
       .then(pairs => res.send(pairs)) // sends an array of pairs
       .catch(err => {
+        console.log("err", err)
         res.status(500).send(String(err));
       });
   })
