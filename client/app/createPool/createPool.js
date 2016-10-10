@@ -157,14 +157,12 @@ angular.module('PU.createPool', ['PU.factories'])
     // $scope.loading = true;
     CurrentUser.get()
     .then(function(userData) {
-      console.log("Userdata: ", userData);
       if (!userData) {
         $location.path('/signin');
       } else {
         $scope.currentUser = userData;
         DB.canCreate($scope.currentUser)
         .then(function(canCreate) {
-          console.log("Can create? ", canCreate);
           if (!canCreate) {
             $scope.cantCreateError = true;
             $scope.loadingPage = false;
@@ -177,15 +175,10 @@ angular.module('PU.createPool', ['PU.factories'])
               MakerPass.getCohorts()
             ])
             .then(function(resolveData) {
-              console.log("Promises resolved");
-              console.log('resolveData', resolveData[0]);
               var cohorts = resolveData[0].reverse(); // reverse for most recent order
               for (var i = 0; i < cohorts.length; i++) {
                 $scope.allCohorts.push(cohorts[i]);
-                console.log('$scope.allCohorts', $scope.allCohorts);
               }
-
-              console.log("Current scope: ", $scope);
               $scope.loadingPage = false;
               $scope.$apply();
             });

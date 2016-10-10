@@ -66,7 +66,6 @@ angular.module('PU', [
         } else {
           $scope.currentUser = user;
           $scope.hideHist = path === `/users/${user.uid}`;
-          console.log("In header, currentUser: ", $scope.currentUser);
         }
       });
     }());

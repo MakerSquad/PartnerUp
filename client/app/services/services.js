@@ -43,7 +43,6 @@ angular.module('PU.factories', [])
       })
       .catch(err => Promise.reject(err.statusText));
     } else {
-      console.log("No signin info");
       return Promise.reject("No signin info");
     }
   };
@@ -72,7 +71,6 @@ angular.module('PU.factories', [])
 .factory('DB', function($http) {
   var getPool = function(poolId) {
     if (!Number.isInteger(Number(poolId))) {
-      console.log("Error");
       return Promise.reject("Invalid pool id");
     }
     return $http({
@@ -98,7 +96,6 @@ angular.module('PU.factories', [])
       url: `/group/${cls.id}/members`
     })
     .then(resp => {
-      console.log("Memberships response: ", resp);
       return resp.data;
     })
     .catch(err => Promise.reject(err.statusText));
@@ -124,7 +121,6 @@ angular.module('PU.factories', [])
       }
     })
     .then(resp => {
-      console.log("Success posting pairs!");
       return resp.data;
     })
     .catch(err => Promise.reject(err.statusText));

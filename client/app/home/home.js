@@ -48,7 +48,6 @@ angular.module('PU.home', ['PU.factories'])
         DB.deletePool(pool.id)
         .then(function(resp) {
           $route.reload(); // the page needs to update with the delete pool gone
-          console.log(resp);
         })
         .catch(function(err) {
           console.log(err);
@@ -71,7 +70,6 @@ angular.module('PU.home', ['PU.factories'])
     $scope.loading = true; // sets loading to true so the gif can come into play
     CurrentUser.get() // gets all user data
     .then(function(userData) {
-      console.log("Userdata: ", userData);
       if (!userData) {
         $location.path('/signin'); // whoops you aren't signed in! so its redirects you to sign in
       } else {
@@ -80,9 +78,6 @@ angular.module('PU.home', ['PU.factories'])
           $scope.showPools() // promises that showPools will finish
         ])
         .then(function(resolveData) {
-          console.log("Promises resolved");
-          console.log('resolveData', resolveData);
-          console.log("Current scope: ", $scope);
           $scope.loading = false; // sets loading to false. no more loading gif.
           $scope.$apply(); // applies all the changes to the page
         });

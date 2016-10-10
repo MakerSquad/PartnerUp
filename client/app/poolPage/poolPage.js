@@ -39,7 +39,6 @@ angular.module('PU.poolPage', ['PU.factories'])
       $scope.currentUser = user;
       DB.getPool($routeParams.poolId)
       .then(function(poolInfo) {
-        console.log("PoolInfo: ", poolInfo);
         if (!poolInfo) {
           $scope.error = "Whoops, no pool here (neither swimming nor billiards)";
           $scope.loading = false;
@@ -74,7 +73,6 @@ angular.module('PU.poolPage', ['PU.factories'])
           for (var j = 0; j < $scope.students.length % groupSize; j++) {
             $scope.students.push({user: {name: "Rubber Duck Debugger", uid: "-" + j, avatar_url: '../../assets/rubberducky.png'}}); //  give them decrementing ids
           }
-          console.log("$scope.students: ", $scope.students);
 
           $scope.makeMap();
           if (!partOfGroup) {
@@ -119,7 +117,6 @@ angular.module('PU.poolPage', ['PU.factories'])
   var refreshGroupings = function() {
     return DB.getPairs($scope.currPool)
     .then(function(groupings) {
-      console.log("Data from getPairs: ", groupings);
       $scope.pastGroupings = groupings.reverse();
       for (var i = 0; i < $scope.pastGroupings.length; i++) {
         $scope.pastGroupings[i].groups = createGroupings($scope.pastGroupings[i].pairs);
@@ -251,7 +248,6 @@ angular.module('PU.poolPage', ['PU.factories'])
     checkClashes();
     $scope.partnerUp = true;
     $scope.loadingGroups = false;
-    console.log("Groups after randomize: ", $scope.groups);
     return $scope.groups;
   };
 

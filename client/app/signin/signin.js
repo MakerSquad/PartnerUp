@@ -51,7 +51,6 @@ angular.module('PU.signin', [])
     };
 
     $.oauthpopup({windowName: 'login', path: '/auth/makerpass', callback: function(data) {
-      console.log("data in callback", data);
       var signInInfo = JSON.parse(data.slice(data.indexOf('{'), data.lastIndexOf('}') + 1));
       if (!signInInfo.token) {
         alert("Whoops! Something went wrong with your log in. Please try again, I promise we'll (try to) do better");
