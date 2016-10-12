@@ -641,4 +641,18 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
     $location.path(`/users/${user.user.uid}`);
   };
+
+  $scope.deletePool = function() {
+    if (confirm("Are you sure you want to delete this pool? You can't get it back")) {
+      DB.deletePool($routeParams.poolId)
+      .then(function() {
+        $location.path('/');
+      })
+      .catch(function(err) {
+        console.error("Error deleting pool: ", err);
+        alert(`Whoops, looks like this pool is being difficult and doesn't want to leave.\n
+        Here's what it told us:\n${err}`);
+      });
+    }
+  };
 });

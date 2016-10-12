@@ -44,7 +44,7 @@ angular.module('PU.home', ['PU.factories'])
     // precautionary if statement to make sure a student may not delete a pool.
     if (pool.role === 'fellow' || pool.role === 'instructor' || pool.role === 'memberAdmin') {
       // confirms that you want to delete the pool. pressing cancel will cancel the event
-      if (confirm('Do you want to delete this pool, once delete its gone forever?')) {
+      if (confirm('Do you want to delete this pool, once it\'s deleted, it\'s gone forever?')) {
         DB.deletePool(pool.id)
         .then(function(resp) {
           $route.reload(); // the page needs to update with the delete pool gone
@@ -55,7 +55,7 @@ angular.module('PU.home', ['PU.factories'])
       }
     } else {
       // says why you may not delete this pool
-      alert("you are not an admin, you may not delete this pool");
+      alert("You are not an admin, you may not delete this pool");
     }
   };
 
