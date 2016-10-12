@@ -29,6 +29,23 @@ $ NODE_ENV=test npm run migrate
 ```
 PartnerUp connects to a remote database in production, but will use local databases in the development and test environments.
 
+Fill in Makerpass Client Information:
+
+The Makerpass App information is not pushed up to Github and will need to be retrieved from a Makerpass administrator
+
+Find the TOFILLOUT_makerpassInfo.js file in server/:
+  ```js
+  //  TODO: Fill this out with the makerpass information
+  //  Save as a new file "makerpassInfo.js" in this same folder
+
+  module.exports = {
+    id: MAKERPASS_CLIENT_ID,
+    secret: MAKERPASS_CLIENT_SECRET
+  };
+  ```
+
+Fill in this file with the app's information and save it as a new file "makerpassInfo.js" in the server folder
+
 That's it! You're now ready to partner up with the PartnerUp team!
 
 ## Terminal Commands for Development

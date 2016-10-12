@@ -11,13 +11,18 @@ var db = require('./db');
 var bodyParser = require('body-parser');
 var hash = require('string-hash');
 
-AuthPort.registerService('makerpass', MakerpassService);
+try {
+  var makerpassInfo = require('./makerpassInfo.js');
+} catch (e) {
 
+}
+
+AuthPort.registerService('makerpass', MakerpassService);
 
 AuthPort.createServer({
   service: 'makerpass',
-  id: process.env.MAKERPASS_CLIENT_ID || 'd125322e59940ae2554e017b1bde13259f187bfd2e58c7dc24eed0ec52d980cf',
-  secret: process.env.MAKERPASS_CLIENT_SECRET || '6a2324fd5414ab9f68bf8cad62a4e387090b03c8393b5c6e022ece6357bbc06b',
+  id: process.env.MAKERPASS_CLIENT_ID || makerpassInfo.id,
+  secret: process.env.MAKERPASS_CLIENT_SECRET || makerpassInfo.secret,
   callbackURL: process.env.HOST + '/auth/makerpass'
 });
 

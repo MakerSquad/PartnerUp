@@ -426,6 +426,39 @@ angular.module('PU.poolPage', ['PU.factories'])
   };
 
   /**
+  * alphabetizeGroups is a helper function to finalize that alphabetizes
+  * $scope.groups. Students are alphabetized within the groups first (Rubber ducks
+  * are always put at the end), then the groups are alphabetized by the first student's name
+  */
+
+  var alphabetizeGroups = function() {
+    for (var i = 0; i < $scope.groups.length; i++) {
+      $scope.groups[i].sort(function(a, b) {
+        if (/-\d+/.test(a.user.uid)) { //  rubber duck
+          return 1;
+        }
+        if (/-\d+/.test(b.user.uid)) {
+          return -1;
+        }
+        return a.user.name.toLowerCase() < b.user.name.toLowerCase() ?
+        -1 : 1;
+      });
+    }
+    $scope.groups.sort(function(grp1, grp2) {
+      var a = grp1[0];
+      var b = grp2[0];
+      if (/-\d+/.test(a.user.uid)) { //  rubber duck
+        return 1;
+      }
+      if (/-\d+/.test(b.user.uid)) {
+        return -1;
+      }
+      return a.user.name.toLowerCase() < b.user.name.toLowerCase() ?
+      -1 : 1;
+    });
+  };
+
+  /**
   * Finalize is called when a user is happy with the new grouping.
   * Finalize takes the current pairings and records them into the "past pairs" object,
   * as well as sending them to the back-end for persisting storage
@@ -434,6 +467,7 @@ angular.module('PU.poolPage', ['PU.factories'])
 
   $scope.finalize = function() {
     $scope.loading = true;
+    alphabetizeGroups();
     if ($scope.groupingName && $scope.groupingName.length) {
       $scope.creatingGrouping = false;
       var newPairs = [];
