@@ -70,10 +70,6 @@ angular.module('PU.poolPage', ['PU.factories'])
             }
           }
 
-          for (var j = 0; j < $scope.students.length % groupSize; j++) {
-            $scope.students.push({user: {name: "Rubber Duck Debugger", uid: "-" + j, avatar_url: '../../assets/rubberducky.png'}}); //  give them decrementing ids
-          }
-
           $scope.makeMap();
           if (!partOfGroup) {
             $scope.stuView = true;
@@ -211,6 +207,13 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
   };
 
+  $scope.studentLookupById = function(uid) {
+    if (/-\d+/.test(uid)) {
+      return {user: {name: "Rubber Duck Debugger", uid: uid, avatar_url: '../../assets/rubberducky.png'}};
+    }
+    return $scope.idMap[uid];
+  };
+
   /**
   * trueRandomize generates a completely random grouping of the current students, disregarding pair history
   * trueRandomize is called if our loop threshold is reached before we are able to resolve clashes
@@ -222,9 +225,13 @@ angular.module('PU.poolPage', ['PU.factories'])
       $scope.groups[i] = [];
     }
     for (var s in $scope.lockedStus) {
-      $scope.groups[$scope.lockedStus[s][0]].push($scope.idMap[s]);
+      $scope.groups[$scope.lockedStus[s][0]].push($scope.studentLookupById(s));
     }
-    var stus = $scope.students.filter(function(stu) {
+    var stus = $scope.students.slice();
+    for (var d = 0; d < stus.length % groupSize; d++) {
+      stus.push({user: {name: "Rubber Duck Debugger", uid: "-" + d, avatar_url: '../../assets/rubberducky.png'}}); //  give them decrementing ids
+    }
+    stus = stus.filter(function(stu) {
       return !$scope.lockedStus[stu.user.uid]; // don't shuffle the locked students
     });
 
@@ -251,6 +258,28 @@ angular.module('PU.poolPage', ['PU.factories'])
     return $scope.groups;
   };
 
+  var swapDucksToEnd = function() {
+    for (var i = 0; i < $scope.groups.length; i++) {
+      var duckCount = 0; // count the number of ducks in a group
+      for (var j = 0; j < $scope.groups[i].length; j++) {
+        if (/-\d+/.test($scope.groups[i][j].user.uid)) {
+          duckCount += 1;
+          var toSwapInd = $scope.groups[i].length - 1;
+          var toSwap = $scope.groups[i][toSwapInd];
+          while ($scope.lockedStus[toSwap.user.uid] ||
+          /-\d+/.test(toSwap.user.uid) && toSwapInd > j) {
+            toSwapInd -= 1;
+            toSwap = $scope.groups[i][toSwapInd];
+          }
+          if (toSwapInd > j) {
+            swapStus([i, j], [i, toSwapInd]); //  swap to end
+          }
+        }
+      }
+      $scope.groups[i].duckCount = duckCount;
+    }
+  };
+
   /**
   * Randomize generates a grouping of the current students, attempting to avoid clashes
   * Recursively calls itself if we were unable to make non-repeating groups; if this recursion occurs
@@ -266,7 +295,7 @@ angular.module('PU.poolPage', ['PU.factories'])
     groupSize = Number(groupSize);
     timeoutCounter += 1;
 
-    if (!$scope.noRepeats) {
+    if ($scope.alreadyFailed) {
       return $scope.trueRandomize();
     }
 
@@ -280,13 +309,17 @@ angular.module('PU.poolPage', ['PU.factories'])
       return $scope.trueRandomize();
     }
 
-    for (var i = 0; i < $scope.students.length / groupSize; i++) {
+    for (var i = 0; i < Math.ceil($scope.students.length / groupSize); i++) {
       $scope.groups[i] = [];
     }
     for (var s in $scope.lockedStus) {
-      $scope.groups[$scope.lockedStus[s][0]].push($scope.idMap[s]);
+      $scope.groups[$scope.lockedStus[s][0]].push($scope.studentLookupById(s));
     }
     var stus = $scope.students.slice();
+
+    for (var d = 0; d < stus.length % groupSize; d++) {
+      stus.push({user: {name: "Rubber Duck Debugger", uid: "-" + d, avatar_url: '../../assets/rubberducky.png'}}); //  give them decrementing ids
+    }
 
     stus = stus.filter(function(stu) {
       return !$scope.lockedStus[stu.user.uid]; // don't shuffle the locked students
@@ -318,6 +351,10 @@ angular.module('PU.poolPage', ['PU.factories'])
         }
         var noClashes = true;
         for (var k = 0; k < group.length; k++) {
+          if (/-\d+/.test(group[k].user.uid) && /-\d+/.test(shuffled[j].user.uid)) {
+            noClashes = false;
+            break;
+          }
           if ($scope.pastPairs[group[k].user.uid]) {
             if ($scope.pastPairs[group[k].user.uid][shuffled[j].user.uid]) {
               noClashes = false;
@@ -347,6 +384,7 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
     $scope.partnerUp = true;
     swapLockedStusBack();
+    swapDucksToEnd();
     checkClashes();
     timeoutCounter = 0;
     $scope.loadingGroups = false;
@@ -362,9 +400,18 @@ angular.module('PU.poolPage', ['PU.factories'])
   var swapLockedStusBack = function() {
     for (var s in $scope.lockedStus) {
       var currGroup = $scope.lockedStus[s][0];
-      var currIndex = [currGroup, $scope.groups[currGroup].indexOf($scope.idMap[s])];
+      var currIndex = [currGroup, indexOfUid($scope.groups[currGroup], s)];
       swapStus(currIndex, $scope.lockedStus[s]);
     }
+  };
+
+  var indexOfUid = function(arr, uid) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i].user.uid === uid) {
+        return i;
+      }
+    }
+    return -1;
   };
 
   /**
@@ -379,7 +426,7 @@ angular.module('PU.poolPage', ['PU.factories'])
       return true;
     }
     var search = $scope.stuSearch.toLowerCase();
-    return group.filter(stu => $scope.idMap[stu].user.name.toLowerCase().includes(search)).length;
+    return group.filter(stu => $scope.studentLookupById(stu).user.name.toLowerCase().includes(search)).length;
   };
 
   /**

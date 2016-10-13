@@ -33,14 +33,14 @@
     <h3 class="groupingTitle">{{grouping.generationData.title}}</h3>
     <div unselectable="on" class="groupingUsers unselectable" id="groupingUsers">
       <div class="grp" ng-repeat='grp in grouping.groups | filter : filterGroupsByName'>
-        <div class="partner" ng-repeat='partner in grp' ng-click="goToHistory(idMap[partner])" ng-mouseover="idMap[partner].showHist = true; grp.showHist = true" ng-mouseleave="idMap[partner].showHist = false; grp.showHist = false;">
-          <img class="portrait" src='{{idMap[partner].user.avatar_url}}'>
-          <!-- {{idMap[partner].user.name}} -->
-          <label class="tooltip clickable" ng-show="idMap[partner].showHist && grp.showHist" >
-          <!-- ng-show="idMap[partner].showHist && !stuView" -->
+        <div class="partner" ng-repeat='partner in grp' ng-click="goToHistory(studentLookupById(partner))" ng-mouseover="studentLookupById(partner).showHist = true; grp.showHist = true" ng-mouseleave="studentLookupById(partner).showHist = false; grp.showHist = false;">
+          <img class="portrait" src='{{studentLookupById(partner).user.avatar_url}}'>
+          <!-- {{studentLookupById(partner).user.name}} -->
+          <label class="tooltip clickable" ng-show="studentLookupById(partner).showHist && grp.showHist" >
+          <!-- ng-show="studentLookupById(partner).showHist && !stuView" -->
           Click to see student's history
           </label>
-          <div class="partnerName">{{idMap[partner].user.name}}</div>
+          <div class="partnerName">{{studentLookupById(partner).user.name}}</div>
         </div>
       </div>
     </div>
