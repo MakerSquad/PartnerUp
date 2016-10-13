@@ -207,6 +207,14 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
   };
 
+  /**
+  * studentLookupById uses $scope.idMap to map a student uid to the whole
+  * student object. The function is needed to detect Rubber Ducks, which are
+  * not stored directly in $scope.idMap
+  * @param {string} uid : The uid of the user to look up
+  * @return The student object who carries the uid
+  */
+
   $scope.studentLookupById = function(uid) {
     if (/-\d+/.test(uid)) {
       return {user: {name: "Rubber Duck Debugger", uid: uid, avatar_url: '../../assets/rubberducky.png'}};
@@ -253,17 +261,22 @@ angular.module('PU.poolPage', ['PU.factories'])
 
     swapLockedStusBack();
     checkClashes();
+    distributeDucks();
     $scope.partnerUp = true;
     $scope.loadingGroups = false;
     return $scope.groups;
   };
 
+  /**
+  * swapDucksToEnd is a helper function for the randomize functions
+  * swapDucksToEnd iterates through $scope.groups and moves all instances of Rubber Ducks
+  * to the end of the groups (locked students at the end of groups are left in place)
+  */
+
   var swapDucksToEnd = function() {
     for (var i = 0; i < $scope.groups.length; i++) {
-      var duckCount = 0; // count the number of ducks in a group
       for (var j = 0; j < $scope.groups[i].length; j++) {
         if (/-\d+/.test($scope.groups[i][j].user.uid)) {
-          duckCount += 1;
           var toSwapInd = $scope.groups[i].length - 1;
           var toSwap = $scope.groups[i][toSwapInd];
           while ($scope.lockedStus[toSwap.user.uid] ||
@@ -276,7 +289,49 @@ angular.module('PU.poolPage', ['PU.factories'])
           }
         }
       }
-      $scope.groups[i].duckCount = duckCount;
+    }
+  };
+
+  /**
+  * distributeDucks is a helper function to trueRandomize that
+  * swaps ducks to the end of the groups, then makes sure there are no groups
+  * with more than 1 rubber duck debugger
+  */
+
+  var distributeDucks = function() {
+    swapDucksToEnd();
+    var duckCount = [];
+    var zeros = [];
+    var overDucked = [];
+    for (var i = 0; i < $scope.groups.length; i++) {
+      duckCount[i] = 0;
+      for (var j = 0; j < $scope.groups[i].length; j++) {
+        if (/-\d+/.test($scope.groups[i][j].user.uid)) {
+          duckCount[i] += 1;
+          if (duckCount[i] > 1) {
+            overDucked.push(i);
+          }
+        }
+      }
+      if (duckCount[i] === 0) {
+        zeros.push(i);
+      }
+    }
+    for (var d = 0; d < duckCount.length; d++) {
+      if (duckCount[d] > 1) {
+        var indexOfDuck = 0;
+        while (!/-\d+/.test($scope.groups[d][indexOfDuck].user.uid)) {
+          indexOfDuck += 1; //  find first index of duck
+        }
+        var zeroIndex = zeros.pop();
+        var studentToSwapIndex = $scope.groups[zeroIndex].length - 1;
+        while ($scope.lockedStus[$scope.groups[zeroIndex][studentToSwapIndex].user.uid]) {
+          studentToSwapIndex -= 1; // find last index of unlocked student
+        }
+        swapStus([d, indexOfDuck], [zeroIndex, studentToSwapIndex]);
+        duckCount[d] -= 1;
+        d -= 1;
+      }
     }
   };
 
@@ -404,6 +459,15 @@ angular.module('PU.poolPage', ['PU.factories'])
       swapStus(currIndex, $scope.lockedStus[s]);
     }
   };
+
+  /**
+  * IndexOfUid takes in a group of students and a uid, then finds the index
+  * of the student object that carries that uid in the group
+  * This function is necessary because of complications with indexOf and object equality
+  * @param {array} arr : the group to search through
+  * @param {string} uid : the uid to look up
+  * @return {int} the index of the student within that array
+  */
 
   var indexOfUid = function(arr, uid) {
     for (var i = 0; i < arr.length; i++) {
