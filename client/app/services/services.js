@@ -209,6 +209,16 @@ angular.module('PU.factories', [])
     .catch(err => Promise.reject(err.statusText));
   };
 
+  var updateRoles = function(poolId, updatedMembers) {
+    return $http({
+      method: 'PUT',
+      url: `/${poolId}/members`,
+      data: {members: updatedMembers}
+    })
+    .then(resp => resp.data)
+    .catch(err => Promise.reject(err.statusText));
+  };
+
   return {
     getUserHistory: getUserHistory,
     getClasses: getClasses,
@@ -223,6 +233,7 @@ angular.module('PU.factories', [])
     getPool: getPool,
     deletePool: deletePool,
     deleteAGrouping: deleteAGrouping,
-    canCreate: canCreate
+    canCreate: canCreate,
+    updateRoles: updateRoles
   };
 });

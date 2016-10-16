@@ -10,10 +10,10 @@
       </h3>
     </div>
     <div class="homeRoles">
-      <div class="admin homeRole" ng-if="pool.role === 'fellow' || pool.role === 'instructor' || pool.role === 'memberAdmin'">
+      <div class="admin homeRole" ng-if="pool.role === 'fellow' || pool.role === 'instructor' || pool.role === 'memberAdmin' || pool.role === 'inactiveMA'">
         admin
       </div>
-      <div class="member homeRole" ng-if="pool.role==='student' || pool.role === 'memberAdmin'">member</div>
+      <div class="member homeRole" ng-if="pool.role==='student' || pool.role === 'memberAdmin' || pool.role === 'inactiveStu' || pool.role === 'inactiveMA'">member</div>
     </div>
   </div>
   <h3 class='noPools' ng-show="!pools.length && !loading">You have no open pools. Go create one now!</h3>

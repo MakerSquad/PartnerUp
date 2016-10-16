@@ -68,6 +68,27 @@
   border: 1px solid #CCC;
 }
 
+.currentStus{
+  margin-left: auto;
+  margin-right: auto;
+  width: 55%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.editPage{
+  text-align: center;
+}
+
+.editStu{
+  flex: 1;
+  display: flex;
+  min-width: 250px;
+  height: 40px;
+  margin: 5px;
+  padding: 5px;
+}
+
 .partner{
   flex: 1;
   display: flex;
@@ -103,6 +124,13 @@
 .partnerName{
   flex: 10;
 }
+
+.removeBtn{
+  float:right;
+  max-height: 15px;
+  max-width: 15px;
+  padding: 2px !important;
+}
 .lockBtn{
   /*flex: none !important;*/
   /*display: block !important;*/
@@ -111,7 +139,11 @@
   max-height: 15px;
   cursor: pointer;
   max-width: 15px;
-  margin-left: 10%;
+  margin-left: 5%;
+}
+
+.edit{
+  margin-bottom: 2%;
 }
 
 .selectedStu{

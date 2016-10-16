@@ -396,6 +396,22 @@ app.get('/user/:uid', (req, res) => {
   }).catch(err => res.status(401).send(String(err)));
 });
 
+app.put('/:groupId/members', (req, res) => {
+  db.authenticate(req.cookies.token)
+  .then(uid => {
+    db.updateMemberRoles(req.params.groupId, req.body.members)
+    .then(resp => {
+      res.status(204).send(resp);
+    })
+    .catch(err => {
+      res.status(500).send("Error updating: ", err);
+    });
+  })
+  .catch(err => {
+    res.status(500).send(String(err));
+  });
+});
+
 var port = process.env.PORT || 4000;
 app.listen(port);
 console.log('listening on port ' + port);

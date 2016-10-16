@@ -235,6 +235,25 @@ knex.addGroup = (group, creator) => {
   }); // throw error if something went horribly wrong
 };
 
+knex.updateMemberRoles = (groupId, members) => {
+  console.log("Updating: ", members);
+  var updates = [];
+  for (let i = 0; i < members.length; i++) {
+    updates.push(knex('group_membership').where('user_uid', members[i].user_uid)
+      .andWhere('group_id', groupId).update({role: members[i].role})
+      .then(res => {
+        console.log(`Update for ${members[i].user.name} successful`);
+      })
+      .catch(err => {
+        console.log("Error updating: ", err);
+      }));
+  }
+  return Promise.all(updates)
+  .then(data => data)
+  .catch(err => {
+    console.log("Error in promise.all: ", err);
+  });
+};
 /**
   checks if student and if so checks if user can create table
   change maxForStudent for how many groups a student can create

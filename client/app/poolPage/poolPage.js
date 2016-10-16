@@ -23,6 +23,7 @@ angular.module('PU.poolPage', ['PU.factories'])
   var groupSize = 2;
   var timeoutCounter = 0;
   var timeoutThreshold = 4000;
+  $scope.editing = false;
 
   /**
   * The init function sets up the page, loading all the necessary data from the back end
@@ -50,7 +51,7 @@ angular.module('PU.poolPage', ['PU.factories'])
         .then(function(members) {
           var partOfGroup = false;
           for (var i = 0; i < members.length; i++) {
-            if (members[i].role === 'student') {
+            if (members[i].role === 'student' || members[i].role === 'inactiveStu') {
               if (members[i].user.uid === $scope.currentUser.uid) {
                 $scope.stuView = true;
                 partOfGroup = true;
@@ -61,7 +62,7 @@ angular.module('PU.poolPage', ['PU.factories'])
               if (members[i].user.uid === $scope.currentUser.uid) {
                 partOfGroup = true;
               }
-            } else if (members[i].role === 'memberAdmin') {
+            } else if (members[i].role === 'memberAdmin' || members[i].role === "inactiveMA") {
               $scope.students.push(members[i]);
               $scope.admins.push(members[i]);
               if (members[i].user.uid === $scope.currentUser.uid) {
@@ -229,20 +230,23 @@ angular.module('PU.poolPage', ['PU.factories'])
   */
 
   $scope.trueRandomize = function() {
-    for (var i = 0; i < $scope.groups.length; i++) {
+    $scope.groups = [];
+    for (var i = 0; i < Math.ceil($scope.students.length / groupSize); i++) {
       $scope.groups[i] = [];
     }
     for (var s in $scope.lockedStus) {
       $scope.groups[$scope.lockedStus[s][0]].push($scope.studentLookupById(s));
     }
     var stus = $scope.students.slice();
+    stus = stus.filter(function(stu) {
+      return stu.role !== "inactiveStu" && stu.role !== "inactiveMA"; // don't shuffle inactive students
+    });
     for (var d = 0; d < stus.length % groupSize; d++) {
       stus.push({user: {name: "Rubber Duck Debugger", uid: "-" + d, avatar_url: '../../assets/rubberducky.png'}}); //  give them decrementing ids
     }
     stus = stus.filter(function(stu) {
-      return !$scope.lockedStus[stu.user.uid]; // don't shuffle the locked students
+      return !$scope.lockedStus[stu.user.uid]; // don't shuffle locked students
     });
-
     var shuffled = [];
 
     while (stus.length) {
@@ -258,13 +262,17 @@ angular.module('PU.poolPage', ['PU.factories'])
       }
       currGroupInd += 1;
     }
-
+    removeEmptyGroups();
     swapLockedStusBack();
     checkClashes();
     distributeDucks();
     $scope.partnerUp = true;
     $scope.loadingGroups = false;
     return $scope.groups;
+  };
+
+  var removeEmptyGroups = function() {
+    return $scope.groups.filter(grp => grp.length > 0);
   };
 
   /**
@@ -343,6 +351,7 @@ angular.module('PU.poolPage', ['PU.factories'])
   */
 
   $scope.randomize = function() {
+    $scope.groups = [];
     $scope.loadingGroups = true;
     if (!groupSize) {
       groupSize = 2; // default group size to 2
@@ -372,12 +381,16 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
     var stus = $scope.students.slice();
 
+    stus = stus.filter(function(stu) {
+      return stu.role !== "inactiveStu" && stu.role !== "inactiveMA"; // remove inactive students
+    });
+
     for (var d = 0; d < stus.length % groupSize; d++) {
       stus.push({user: {name: "Rubber Duck Debugger", uid: "-" + d, avatar_url: '../../assets/rubberducky.png'}}); //  give them decrementing ids
     }
 
     stus = stus.filter(function(stu) {
-      return !$scope.lockedStus[stu.user.uid]; // don't shuffle the locked students
+      return !$scope.lockedStus[stu.user.uid]; // don't shuffle locked students
     });
 
     var shuffled = [];
@@ -438,6 +451,7 @@ angular.module('PU.poolPage', ['PU.factories'])
       }
     }
     $scope.partnerUp = true;
+    removeEmptyGroups();
     swapLockedStusBack();
     swapDucksToEnd();
     checkClashes();
@@ -544,6 +558,11 @@ angular.module('PU.poolPage', ['PU.factories'])
 
   var alphabetizeGroups = function() {
     for (var i = 0; i < $scope.groups.length; i++) {
+      if (!$scope.groups[i].length) {
+        $scope.groups.splice(i, 1); //  remove any empty arrays
+        i -= 1;
+        continue;
+      }
       $scope.groups[i].sort(function(a, b) {
         if (/-\d+/.test(a.user.uid)) { //  rubber duck
           return 1;
@@ -578,8 +597,8 @@ angular.module('PU.poolPage', ['PU.factories'])
 
   $scope.finalize = function() {
     $scope.loading = true;
-    alphabetizeGroups();
     if ($scope.groupingName && $scope.groupingName.length) {
+      alphabetizeGroups();
       $scope.creatingGrouping = false;
       var newPairs = [];
       for (var i = 0; i < $scope.groups.length; i++) {
@@ -764,6 +783,47 @@ angular.module('PU.poolPage', ['PU.factories'])
         alert(`Whoops, looks like this pool is being difficult and doesn't want to leave.\n
         Here's what it told us:\n${err}`);
       });
+    }
+  };
+
+  $scope.editStudents = function() {
+    $scope.editing = true;
+    $scope.edited = {};
+  };
+
+  $scope.closeEdit = function() {
+    if (!Object.keys($scope.edited).length) {
+      $scope.editing = false;
+      return;
+    }
+    if (!$scope.students.filter(stu => stu.role === "student" || stu.role === "memberAdmin").length) {
+      alert("Sorry, but the pool needs to have at least one student");
+      return;
+    }
+    $scope.lockedStus = {};
+    $scope.randomize();
+    var updatedStus = [];
+    for (let i in $scope.edited) {
+      updatedStus.push($scope.studentLookupById(i));
+    }
+    DB.updateRoles($routeParams.poolId, updatedStus)
+    .then(() => {
+      $scope.editing = false;
+    })
+    .catch(err => {
+      console.error("Error updating roles: ", err);
+      $scope.editing = false;
+    });
+  };
+
+  $scope.toggleRemoved = function(stu) {
+    stu.role = stu.role === "student" ? "inactiveStu" :
+    stu.role === "memberAdmin" ? "inactiveMA" :
+    stu.role === "inactiveStu" ? "student" : "memberAdmin";
+    if ($scope.edited[stu.user.uid]) {
+      delete $scope.edited[stu.user.uid];
+    } else {
+      $scope.edited[stu.user.uid] = true;
     }
   };
 });
