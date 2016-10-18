@@ -20,7 +20,7 @@ angular.module('PU.poolPage', ['PU.factories'])
   $scope.idMap = {};
   $scope.alreadyFailed = false;
   $scope.error = "";
-  var groupSize = 2;
+  $scope.groupSize = 2;
   var timeoutCounter = 0;
   var timeoutThreshold = 4000;
   $scope.editing = false;
@@ -46,7 +46,7 @@ angular.module('PU.poolPage', ['PU.factories'])
           return;
         }
         $scope.currPool = poolInfo;
-        groupSize = poolInfo.group_size;
+        $scope.groupSize = poolInfo.group_size;
         DB.getMemberships(poolInfo)
         .then(function(members) {
           var partOfGroup = false;
@@ -197,6 +197,16 @@ angular.module('PU.poolPage', ['PU.factories'])
     return arr;
   };
 
+  $scope.groupSizeString = function(gs) {
+    gs = Number(gs);
+    var stus = $scope.students.filter(s => s.role === 'student' || s.role === "memberAdmin");
+    var numGroups = Math.ceil(stus.length / gs);
+    numGroups += numGroups === 1 ? " group" : " groups";
+    var remainder = stus.length % gs;
+    var size = remainder ? `${gs - 1}-${gs}` : `${gs}`;
+    return `${numGroups} of ${size}`;
+  };
+
   /**
   * makeMap generates an object that maps student uids to the full student objects.
   * This map is used to quickly lookup the students in the cases where we only have ids
@@ -231,7 +241,7 @@ angular.module('PU.poolPage', ['PU.factories'])
 
   $scope.trueRandomize = function() {
     $scope.groups = [];
-    for (var i = 0; i < Math.ceil($scope.students.length / groupSize); i++) {
+    for (var i = 0; i < Math.ceil($scope.students.length / $scope.groupSize); i++) {
       $scope.groups[i] = [];
     }
     for (var s in $scope.lockedStus) {
@@ -241,7 +251,7 @@ angular.module('PU.poolPage', ['PU.factories'])
     stus = stus.filter(function(stu) {
       return stu.role !== "inactiveStu" && stu.role !== "inactiveMA"; // don't shuffle inactive students
     });
-    for (var d = 0; d < stus.length % groupSize; d++) {
+    for (var d = 0; d < stus.length % $scope.groupSize; d++) {
       stus.push({user: {name: "Rubber Duck Debugger", uid: "-" + d, avatar_url: '../../assets/rubberducky.png'}}); //  give them decrementing ids
     }
     stus = stus.filter(function(stu) {
@@ -257,7 +267,7 @@ angular.module('PU.poolPage', ['PU.factories'])
     var currGroupInd = 0;
     while (shuffled.length) {
       var grp = $scope.groups[currGroupInd];
-      while (grp.length < groupSize) {
+      while (grp.length < $scope.groupSize) {
         grp.push(shuffled.splice(0, 1)[0]);
       }
       currGroupInd += 1;
@@ -353,15 +363,11 @@ angular.module('PU.poolPage', ['PU.factories'])
   $scope.randomize = function() {
     $scope.groups = [];
     $scope.loadingGroups = true;
-    if (!groupSize) {
-      groupSize = 2; // default group size to 2
+    if (!$scope.groupSize) {
+      $scope.groupSize = 2; // default group size to 2
     }
-    groupSize = Number(groupSize);
+    $scope.groupSize = Number($scope.groupSize);
     timeoutCounter += 1;
-
-    if ($scope.alreadyFailed) {
-      return $scope.trueRandomize();
-    }
 
     if (timeoutCounter > timeoutThreshold) {
       if (!$scope.alreadyFailed) {
@@ -373,7 +379,7 @@ angular.module('PU.poolPage', ['PU.factories'])
       return $scope.trueRandomize();
     }
 
-    for (var i = 0; i < Math.ceil($scope.students.length / groupSize); i++) {
+    for (var i = 0; i < Math.ceil($scope.students.length / $scope.groupSize); i++) {
       $scope.groups[i] = [];
     }
     for (var s in $scope.lockedStus) {
@@ -385,7 +391,7 @@ angular.module('PU.poolPage', ['PU.factories'])
       return stu.role !== "inactiveStu" && stu.role !== "inactiveMA"; // remove inactive students
     });
 
-    for (var d = 0; d < stus.length % groupSize; d++) {
+    for (var d = 0; d < stus.length % $scope.groupSize; d++) {
       stus.push({user: {name: "Rubber Duck Debugger", uid: "-" + d, avatar_url: '../../assets/rubberducky.png'}}); //  give them decrementing ids
     }
 
@@ -412,7 +418,7 @@ angular.module('PU.poolPage', ['PU.factories'])
       var failed = true;
       for (var j = start; j < shuffled.length; j++) {
         failed = true;
-        if (group.length === groupSize) {
+        if (group.length === $scope.groupSize) {
           failed = false;
           currGroupInd += 1;
           break;
@@ -437,7 +443,7 @@ angular.module('PU.poolPage', ['PU.factories'])
         } else {
           continue;
         }
-        if (group.length === groupSize) {
+        if (group.length === $scope.groupSize) {
           currGroupInd += 1;
           if (start) {
             shuffled.splice(0, 1);
@@ -447,7 +453,7 @@ angular.module('PU.poolPage', ['PU.factories'])
         }
       }
       if (failed) {
-        return $scope.randomize(groupSize);
+        return $scope.randomize($scope.groupSize);
       }
     }
     $scope.partnerUp = true;
@@ -616,7 +622,7 @@ angular.module('PU.poolPage', ['PU.factories'])
           }
         }
       }
-      DB.addPairs($scope.currPool, newPairs, $scope.groupingName, groupSize)
+      DB.addPairs($scope.currPool, newPairs, $scope.groupingName, $scope.groupSize)
       .then(function() {
         refreshGroupings()
         .then(function() {
@@ -636,7 +642,7 @@ angular.module('PU.poolPage', ['PU.factories'])
   * or unlocks the student, if they are already locked, by deleting their key in lockedStus.
   * The students are stored in lockedStus by their uids as a key, and as their current indices
   * as values, to allow them to stay in place when the groupings are re-rolled.
-  * If groupSize is set to 2, their current partner will be locked as well
+  * If $scope.groupSize is set to 2, their current partner will be locked as well
   * @param stu The student to lock in place
   */
 
@@ -646,13 +652,13 @@ angular.module('PU.poolPage', ['PU.factories'])
       if (index !== -1) {
         $scope.lockedStus[stu.user.uid] = index;
       }
-      if (groupSize === 2) {
+      if ($scope.groupSize === 2) {
         for (var i = 0; i < $scope.groups[index[0]].length; i++) {
           $scope.lockedStus[$scope.groups[index[0]][i].user.uid] = [index[0], i];
         }
       }
     } else {
-      if (groupSize === 2) {
+      if ($scope.groupSize === 2) {
         for (var j = 0; j < $scope.groups[index[0]].length; j++) {
           delete $scope.lockedStus[$scope.groups[index[0]][j].user.uid];
         }
@@ -792,6 +798,7 @@ angular.module('PU.poolPage', ['PU.factories'])
   };
 
   $scope.closeEdit = function() {
+    $scope.alreadyFailed = false;
     if (!Object.keys($scope.edited).length) {
       $scope.editing = false;
       return;
