@@ -400,6 +400,45 @@ knex.addPairs = (pairData, groupId) => {
 };
 
 /**
+* Function that edits the information of a generation
+* @param {int} groupId : The groupId of the generation
+* @param {int} genId : The id of the generation to edit
+* @param {string} genTitle : The new title of the generation
+* @param {int} groupSize : The new group size of the generation
+* @param {object[][]} pairs : The new pairs of the generation
+*/
+
+knex.editGeneration = (groupId, genId, genTitle, groupSize, pairs) => {
+  return knex('generations').where({group_id: groupId, id: genId})
+  .update({title: genTitle, group_size: groupSize})
+  .then(() => {
+    knex('pairs').where({gen_table_id: genId}).del()
+    .then(() => {
+      var rows = [];
+      // format it for batchInsert
+      for (let i = 0; i < pairs.length; i++) {
+        rows.push({ // row for batch insert
+          user1_uid: pairs[i][0], // user 1
+          user2_uid: pairs[i][1], // user 2
+          gen_table_id: genId // generation id on database
+        });
+      }
+      return knex.batchInsert('pairs', rows, pairs.length) // insert all the pairs into database for history
+      .then(e => ('pairs added')) // returns string for client that pair is added
+      .catch(err => {
+        throw new Error(`Failed to insert new pairs:\n${err}`);
+      });
+    })
+    .catch(err => {
+      throw new Error(`Failed to delete pairs:\n${err}`);
+    });
+  })
+  .catch(err => {
+    throw new Error(`Failed to update generation info:\n${err}`);
+  });
+};
+
+/**
   Private function (in db.js) to add generation when new group is created
   @access private
   @memberof database
@@ -416,32 +455,32 @@ knex.addPairs = (pairData, groupId) => {
 */
 function addGeneration(genData) {
   // test if SAME generation exist
-  return knex('generations').where({
-    group_id: genData.groupId,
-    title: genData.genTitle,
-    group_size: genData.groupSize
-  })
+  // return knex('generations').where({
+  //   group_id: genData.groupId,
+  //   title: genData.genTitle,
+  //   group_size: genData.groupSize
+  // })
+  // .returning('*')
+  // .then(exist => {
+  //   if (!exist.length) { // if array is empty
+  return knex('generations').where({group_id: genData.groupId})
   .returning('*')
-  .then(exist => {
-    if (!exist.length) { // if array is empty
-      return knex('generations').where({group_id: genData.groupId})
-      .returning('*')
-      .then(next => {
-        return knex('generations').insert({
-          group_id: genData.groupId, // adds the group
-          title: genData.genTitle, // adds the title
-          group_size: genData.groupSize// group size for better history
-        }).returning('id').then(id => id[0]);// returns the id
-      })
-      .catch(err => {
-        throw new Error(err + '\n unable to create new generation');
-      }); // throw error if something went horribly wrong
-    }
-    return exist[0].id; // if exist it will just return old generation id
+  .then(next => {
+    return knex('generations').insert({
+      group_id: genData.groupId, // adds the group
+      title: genData.genTitle, // adds the title
+      group_size: genData.groupSize// group size for better history
+    }).returning('id').then(id => id[0]);// returns the id
   })
   .catch(err => {
-    throw new Error(err + '\n parems aren\'t correct when calling addGeneration');
+    throw new Error(err + '\n unable to create new generation');
   }); // throw error if something went horribly wrong
+  //   }
+  //   return exist[0].id; // if exist it will just return old generation id
+  // })
+  // .catch(err => {
+  //   throw new Error(err + '\n parems aren\'t correct when calling addGeneration');
+  // }); // throw error if something went horribly wrong
 }
 
 /**

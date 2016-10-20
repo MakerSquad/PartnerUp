@@ -408,7 +408,23 @@ app.put('/:groupId/members', (req, res) => {
     });
   })
   .catch(err => {
-    res.status(500).send(String(err));
+    res.status(401).send(String(err));
+  });
+});
+
+app.put('/group/:groupId/:generationId', (req, res) => {
+  db.authenticate(req.cookies.token)
+  .then(uid => {
+    db.editGeneration(req.params.groupId, req.params.generationId, req.body.title, req.body.groupSize, req.body.pairs)
+    .then(resp => {
+      res.status(204).send(resp);
+    })
+    .catch(err => {
+      res.status(500).send("Error updating: ", err);
+    });
+  })
+  .catch(err => {
+    res.status(401).send(String(err));
   });
 });
 

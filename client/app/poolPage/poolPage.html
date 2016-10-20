@@ -9,7 +9,7 @@
   <br>
   <button class="partnerUpBtn" ng-hide="stuView || loading" ng-click="startNewGrouping()">{{creatingGrouping ? "Close" : "Organize New Grouping"}}</button>
   <div loading ng-show="loadingNewGrouping"></div>
-  <div class="newGrouping fade" ng-show="creatingGrouping && !loadingNewGrouping && !stuView">
+  <div id="newGrouping" class="newGrouping fade" ng-show="creatingGrouping && !loadingNewGrouping && !stuView">
     <input class="groupingName" ng-model="groupingName" maxlength="20" placeholder="Enter title">
     <button class="reroll" ng-click="randomize()">Re-roll</button>
     <div class="grpSizeSection">
@@ -53,6 +53,7 @@
           </div>
         </div>
       </div>
+      <button class="editGroupingBtn" ng-click="editGrouping(grouping)" ng-show="!stuView">Edit</button>
       <button class="trashButton" ng-click="deleteGrouping(grouping)" ng-show="!stuView"><img src="assets/oie_transparent.png" class="trash" ></button>
       <button class="clipyclip histclip" data-clipboard-target="#groupingUsers">copy me</button>
     </div>

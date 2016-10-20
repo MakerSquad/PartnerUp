@@ -1,6 +1,6 @@
 angular.module('PU.poolPage', ['PU.factories'])
 
-.controller('PoolPageController', function($scope, $routeParams, MakerPass, $location, $route, $http, DB, CurrentUser) {
+.controller('PoolPageController', function($scope, $routeParams, MakerPass, $location, $route, $http, DB, CurrentUser, $anchorScroll) {
   $scope.pastGroupings = [];
   $scope.currPool = {};
   $scope.pastPairs = {};
@@ -24,6 +24,7 @@ angular.module('PU.poolPage', ['PU.factories'])
   var timeoutCounter = 0;
   var timeoutThreshold = 4000;
   $scope.editing = false;
+  $scope.editedGrouping = null;
 
   /**
   * The init function sets up the page, loading all the necessary data from the back end
@@ -77,6 +78,7 @@ angular.module('PU.poolPage', ['PU.factories'])
           }
           refreshGroupings()
           .then(function() {
+            console.log("$scope.pastGroupings: ", $scope.pastGroupings);
             $scope.loading = false;
           })
           .catch(function(err) {
@@ -114,7 +116,9 @@ angular.module('PU.poolPage', ['PU.factories'])
   var refreshGroupings = function() {
     return DB.getPairs($scope.currPool)
     .then(function(groupings) {
-      $scope.pastGroupings = groupings.reverse();
+      $scope.pastGroupings = groupings.sort((a, b) => {
+        return b.generationData.created_at > a.generationData.created_at;
+      });
       for (var i = 0; i < $scope.pastGroupings.length; i++) {
         $scope.pastGroupings[i].groups = createGroupings($scope.pastGroupings[i].pairs);
         $scope.pastGroupings[i].pairs.forEach(function(pair) {
@@ -173,6 +177,7 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
     if ($scope.creatingGrouping) {
       $scope.creatingGrouping = false;
+      $scope.editedGrouping = null;
       return;
     }
     $scope.loadingNewGrouping = true;
@@ -622,14 +627,27 @@ angular.module('PU.poolPage', ['PU.factories'])
           }
         }
       }
-      DB.addPairs($scope.currPool, newPairs, $scope.groupingName, $scope.groupSize)
-      .then(function() {
-        refreshGroupings()
+      if (!$scope.editedGrouping) {
+        DB.addPairs($scope.currPool, newPairs, $scope.groupingName, $scope.groupSize)
         .then(function() {
-          $scope.alreadyFailed = false;
-          $scope.loading = false;
+          refreshGroupings()
+          .then(function() {
+            $scope.alreadyFailed = false;
+            $scope.loading = false;
+            $scope.editedGrouping = null;
+          });
         });
-      });
+      } else {
+        DB.editGrouping($scope.currPool, $scope.editedGrouping.id, newPairs, $scope.groupingName, $scope.groupSize)
+        .then(function() {
+          refreshGroupings()
+          .then(function() {
+            $scope.alreadyFailed = false;
+            $scope.editedGrouping = null;
+            $scope.loading = false;
+          });
+        });
+      }
       //  $scope.groupingName = "";
     } else {
       alert("Please enter a title for this class list");
@@ -712,7 +730,9 @@ angular.module('PU.poolPage', ['PU.factories'])
       $scope.selectedForSwap = null;
       $scope.selectedForSwapIndex = null;
     }
-    checkClashes();
+    if (!$scope.editedGrouping) {
+      checkClashes();
+    }
   };
 
   /**
@@ -778,6 +798,12 @@ angular.module('PU.poolPage', ['PU.factories'])
     $location.path(`/users/${user.user.uid}`);
   };
 
+  /**
+  * deletePool sends a request to the back end to delete the current pool
+  * The user is prompted to confirm the deletion before the request is sent
+  * After deletion, the user is redirected to the home page
+  */
+
   $scope.deletePool = function() {
     if (confirm("Are you sure you want to delete this pool? You can't get it back")) {
       DB.deletePool($routeParams.poolId)
@@ -792,10 +818,19 @@ angular.module('PU.poolPage', ['PU.factories'])
     }
   };
 
+  /**
+  * EditStudents hides the main poolPage and shows the editing page
+  */
+
   $scope.editStudents = function() {
     $scope.editing = true;
     $scope.edited = {};
   };
+
+  /**
+  * closeEdit hides the editing page and sends the requests to the back end to edit student roles
+  * closeEdit will call randomize if the student list has been updated
+  */
 
   $scope.closeEdit = function() {
     $scope.alreadyFailed = false;
@@ -823,6 +858,11 @@ angular.module('PU.poolPage', ['PU.factories'])
     });
   };
 
+  /**
+  * toggleRemoved toggles a student to the active or inactive state
+  * @param {object} stu : the student being toggled
+  */
+
   $scope.toggleRemoved = function(stu) {
     stu.role = stu.role === "student" ? "inactiveStu" :
     stu.role === "memberAdmin" ? "inactiveMA" :
@@ -832,5 +872,24 @@ angular.module('PU.poolPage', ['PU.factories'])
     } else {
       $scope.edited[stu.user.uid] = true;
     }
+  };
+
+  /**
+  * editGrouping opens the newGrouping section and sets its data to the group to edit
+  * @param {object} grouping : the grouping to edit
+  */
+
+  $scope.editGrouping = function(grouping) {
+    $scope.editedGrouping = {
+      title: grouping.generationData.title,
+      id: grouping.generationData.id,
+      pairs: grouping.pairs,
+      groupSize: grouping.generationData.group_size
+    };
+    $scope.groupSize = grouping.generationData.group_size;
+    $scope.groups = grouping.groups.map(grp => grp.map(stuId => $scope.studentLookupById(stuId)));
+    $scope.groupingName = grouping.generationData.title;
+    $scope.creatingGrouping = true;
+    $anchorScroll('newGrouping');
   };
 });

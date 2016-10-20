@@ -219,6 +219,20 @@ angular.module('PU.factories', [])
     .catch(err => Promise.reject(err.statusText));
   };
 
+  var editGrouping = function(pool, groupingId, pairs, title, groupSize) {
+    return $http({
+      method: "PUT",
+      url: `/group/${pool.id}/${groupingId}`,
+      data: {
+        title: title,
+        groupSize: groupSize,
+        pairs: pairs
+      }
+    })
+    .then(resp => resp.data)
+    .catch(err => Promise.reject(err.statusText));
+  };
+
   return {
     getUserHistory: getUserHistory,
     getClasses: getClasses,
@@ -234,6 +248,7 @@ angular.module('PU.factories', [])
     deletePool: deletePool,
     deleteAGrouping: deleteAGrouping,
     canCreate: canCreate,
-    updateRoles: updateRoles
+    updateRoles: updateRoles,
+    editGrouping: editGrouping
   };
 });
