@@ -8,7 +8,7 @@ By [MakerSquad](https://github.com/makersquad)
   - Instructors should have _full control_ over the groupings, able to manually move students around and overwrite the automated groupings any way they desire
   - Students should also be able to create groups for people in their classes for personal study sessions, hackathons, or even just recreational tournaments outside of programming
 
-PartnerUp is fully integrated with Hack Reactor's _MakerPass_, allowing for smooth implementation into the existing course administration and structure. Thus, in its current state, PartnerUp is not usable without a MakerPass account (although there is a neat demo you can play around with :slightly_smiling_face:)
+PartnerUp is fully integrated with Hack Reactor's _MakerPass_, allowing for smooth implementation into the existing course administration and structure. Thus, in its current state, PartnerUp is not usable without a MakerPass account (although there is a neat [demo](https://partnerup.herokuapp.com) you can play around with :slightly_smiling_face:)
 
 ## Setup
 To continue the development of PartnerUp, there are a few steps you'll need to take after cloning the repo:

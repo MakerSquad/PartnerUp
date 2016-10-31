@@ -10,7 +10,7 @@
   <button class="partnerUpBtn" ng-hide="stuView || loading" ng-click="startNewGrouping()">{{creatingGrouping ? "Close" : "Organize New Grouping"}}</button>
   <div loading ng-show="loadingNewGrouping"></div>
   <div id="newGrouping" class="newGrouping fade" ng-show="creatingGrouping && !loadingNewGrouping && !stuView">
-    <input class="groupingName" ng-model="groupingName" maxlength="20" placeholder="Enter title">
+    <input class="groupingName" ng-model="groupingName" placeholder="Enter title">
     <button class="reroll" ng-click="randomize()">Re-roll</button>
     <div class="grpSizeSection">
       <select class="grpSize" ng-model="groupSize" ng-change="randomize()">
