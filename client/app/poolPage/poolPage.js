@@ -843,9 +843,12 @@ angular.module('PU.poolPage', ['PU.factories'])
       return;
     }
     $scope.lockedStus = {};
-    $scope.randomize();
+    //  $scope.randomize();
     var updatedStus = [];
     for (let i in $scope.edited) {
+      let stu = $scope.studentLookupById(i);
+      let index = searchForSelected(stu);
+      $scope.groups[index[0]][index[1]] = {user: {name: "Rubber Duck Debugger", uid: "-100", avatar_url: '../../assets/rubberducky.png'}};
       updatedStus.push($scope.studentLookupById(i));
     }
     DB.updateRoles($routeParams.poolId, updatedStus)
